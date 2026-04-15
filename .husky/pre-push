@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+# 브랜치명 검증
+branch_name=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+if [ -z "$branch_name" ]; then
+  echo "브랜치명을 확인할 수 없어(pre-push: detached HEAD 등) 브랜치명 검증을 건너뜁니다."
+  exit 0
+fi
+
+# main, master 브랜치는 예외 처리 (메인 브랜치)
+if [ "$branch_name" = "main" ] || [ "$branch_name" = "master" ]; then
+  echo "✅ 메인 브랜치: $branch_name"
+  exit 0
+fi
+
+# 브랜치명 규칙: type/#이슈번호-설명
+pattern='^(feat|fix|hotfix|chore|docs|refactor|test)/#[0-9]+-[a-z0-9-]+$'
+
+if echo "$branch_name" | grep -Eq "$pattern"; then
+  echo "✅ 브랜치명이 규칙을 따릅니다: $branch_name"
+else
+  echo "❌ 브랜치명이 규칙을 따르지 않습니다."
+  echo ""
+  echo "올바른 브랜치명 형식 예시:"
+  echo "  - feat/#123-additem-route"
+  echo "  - fix/#210-price-parse-bug"
+  echo "  - refactor/#98-split-product-components"
+  echo ""
+  echo "현재 브랜치: $branch_name"
+  exit 1
+fi
