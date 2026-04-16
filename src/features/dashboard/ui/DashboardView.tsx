@@ -2,7 +2,6 @@
 
 import { useDashboard } from '../hooks/useDashboard';
 import { useJobPostings } from '../hooks/useJobPostings';
-import { JobFilterBar } from './JobFilterBar';
 import { JobListSection } from './JobListSection';
 import { MatchedJobsCard } from './MatchedJobsCard';
 import { PersonalitySummaryCard } from './PersonalitySummaryCard';
@@ -10,14 +9,7 @@ import { PersonalitySummaryCard } from './PersonalitySummaryCard';
 export function DashboardView() {
   const { childName, personalityAxes, personalitySummary, matchedJobs } =
     useDashboard();
-  const {
-    postings,
-    filters,
-    setFitFilter,
-    setWorkTypeFilter,
-    setLocationFilter,
-    toggleBookmark,
-  } = useJobPostings();
+  const { postings, toggleBookmark } = useJobPostings();
 
   return (
     <div className="py-10 md:py-16">
@@ -41,14 +33,6 @@ export function DashboardView() {
             맞춤 채용공고
           </h2>
           <div className="flex flex-col gap-5">
-            <JobFilterBar
-              fitFilter={filters.fitFilter}
-              workTypeFilter={filters.workTypeFilter}
-              locationFilter={filters.locationFilter}
-              onFitChange={setFitFilter}
-              onWorkTypeChange={setWorkTypeFilter}
-              onLocationChange={setLocationFilter}
-            />
             <JobListSection
               childName={childName}
               postings={postings}
