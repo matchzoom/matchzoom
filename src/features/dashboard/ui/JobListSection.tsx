@@ -46,7 +46,9 @@ export function JobListSection({
           <p className="text-[0.9375rem] font-semibold text-gray-700">
             조건에 맞는 채용공고가 없어요
           </p>
-          <p className="text-[0.875rem] text-gray-400">필터를 조정해 보세요</p>
+          <p className="text-[0.875rem] text-gray-400">
+            아직 등록된 채용공고가 없어요
+          </p>
         </div>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2" aria-label="채용공고 목록">
