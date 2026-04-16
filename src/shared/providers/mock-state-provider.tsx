@@ -42,7 +42,13 @@ const DARK_VARS: [string, string][] = [
 
 export function MockStateProvider({ children }: { children: React.ReactNode }) {
   const [userState, setUserState] = useState<UserState>('guest');
-  const [theme, setTheme] = useState<Theme>('light');
+  // 인라인 스크립트가 이미 html 클래스를 설정했으므로 DOM에서 읽어 초기값으로 사용
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'light';
+    return document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light';
+  });
 
   useEffect(() => {
     const root = document.documentElement;
@@ -55,6 +61,7 @@ export function MockStateProvider({ children }: { children: React.ReactNode }) {
       root.classList.remove('dark');
       root.classList.add('light');
     }
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {

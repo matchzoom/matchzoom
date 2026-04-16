@@ -16,7 +16,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className="light">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        {/* 테마 초기화: localStorage → 시스템 설정 순으로 결정. React 하이드레이션 전에 실행되어 FOUC 방지 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s||(d?'dark':'light');document.documentElement.classList.add(t)}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body>
         <a href="#main-content" className="skip-link">
           본문 바로가기
