@@ -165,6 +165,7 @@
 
 html {
   font-size: 16px; /* rem 기준 — 절대 변경 금지 */
+  scrollbar-gutter: stable;
 }
 
 body {

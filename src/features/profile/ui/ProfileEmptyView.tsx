@@ -4,8 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
+import { ProfileSidebar } from './ProfileSidebar';
+
+type ProfileTab = 'result' | 'scraps';
+
+const MOBILE_TABS: { tab: ProfileTab; label: string }[] = [
+  { tab: 'result', label: '내 검사 결과' },
+  { tab: 'scraps', label: '스크랩한 공고' },
+];
 
 export function ProfileEmptyView() {
+  const [activeTab, setActiveTab] = useState<ProfileTab>('result');
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   const handleWithdraw = () => {
@@ -18,55 +27,60 @@ export function ProfileEmptyView() {
       <div className="flex gap-8">
         {/* 데스크탑 사이드바 */}
         <div className="hidden w-[220px] shrink-0 md:block">
-          <nav
-            aria-label="프로필 메뉴"
-            className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
-          >
-            <ul role="list">
-              <li>
-                <Link
-                  href="/survey"
-                  className="transition-ui block cursor-pointer border-l-[3px] border-transparent px-4 py-3 text-[0.9375rem] font-normal text-gray-700 hover:bg-gray-100"
-                >
-                  검사 시작하기
-                </Link>
-              </li>
-            </ul>
-
-            <div className="border-t border-gray-200" />
-
-            <div className="px-4 py-3">
-              <button
-                type="button"
-                onClick={() => setShowWithdrawModal(true)}
-                className="transition-ui cursor-pointer text-[0.8125rem] font-normal text-gray-400 hover:text-error"
-              >
-                회원 탈퇴
-              </button>
-            </div>
-          </nav>
+          <ProfileSidebar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onWithdrawClick={() => setShowWithdrawModal(true)}
+          />
         </div>
 
         {/* 콘텐츠 영역 */}
         <div className="min-w-0 flex-1">
-          {/* 모바일 액션 */}
-          <div className="mb-6 flex items-center gap-4 md:hidden">
-            <Link
-              href="/survey"
-              className="transition-ui cursor-pointer text-[0.875rem] font-semibold text-primary hover:underline"
+          {/* 모바일 탭 */}
+          <div className="mb-6 md:hidden">
+            <div
+              role="tablist"
+              aria-label="프로필 탭"
+              className="flex border-b border-gray-200"
             >
-              검사 시작하기
-            </Link>
-            <span className="text-gray-200" aria-hidden="true">
-              |
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowWithdrawModal(true)}
-              className="transition-ui cursor-pointer text-[0.875rem] text-gray-400 hover:text-error"
-            >
-              회원 탈퇴
-            </button>
+              {MOBILE_TABS.map(({ tab, label }) => (
+                <button
+                  key={tab}
+                  role="tab"
+                  type="button"
+                  aria-selected={activeTab === tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={
+                    'transition-ui cursor-pointer px-4 py-3 text-[0.9375rem] font-semibold ' +
+                    (activeTab === tab
+                      ? 'border-b-2 border-primary text-primary'
+                      : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900')
+                  }
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* 모바일 액션 버튼 */}
+            <div className="mt-3 flex items-center gap-4">
+              <Link
+                href="/survey"
+                className="transition-ui cursor-pointer text-[0.875rem] font-semibold text-primary hover:underline"
+              >
+                검사 시작하기
+              </Link>
+              <span className="text-gray-200" aria-hidden="true">
+                |
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowWithdrawModal(true)}
+                className="transition-ui cursor-pointer text-[0.875rem] text-gray-400 hover:text-error"
+              >
+                회원 탈퇴
+              </button>
+            </div>
           </div>
 
           {/* 빈 상태 */}
