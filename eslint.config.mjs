@@ -6,6 +6,7 @@ import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import boundaries from 'eslint-plugin-boundaries';
 import globals from 'globals';
 
 export default [
@@ -31,6 +32,7 @@ export default [
       prettier,
       react,
       'react-hooks': reactHooks,
+      boundaries,
     },
     languageOptions: {
       parser: typescriptParser,
@@ -41,12 +43,19 @@ export default [
         project: './tsconfig.json',
       },
       globals: {
-        ...globals.browser, // fetch 등을 인식
-        ...globals.node, // process 등을 인식
+        ...globals.browser,
+        ...globals.node,
       },
     },
     settings: {
       react: { version: 'detect' },
+      'boundaries/elements': [
+        { type: 'app', pattern: 'src/app/**' },
+        { type: 'widgets', pattern: 'src/widgets/**' },
+        { type: 'features', pattern: 'src/features/**' },
+        { type: 'shared', pattern: 'src/shared/**' },
+      ],
+      'boundaries/ignore': ['**/*.test.*', '**/*.spec.*'],
     },
     rules: {
       'no-unused-vars': 'off',
@@ -60,6 +69,19 @@ export default [
         { argsIgnorePattern: '^_' },
       ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // FSD 단방향 의존성 규칙
+      'boundaries/dependencies': [
+        'error',
+        {
+          default: 'disallow',
+          rules: [
+            { from: 'app', allow: ['widgets', 'features', 'shared'] },
+            { from: 'widgets', allow: ['features', 'shared'] },
+            { from: 'features', allow: ['shared'] },
+            { from: 'shared', allow: [] },
+          ],
+        },
+      ],
     },
   },
 ];

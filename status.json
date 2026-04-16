@@ -1,0 +1,54 @@
+{
+  "project": "마주봄 (matchzoom)",
+  "version": "1.0.0",
+  "created_at": "2026-04-16T00:00:00Z",
+  "updated_at": "2026-04-16T00:00:00Z",
+  "current_phase": "phase-01-foundation.md",
+  "previous_phase": null,
+  "phase_status": "not_started",
+  "phase_started_at": null,
+  "completed_tasks": [],
+  "phases": {
+    "phase-01-foundation.md": {
+      "title": "Foundation — FSD 구조, 공통 타입, 환경 설정",
+      "status": "not_started",
+      "completed_at": null
+    },
+    "phase-02-supabase.md": {
+      "title": "Supabase API 레이어 — client.ts + raw fetch 함수",
+      "status": "not_started",
+      "completed_at": null
+    },
+    "phase-03-survey.md": {
+      "title": "/survey 라우트 — 검사 폼 + useState 상태 관리",
+      "status": "not_started",
+      "completed_at": null
+    },
+    "phase-04-dashboard.md": {
+      "title": "/ 대시보드 + /profile 라우트 — 결과 UI",
+      "status": "not_started",
+      "completed_at": null
+    },
+    "phase-05-ai-matching.md": {
+      "title": "AI 직종 매칭 — pgvector 유사도 + 채용공고 적합도",
+      "status": "not_started",
+      "completed_at": null
+    }
+  },
+  "meta": {
+    "tech_stack": [
+      "Next.js 16 App Router",
+      "TypeScript",
+      "TailwindCSS v4",
+      "TanStack Query v5",
+      "Zod v4",
+      "Supabase REST (no library)",
+      "Recharts",
+      "Vercel"
+    ],
+    "excluded": ["react-hook-form", "@supabase/supabase-js"],
+    "package_manager": "pnpm",
+    "path_alias": "@/* → ./src/*",
+    "architecture": "FSD (Feature-Sliced Design)"
+  }
+}
