@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Skill(keybindings-help)",
+      "Skill(update-config)",
+      "Bash(mkdir -p /Users/ahreum/Documents/myfolder/coding/마주봄/.claude/commands)",
+      "Bash(mkdir -p /Users/ahreum/Documents/myfolder/coding/마주봄/.claude/rules)"
+    ]
+  }
+}

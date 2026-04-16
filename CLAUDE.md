@@ -216,6 +216,27 @@ export const useBookmarkToggle = () => useMutation(...);
 
 ---
 
+## 12. PR 생성 절차
+
+**"PR 올려줘" 요청 시 반드시 `/ship` 커맨드를 실행한다.**
+
+```
+/ship [작업 내용 간단 설명 (선택)]
+```
+
+커맨드가 자동으로 처리하는 항목:
+
+1. 로컬 CI 검증 (`pnpm type-check` / `pnpm lint` / `pnpm build`) — 실패 시 즉시 수정
+2. GitHub 이슈 생성 (커밋 타입 기반 라벨 자동 선택)
+3. 커밋 (미커밋 변경사항이 있는 경우, conventional commits 형식)
+4. PR 생성 (`Closes #이슈번호` 자동 포함)
+5. 위키 작성 (`/tmp/matchzoom.wiki/` 에 직접 clone → 편집 → push)
+6. CI 모니터링 — 실패 시 오류 수정 후 재확인, 통과 시 완료 보고
+
+세부 동작은 `.claude/commands/ship.md` 참고.
+
+---
+
 ## 관련 문서
 
 - 기획: `docs/PRD.md`
