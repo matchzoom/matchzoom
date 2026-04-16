@@ -1,4 +1,4 @@
-PR을 생성하고 위키를 업데이트하는 전체 파이프라인을 실행한다.
+PR을 생성하고 작업 내용을 위키에 기록하는 전체 파이프라인을 실행한다.
 선택 인자 `$ARGUMENTS`가 있으면 이슈/PR 설명에 힌트로 활용한다.
 
 반드시 아래 6단계를 순서대로 완전히 이행한다. 어느 단계도 생략하지 않는다.
@@ -82,41 +82,38 @@ EOF
 
 ## Step 5 — 위키 작성
 
+작업 내용을 위키에 기록한다. PR 메타데이터 페이지(PR #번호: 제목)가 아니라,
+**이번 작업으로 새로 생기거나 바뀐 내용**을 위키 문서에 직접 반영한다.
+
 ### 5-1. 위키 레포 준비
 
 ```bash
-# 이미 clone된 경우 pull, 없으면 clone
 if [ -d /tmp/matchzoom.wiki ]; then
-  cd /tmp/matchzoom.wiki && git pull
+  git -C /tmp/matchzoom.wiki pull
 else
   gh repo clone matchzoom/matchzoom.wiki /tmp/matchzoom.wiki
 fi
 ```
 
-### 5-2. 위키 페이지 작성
+### 5-2. 작업 내용 파악 후 위키 결정
 
-`git diff main..HEAD` 결과와 PR 정보를 바탕으로 위키 내용을 직접 작성한다.
-`.claude/rules/wiki-sync.md`의 섹션 구조 규칙을 반드시 따른다.
+`git diff main..HEAD`와 변경된 파일 목록을 분석해 어떤 위키 페이지를 써야 하는지 판단한다.
 
-Write 툴로 `/tmp/matchzoom.wiki/PR-{PR번호}-{제목}.md` 를 생성한다.
+**판단 기준:**
+- 기존 위키 페이지(`프로젝트-구조`, `하네스-구조`, `디자인-방식`, `퍼블-구현-방식`, `PR-방식`)와 관련 있으면 → 해당 페이지의 관련 섹션을 업데이트한다
+- 기존 페이지에 없는 새로운 기능/구조면 → 새 위키 페이지를 만든다 (파일명: `{주제}.md`)
+- 작업 범위가 여러 페이지에 걸치면 → 각 페이지를 모두 업데이트한다
 
-### 5-3. Home.md 업데이트
+**절대 하지 않는 것:**
+- `PR-{번호}-{제목}.md` 형식의 PR 전용 페이지 생성 금지
+- Home.md에 PR 이력 항목 추가 금지
 
-Edit 툴로 `/tmp/matchzoom.wiki/Home.md` 의 PR 목록 맨 위에 새 항목을 추가한다:
+### 5-3. 위키 내용 작성
 
-```
-- [PR #{번호}: {제목}](./PR-{번호}-{제목}) — YYYY-MM-DD
-```
+`.claude/rules/wiki-sync.md`의 섹션 규칙을 따라 내용을 작성한다.
+Edit 툴(기존 페이지 수정) 또는 Write 툴(신규 페이지 생성)을 사용한다.
 
-Home.md가 없으면 Write 툴로 새로 생성한다:
-
-```markdown
-# 마주봄 Wiki
-
-## PR 변경 이력
-
-- [PR #{번호}: {제목}](./PR-{번호}-{제목}) — YYYY-MM-DD
-```
+새 페이지를 만들었다면 `Home.md`의 "프로젝트 개요 문서" 목록에 항목을 추가한다.
 
 ### 5-4. 위키 push
 
@@ -125,8 +122,9 @@ cd /tmp/matchzoom.wiki
 git config user.name "aahreum"
 git config user.email "cocoding420@gmail.com"
 git add -A
-git commit -m "docs: PR #{번호} 위키 작성"
-git push
+git commit -m "docs: {작업 내용 한 줄 요약} 위키 반영"
+TOKEN=$(gh auth token)
+git push "https://${TOKEN}@github.com/matchzoom/matchzoom.wiki.git" HEAD:master
 ```
 
 ---
@@ -153,5 +151,4 @@ gh pr checks {PR번호} --watch
 
 - 생성된 이슈 번호 및 URL
 - 생성된 PR 번호 및 URL
-- 위키 페이지 URL (`https://github.com/matchzoom/matchzoom/wiki/PR-{번호}-{제목}`)
 - CI 통과 여부

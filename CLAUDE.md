@@ -230,7 +230,7 @@ export const useBookmarkToggle = () => useMutation(...);
 2. GitHub 이슈 생성 (커밋 타입 기반 라벨 자동 선택)
 3. 커밋 (미커밋 변경사항이 있는 경우, conventional commits 형식)
 4. PR 생성 (`Closes #이슈번호` 자동 포함)
-5. 위키 작성 (`/tmp/matchzoom.wiki/` 에 직접 clone → 편집 → push)
+5. 위키 작성 — 작업 내용을 기존 위키 페이지에 반영하거나 새 페이지 생성 후 push
 6. CI 모니터링 — 실패 시 오류 수정 후 재확인, 통과 시 완료 보고
 
 세부 동작은 `.claude/commands/ship.md` 참고.
