@@ -32,6 +32,7 @@
   --warning:     #B45309;
   --warning-bg:  #FEF3C7;
   --error:       #C81E1E;
+  --error-hover: #A81818;
   --error-bg:    #FDECEC;
   --info:        #1E5FB8;
   --info-bg:     #E7F0FB;
@@ -100,8 +101,9 @@
   --color-success-bg: var(--success-bg);
   --color-warning:    var(--warning);
   --color-warning-bg: var(--warning-bg);
-  --color-error:      var(--error);
-  --color-error-bg:   var(--error-bg);
+  --color-error:       var(--error);
+  --color-error-hover: var(--error-hover);
+  --color-error-bg:    var(--error-bg);
   --color-info:       var(--info);
   --color-info-bg:    var(--info-bg);
 
@@ -142,6 +144,14 @@ body {
 /* 숫자 tabular 정렬 (표·금액·통계) */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* UI 공통 트랜지션 — 색상 계열만 150ms ease (UI_guide 6장) */
+.transition-ui {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 }
 
 /* 스킵 링크 (접근성) */
