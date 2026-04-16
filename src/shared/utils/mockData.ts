@@ -4,10 +4,29 @@ import type {
   PersonalityAxis,
 } from '@/shared/types/job';
 import type { UserProfile } from '@/shared/types/user';
+import type { ChildProfile } from '@/shared/types/childProfile';
 
 export const MOCK_USER_PROFILE: UserProfile = {
   name: '민준',
   lastSurveyDate: '2026.04.10',
+};
+
+export const MOCK_CHILD_PROFILE: ChildProfile = {
+  name: '민준',
+  age: 17,
+  gender: '남성',
+  education: '특수학교 고등부 졸업',
+  region1: { city: '서울', district: '강남구' },
+  region2: { city: '서울', district: '마포구' },
+  barrierFree: true,
+  disabilityType: '지적장애',
+  disabilityGrade: '중등도',
+  mobility: '자유로움',
+  handUse: '세밀한 작업 가능',
+  stamina: '4시간 이상 활동 가능',
+  speaking: '일상 대화 가능',
+  instructionUnderstanding: '2단계 지시 이해',
+  preferredActivities: ['같은 일 반복하기', '손으로 만들기', '물건 정리·분류'],
 };
 
 export const MOCK_PERSONALITY_SUMMARY =

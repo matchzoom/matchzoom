@@ -1,0 +1,1 @@
+export { PersonalityRadarChart } from './PersonalityRadarChart';
