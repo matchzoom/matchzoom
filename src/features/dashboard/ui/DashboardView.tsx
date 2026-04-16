@@ -32,13 +32,11 @@ export function DashboardView() {
           <h2 id="job-postings-heading" className="sr-only">
             맞춤 채용공고
           </h2>
-          <div className="flex flex-col gap-5">
-            <JobListSection
-              childName={childName}
-              postings={postings}
-              onBookmarkToggle={toggleBookmark}
-            />
-          </div>
+          <JobListSection
+            childName={childName}
+            postings={postings}
+            onBookmarkToggle={toggleBookmark}
+          />
         </section>
       </div>
     </div>
