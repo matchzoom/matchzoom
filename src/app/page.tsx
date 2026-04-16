@@ -1,7 +1,37 @@
-export default function Home() {
+'use client';
+
+import { useMockState } from '@/shared/providers/mock-state-provider';
+import { DevStatePanel } from '@/shared/ui/DevStatePanel';
+import { DashboardView } from '@/features/dashboard';
+import {
+  HeroSection,
+  ServiceIntroSection,
+  TrustSection,
+  LandingBottomCta,
+} from '@/features/landing';
+
+function LandingView() {
+  const handleCtaClick = () => {
+    console.warn('[마주봄 목업] "검사 시작" CTA 클릭 → /survey로 이동 예정');
+  };
+
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-16 text-gray-500 md:px-5 lg:px-6">
-      랜딩 섹션은 다음 작업에서 추가됩니다.
-    </div>
+    <>
+      <HeroSection onCtaClick={handleCtaClick} />
+      <ServiceIntroSection />
+      <TrustSection />
+      <LandingBottomCta onCtaClick={handleCtaClick} />
+    </>
+  );
+}
+
+export default function Home() {
+  const { userState } = useMockState();
+
+  return (
+    <>
+      {userState === 'surveyed' ? <DashboardView /> : <LandingView />}
+      <DevStatePanel />
+    </>
   );
 }

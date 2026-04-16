@@ -1,0 +1,1 @@
+export { FitBadge } from './FitBadge';

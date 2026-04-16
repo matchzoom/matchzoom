@@ -1,4 +1,7 @@
 import { QueryProvider } from '@/shared/providers/query-provider';
+import { MockStateProvider } from '@/shared/providers/mock-state-provider';
+import { Header } from '@/widgets/header';
+import { Footer } from '@/widgets/footer';
 import './globals.css';
 
 export const metadata = {
@@ -19,7 +22,11 @@ export default function RootLayout({
           본문 바로가기
         </a>
         <QueryProvider>
-          <main id="main-content">{children}</main>
+          <MockStateProvider>
+            <Header />
+            <main id="main-content">{children}</main>
+            <Footer />
+          </MockStateProvider>
         </QueryProvider>
       </body>
     </html>
