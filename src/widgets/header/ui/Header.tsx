@@ -9,7 +9,6 @@ import { Button } from '@/shared/ui/Button';
 export function Header() {
   const { userState } = useMockState();
   const isLoggedIn = userState === 'loggedIn' || userState === 'surveyed';
-  const hasSurvey = userState === 'surveyed';
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -29,14 +28,6 @@ export function Header() {
 
         {isLoggedIn && (
           <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
-            {hasSurvey && (
-              <Link
-                href="/survey?mode=edit"
-                className="transition-ui inline-flex h-10 items-center justify-center rounded-md border border-transparent bg-transparent px-4 text-[0.9375rem] font-semibold text-gray-700 hover:bg-gray-100"
-              >
-                다시 검사하기
-              </Link>
-            )}
             <Link
               href="/profile"
               aria-label="프로필 페이지로 이동"
