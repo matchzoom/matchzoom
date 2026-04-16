@@ -40,7 +40,25 @@ gh issue create \
 
 ---
 
-## Step 3 — 커밋
+## Step 3 — 브랜치 생성 및 커밋
+
+### 3-1. 브랜치 생성 (절대 생략 불가)
+
+현재 브랜치가 `main`이면 **반드시** 작업 브랜치를 먼저 만든다.
+이 단계를 건너뛰면 PR 생성이 불가능하므로 절대 생략하지 않는다.
+
+```bash
+# 현재 브랜치 확인
+git branch --show-current
+
+# main이면 브랜치 생성 후 이동
+git checkout -b type/#이슈번호-short-description
+```
+
+브랜치 형식: `type/#이슈번호-short-description` (CLAUDE.md 7장 규칙 준수)
+예시: `chore/#26-fix-eslint`, `feat/#30-survey-form`, `fix/#28-button-style`
+
+### 3-2. 커밋
 
 - `git status`로 미커밋 변경사항이 있는지 확인한다.
 - 커밋되지 않은 변경사항이 있으면:
