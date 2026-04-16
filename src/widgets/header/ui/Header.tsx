@@ -1,14 +1,19 @@
-import Link from 'next/link';
-import { Menu } from 'lucide-react';
+'use client';
 
+import Link from 'next/link';
+import { User } from 'lucide-react';
+
+import { useMockState } from '@/shared/providers/mock-state-provider';
 import { Button } from '@/shared/ui/Button';
 
 export function Header() {
-  const isAuthed = false;
+  const { userState } = useMockState();
+  const isLoggedIn = userState === 'loggedIn' || userState === 'surveyed';
+  const hasSurvey = userState === 'surveyed';
 
   return (
     <header className="border-b border-gray-200 bg-white">
-      <div className="mx-auto flex h-[56px] max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
+      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
         <Link
           href="/"
           className="rounded-sm text-[1.125rem] font-bold leading-none text-gray-900"
@@ -16,22 +21,30 @@ export function Header() {
           마주봄
         </Link>
 
-        {!isAuthed && (
-          <>
-            <div className="hidden md:block">
-              <Button variant="secondary" size="md">
-                로그인
-              </Button>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="메뉴 열기"
-              className="md:hidden"
+        {!isLoggedIn && (
+          <Button variant="secondary" size="md">
+            로그인
+          </Button>
+        )}
+
+        {isLoggedIn && (
+          <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
+            {hasSurvey && (
+              <Link
+                href="/survey?mode=edit"
+                className="transition-ui inline-flex h-10 items-center justify-center rounded-md border border-transparent bg-transparent px-4 text-[0.9375rem] font-semibold text-gray-700 hover:bg-gray-100"
+              >
+                다시 검사하기
+              </Link>
+            )}
+            <Link
+              href="/profile"
+              aria-label="프로필 페이지로 이동"
+              className="transition-ui flex h-9 w-9 items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
             >
-              <Menu size={24} strokeWidth={1.5} aria-hidden="true" />
-            </Button>
-          </>
+              <User size={20} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+          </nav>
         )}
       </div>
     </header>
