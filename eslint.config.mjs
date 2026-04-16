@@ -16,6 +16,7 @@ export default [
       'out/**',
       'build/**',
       'next-env.d.ts',
+      'src/global.d.ts',
       'node_modules/**',
       'dist/**',
       '*.config.js',
@@ -41,6 +42,7 @@ export default [
         sourceType: 'module',
         ecmaFeatures: { jsx: true },
         project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
       },
       globals: {
         ...globals.browser,
