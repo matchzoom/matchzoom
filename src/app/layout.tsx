@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className="light">
       <body>
         <a href="#main-content" className="skip-link">
           본문 바로가기

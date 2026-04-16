@@ -6,6 +6,8 @@
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 
 :root {
+  color-scheme: light;
+
   /* Primary */
   --primary:          #4166E7;
   --primary-hover:    #3454D1;
@@ -44,32 +46,9 @@
   --text:    #111827;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.dark):not(.light) {
-    --white:   #1F2937;
-    --bg:      #0A0A0A;
-    --surface: #111827;
-    --border:  #374151;
-    --text:    #F9FAFB;
-
-    --gray-900: #F9FAFB;
-    --gray-700: #E5E7EB;
-    --gray-500: #9CA3AF;
-    --gray-400: #6B7280;
-    --gray-300: #4B5563;
-    --gray-200: #374151;
-    --gray-100: #1F2937;
-    --gray-50:  #111827;
-
-    --primary-bg:        #0F1A38;
-    --primary-tag:       #0F1A38;
-    --primary-bg-strong: #1A2A50;
-    --primary-border:    #2A3F7A;
-  }
-}
-
 /* 수동 다크 모드 (DevStatePanel 토글) */
 :root.dark {
+  color-scheme: dark;
   --white:   #1F2937;  /* bg-white 카드·패널 배경 */
   --bg:      #0A0A0A;
   --surface: #111827;

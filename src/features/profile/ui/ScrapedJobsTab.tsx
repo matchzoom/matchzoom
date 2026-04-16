@@ -30,7 +30,7 @@ export function ScrapedJobsTab({
           </p>
           <Link
             href="/"
-            className="transition-ui inline-flex h-10 items-center justify-center rounded-md border border-primary bg-white px-4 text-[0.9375rem] font-semibold text-primary hover:bg-primary-bg"
+            className="transition-ui inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-primary bg-white px-4 text-[0.9375rem] font-semibold text-primary hover:bg-primary-bg"
           >
             맞춤 공고 보러가기
           </Link>

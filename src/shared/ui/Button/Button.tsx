@@ -50,7 +50,7 @@ export function Button({
       aria-disabled={disabled || undefined}
       {...props}
       className={clsx(
-        'transition-ui inline-flex items-center justify-center gap-2 rounded-md text-[0.9375rem] font-semibold leading-none',
+        'transition-ui inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-[0.9375rem] font-semibold leading-none',
         'disabled:cursor-not-allowed',
         sizeClass[size],
         variantClass[variant],

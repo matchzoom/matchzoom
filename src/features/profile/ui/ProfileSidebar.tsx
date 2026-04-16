@@ -31,7 +31,7 @@ export function ProfileSidebar({
               onClick={() => onTabChange(tab)}
               aria-current={activeTab === tab ? 'page' : undefined}
               className={
-                'transition-ui w-full px-4 py-3 text-left text-[0.9375rem] ' +
+                'transition-ui w-full cursor-pointer px-4 py-3 text-left text-[0.9375rem] ' +
                 (activeTab === tab
                   ? 'border-l-[3px] border-primary bg-primary-bg font-semibold text-primary'
                   : 'border-l-[3px] border-transparent font-normal text-gray-700 hover:bg-gray-100')
@@ -49,7 +49,7 @@ export function ProfileSidebar({
         <li>
           <Link
             href="/survey?mode=edit"
-            className="transition-ui block border-l-[3px] border-transparent px-4 py-3 text-[0.9375rem] font-normal text-gray-700 hover:bg-gray-100"
+            className="transition-ui block cursor-pointer border-l-[3px] border-transparent px-4 py-3 text-[0.9375rem] font-normal text-gray-700 hover:bg-gray-100"
           >
             검사 내용 수정
           </Link>
@@ -62,7 +62,7 @@ export function ProfileSidebar({
         <button
           type="button"
           onClick={onWithdrawClick}
-          className="transition-ui text-[0.8125rem] font-normal text-gray-400 hover:text-error"
+          className="transition-ui cursor-pointer text-[0.8125rem] font-normal text-gray-400 hover:text-error"
         >
           회원 탈퇴
         </button>
