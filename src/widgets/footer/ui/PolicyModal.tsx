@@ -146,7 +146,7 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
             type="button"
             onClick={onClose}
             aria-label="모달 닫기"
-            className="transition-ui flex h-9 w-9 items-center justify-center rounded-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
           >
             <X size={20} strokeWidth={1.5} aria-hidden="true" />
           </button>

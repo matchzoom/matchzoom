@@ -26,7 +26,7 @@ export function ProfileEmptyView() {
               <li>
                 <Link
                   href="/survey"
-                  className="transition-ui block border-l-[3px] border-transparent px-4 py-3 text-[0.9375rem] font-normal text-gray-700 hover:bg-gray-100"
+                  className="transition-ui block cursor-pointer border-l-[3px] border-transparent px-4 py-3 text-[0.9375rem] font-normal text-gray-700 hover:bg-gray-100"
                 >
                   검사 시작하기
                 </Link>
@@ -39,7 +39,7 @@ export function ProfileEmptyView() {
               <button
                 type="button"
                 onClick={() => setShowWithdrawModal(true)}
-                className="transition-ui text-[0.8125rem] font-normal text-gray-400 hover:text-error"
+                className="transition-ui cursor-pointer text-[0.8125rem] font-normal text-gray-400 hover:text-error"
               >
                 회원 탈퇴
               </button>
@@ -53,7 +53,7 @@ export function ProfileEmptyView() {
           <div className="mb-6 flex items-center gap-4 md:hidden">
             <Link
               href="/survey"
-              className="transition-ui text-[0.875rem] font-semibold text-primary hover:underline"
+              className="transition-ui cursor-pointer text-[0.875rem] font-semibold text-primary hover:underline"
             >
               검사 시작하기
             </Link>
@@ -63,7 +63,7 @@ export function ProfileEmptyView() {
             <button
               type="button"
               onClick={() => setShowWithdrawModal(true)}
-              className="transition-ui text-[0.875rem] text-gray-400 hover:text-error"
+              className="transition-ui cursor-pointer text-[0.875rem] text-gray-400 hover:text-error"
             >
               회원 탈퇴
             </button>
@@ -81,7 +81,7 @@ export function ProfileEmptyView() {
             </div>
             <Link
               href="/survey"
-              className="transition-ui inline-flex h-12 items-center justify-center rounded-md bg-primary px-5 text-[0.9375rem] font-semibold text-white hover:bg-primary-hover"
+              className="transition-ui inline-flex h-12 cursor-pointer items-center justify-center rounded-md bg-primary px-5 text-[0.9375rem] font-semibold text-white hover:bg-primary-hover"
             >
               검사 시작하기
             </Link>

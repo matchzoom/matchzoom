@@ -95,7 +95,7 @@ export function ConfirmModal({
             type="button"
             onClick={onClose}
             aria-label="모달 닫기"
-            className="transition-ui -mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            className="transition-ui -mt-0.5 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
           >
             <X size={20} strokeWidth={1.5} aria-hidden="true" />
           </button>

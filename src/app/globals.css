@@ -44,8 +44,15 @@
   --text:    #111827;
 }
 
+/* 라이트 모드 명시 */
+:root.light {
+  color-scheme: light;
+}
+
+/* 시스템 다크모드 (JS 미적용 시 CSS 폴백) */
 @media (prefers-color-scheme: dark) {
   :root:not(.dark):not(.light) {
+    color-scheme: dark;
     --white:   #1F2937;
     --bg:      #0A0A0A;
     --surface: #111827;
@@ -68,8 +75,9 @@
   }
 }
 
-/* 수동 다크 모드 (DevStatePanel 토글) */
+/* 다크 모드 */
 :root.dark {
+  color-scheme: dark;
   --white:   #1F2937;  /* bg-white 카드·패널 배경 */
   --bg:      #0A0A0A;
   --surface: #111827;

@@ -1,31 +1,60 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Sun, Moon } from 'lucide-react';
 import clsx from 'clsx';
 
 import { useMockState } from '@/shared/providers/mock-state-provider';
 import type { UserState } from '@/shared/types/user';
 
-const STATES: { value: UserState; label: string; desc: string }[] = [
-  { value: 'guest', label: '비로그인', desc: '랜딩 화면 A' },
+type ScenarioEntry = {
+  userState: UserState;
+  pathname: string;
+  label: string;
+  desc: string;
+};
+
+const SCENARIOS: ScenarioEntry[] = [
+  { userState: 'guest', pathname: '/', label: '비로그인', desc: '랜딩 화면 A' },
   {
-    value: 'loggedIn',
+    userState: 'loggedIn',
+    pathname: '/',
     label: '로그인 (검사 전)',
     desc: '랜딩 화면 A (로그인됨)',
   },
-  { value: 'surveyed', label: '로그인 + 검사 완료', desc: '대시보드 화면 B' },
+  {
+    userState: 'surveyed',
+    pathname: '/',
+    label: '로그인 + 검사 완료',
+    desc: '대시보드 화면 B',
+  },
+  {
+    userState: 'loggedIn',
+    pathname: '/profile',
+    label: '프로필 (검사 전)',
+    desc: '/profile 검사 전',
+  },
+  {
+    userState: 'surveyed',
+    pathname: '/profile',
+    label: '프로필 (검사 완료)',
+    desc: '/profile 검사 완료',
+  },
 ];
 
 export function DevStatePanel() {
   const { userState, setUserState, theme, setTheme } = useMockState();
   const isDark = theme === 'dark';
   const router = useRouter();
+  const pathname = usePathname();
 
-  const goToProfile = (state: UserState) => {
-    setUserState(state);
-    router.push('/profile');
+  const activate = (scenario: ScenarioEntry) => {
+    setUserState(scenario.userState);
+    router.push(scenario.pathname);
   };
+
+  const isActive = (scenario: ScenarioEntry) =>
+    userState === scenario.userState && pathname === scenario.pathname;
 
   return (
     <div
@@ -38,53 +67,35 @@ export function DevStatePanel() {
         목업 상태 전환 (개발용)
       </p>
 
-      {/* 사용자 상태 버튼 */}
       <div className="flex flex-col gap-2">
-        {STATES.map(({ value, label, desc }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setUserState(value)}
-            className={clsx(
-              'transition-ui flex flex-col items-start rounded-md border px-3 py-2 text-left',
-              userState === value
-                ? 'border-primary bg-primary-bg text-primary'
-                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100',
-            )}
-          >
-            <span className="text-[0.8125rem] font-semibold leading-tight">
-              {label}
-            </span>
-            <span
+        {SCENARIOS.map((scenario) => {
+          const active = isActive(scenario);
+          return (
+            <button
+              key={`${scenario.userState}-${scenario.pathname}`}
+              type="button"
+              onClick={() => activate(scenario)}
               className={clsx(
-                'mt-0.5 text-[0.75rem]',
-                userState === value ? 'text-primary' : 'text-gray-400',
+                'transition-ui flex cursor-pointer flex-col items-start rounded-md border px-3 py-2 text-left',
+                active
+                  ? 'border-primary bg-primary-bg text-primary'
+                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100',
               )}
             >
-              {desc}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <div className="my-3 border-t border-gray-200" />
-
-      {/* 프로필 페이지 이동 */}
-      <div className="flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={() => goToProfile('loggedIn')}
-          className="transition-ui flex w-full items-center justify-center rounded-md border border-gray-200 bg-white px-3 py-2 text-[0.8125rem] font-semibold text-gray-700 hover:bg-gray-100"
-        >
-          프로필 (검사 전)
-        </button>
-        <button
-          type="button"
-          onClick={() => goToProfile('surveyed')}
-          className="transition-ui flex w-full items-center justify-center rounded-md border border-gray-200 bg-white px-3 py-2 text-[0.8125rem] font-semibold text-gray-700 hover:bg-gray-100"
-        >
-          프로필 (검사 완료)
-        </button>
+              <span className="text-[0.8125rem] font-semibold leading-tight">
+                {scenario.label}
+              </span>
+              <span
+                className={clsx(
+                  'mt-0.5 text-[0.75rem]',
+                  active ? 'text-primary' : 'text-gray-400',
+                )}
+              >
+                {scenario.desc}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="my-3 border-t border-gray-200" />
@@ -101,7 +112,7 @@ export function DevStatePanel() {
           aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
           className={clsx(
-            'relative h-6 w-11 shrink-0 rounded-[12px]',
+            'relative h-6 w-11 shrink-0 cursor-pointer rounded-[12px]',
             isDark ? 'bg-primary' : 'bg-gray-300',
           )}
           style={{ transition: 'background-color 150ms ease' }}

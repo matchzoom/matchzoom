@@ -29,7 +29,7 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
           onClick={() => onBookmarkToggle(job.id)}
           aria-label={job.bookmarked ? '북마크 해제' : '북마크 추가'}
           aria-pressed={job.bookmarked}
-          className="transition-ui mt-0.5 shrink-0 rounded-sm p-1 text-gray-400 hover:text-primary"
+          className="transition-ui mt-0.5 shrink-0 cursor-pointer rounded-sm p-1 text-gray-400 hover:text-primary"
         >
           {job.bookmarked ? (
             <BookmarkCheck

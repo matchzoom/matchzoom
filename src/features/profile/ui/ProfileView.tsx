@@ -64,7 +64,7 @@ export function ProfileView() {
                   aria-selected={activeTab === tab}
                   onClick={() => setActiveTab(tab)}
                   className={
-                    'transition-ui px-4 py-3 text-[0.9375rem] font-semibold ' +
+                    'transition-ui cursor-pointer px-4 py-3 text-[0.9375rem] font-semibold ' +
                     (activeTab === tab
                       ? 'border-b-2 border-primary text-primary'
                       : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900')
@@ -79,7 +79,7 @@ export function ProfileView() {
             <div className="mt-3 flex items-center gap-4">
               <Link
                 href="/survey?mode=edit"
-                className="transition-ui text-[0.875rem] font-semibold text-primary hover:underline"
+                className="transition-ui cursor-pointer text-[0.875rem] font-semibold text-primary hover:underline"
               >
                 검사 내용 수정
               </Link>
@@ -89,7 +89,7 @@ export function ProfileView() {
               <button
                 type="button"
                 onClick={() => setShowWithdrawModal(true)}
-                className="transition-ui text-[0.875rem] text-gray-400 hover:text-error"
+                className="transition-ui cursor-pointer text-[0.875rem] text-gray-400 hover:text-error"
               >
                 회원 탈퇴
               </button>

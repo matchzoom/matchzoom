@@ -22,7 +22,7 @@ function FilterGroup({ label, options, value, onChange }: FilterGroupProps) {
           onClick={() => onChange(option.value)}
           aria-pressed={value === option.value}
           className={clsx(
-            'transition-ui h-8 rounded-md border px-3 text-[0.8125rem] font-semibold',
+            'transition-ui h-8 cursor-pointer rounded-md border px-3 text-[0.8125rem] font-semibold',
             value === option.value
               ? 'border-primary bg-primary text-white'
               : 'border-gray-300 bg-white text-gray-700 hover:border-primary-border hover:bg-primary-bg',

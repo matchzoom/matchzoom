@@ -293,6 +293,16 @@ Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans
 - 마우스 위치 따라가는 그림자/그라데이션
 - 패럴랙스 스크롤
 
+### 커서 스타일
+
+| 상태 | cursor 값 | 적용 대상 |
+|---|---|---|
+| 기본 인터랙티브 | `pointer` | 버튼, 링크, 탭, 카드(클릭 가능), Pill 선택, 토글, 페이지네이션 등 클릭·탭 가능한 모든 요소 |
+| 비활성(disabled) | `not-allowed` | `disabled` 속성이 있거나 비활성 처리된 모든 인터랙티브 요소 |
+
+- `cursor: default`(기본 화살표)는 인터랙티브 요소에 사용 금지
+- `not-allowed`는 반드시 요소 자체에 직접 적용한다 (부모에 `pointer-events: none` 만 쓰면 커서가 바뀌지 않음)
+
 ### 상태 표현 원칙
 모든 상태(hover, active, focus, disabled)는 **색상 변화로만** 구분한다. 모양·크기·위치는 변하지 않는다.
 
@@ -413,3 +423,5 @@ UI 컴포넌트 또는 페이지 작성 후 반드시 확인:
 - [ ] 모달에 포커스 트랩·ESC 닫기가 구현됐는가
 - [ ] Skeleton 로딩 상태에 `aria-busy="true"`가 있는가
 - [ ] `prefers-reduced-motion` 처리가 됐는가
+- [ ] 클릭 가능한 모든 요소에 `cursor: pointer`가 적용됐는가
+- [ ] disabled 요소에 `cursor: not-allowed`가 적용됐는가
