@@ -45,12 +45,7 @@ export function Checkbox({
           className,
         )}
       >
-        <Check
-          size={16}
-          strokeWidth={2}
-          aria-hidden="true"
-          className="hidden group-has-[:checked]:block"
-        />
+        <Check size={16} strokeWidth={2} aria-hidden="true" className="block" />
         <input
           type="checkbox"
           id={inputId}
