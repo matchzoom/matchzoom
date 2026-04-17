@@ -8,18 +8,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'border border-transparent bg-primary text-white ' +
+          'border border-transparent bg-primary text-static-white ' +
           'hover:bg-primary-hover active:bg-primary-pressed ' +
           'disabled:bg-gray-200 disabled:text-gray-400',
         secondary:
-          'border border-primary bg-white text-primary ' +
+          'border border-primary-on-dark bg-white text-primary-on-dark ' +
           'hover:bg-primary-bg ' +
           'disabled:border-gray-200 disabled:bg-white disabled:text-gray-400',
         ghost:
           'border border-transparent bg-transparent text-gray-700 ' +
           'hover:bg-gray-100',
         destructive:
-          'border border-transparent bg-error text-white ' +
+          'border border-transparent bg-error text-static-white ' +
           'hover:bg-error-hover',
       },
       size: {
