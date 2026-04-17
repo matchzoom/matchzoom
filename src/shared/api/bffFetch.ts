@@ -46,12 +46,7 @@ export const bffFetch = async <T>(
     try {
       await refreshTokenInternal();
       return await coreFetch<T>(url, requestOptions, timeoutMs);
-    } catch (refreshError) {
-      if (isApiError(refreshError) && refreshError.status === 401) {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/';
-        }
-      }
+    } catch {
       throw err;
     }
   }

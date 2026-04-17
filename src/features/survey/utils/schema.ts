@@ -2,13 +2,6 @@ import { z } from 'zod';
 
 export const step1Schema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
-  age: z
-    .string()
-    .min(1, '만 나이를 입력해주세요')
-    .refine((v) => {
-      const n = Number(v);
-      return Number.isInteger(n) && n >= 1 && n <= 99;
-    }, '1~99 사이의 나이를 입력해주세요'),
   gender: z.string().min(1, '성별을 선택해주세요'),
   education: z.string().min(1, '최종학력을 선택해주세요'),
   region_primary_sido: z.string().min(1, '시·도를 선택해주세요'),

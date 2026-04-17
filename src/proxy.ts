@@ -3,7 +3,7 @@ import { verifySession } from '@/shared/utils/session';
 
 const PROTECTED = ['/profile', '/survey'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!PROTECTED.some((p) => pathname.startsWith(p))) {
