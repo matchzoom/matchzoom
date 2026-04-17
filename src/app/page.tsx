@@ -3,12 +3,7 @@
 import { useMockState } from '@/shared/providers/mock-state-provider';
 import { DevStatePanel } from '@/shared/ui/DevStatePanel';
 import { DashboardView } from '@/features/dashboard';
-import {
-  HeroSection,
-  ServiceIntroSection,
-  TrustSection,
-  LandingBottomCta,
-} from '@/features/landing';
+import { HeroSection, ServiceIntroSection } from '@/features/landing';
 
 function LandingView() {
   const handleCtaClick = () => {
@@ -19,8 +14,6 @@ function LandingView() {
     <>
       <HeroSection onCtaClick={handleCtaClick} />
       <ServiceIntroSection />
-      <TrustSection />
-      <LandingBottomCta onCtaClick={handleCtaClick} />
     </>
   );
 }

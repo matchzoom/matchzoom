@@ -100,6 +100,22 @@ export function DevStatePanel() {
 
       <div className="my-3 border-t border-gray-200" />
 
+      {/* 컴포넌트 쇼케이스 이동 */}
+      <button
+        type="button"
+        onClick={() => router.push('/dev/components')}
+        className={clsx(
+          'transition-ui flex w-full cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-[0.8125rem] font-semibold',
+          pathname === '/dev/components'
+            ? 'border-primary bg-primary-bg text-primary'
+            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100',
+        )}
+      >
+        컴포넌트 쇼케이스
+      </button>
+
+      <div className="my-3 border-t border-gray-200" />
+
       {/* 다크/라이트 모드 토글 */}
       <div className="flex items-center justify-between">
         <span className="text-[0.75rem] font-semibold text-gray-500">

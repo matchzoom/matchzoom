@@ -1,0 +1,1 @@
+export { AIResultCard } from './AIResultCard';
