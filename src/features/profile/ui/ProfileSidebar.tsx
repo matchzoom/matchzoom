@@ -1,11 +1,8 @@
-import Link from 'next/link';
-
 type ProfileTab = 'result' | 'scraps';
 
 type ProfileSidebarProps = {
   activeTab: ProfileTab;
   onTabChange: (tab: ProfileTab) => void;
-  onWithdrawClick: () => void;
 };
 
 const NAV_ITEMS: { tab: ProfileTab; label: string }[] = [
@@ -16,7 +13,6 @@ const NAV_ITEMS: { tab: ProfileTab; label: string }[] = [
 export function ProfileSidebar({
   activeTab,
   onTabChange,
-  onWithdrawClick,
 }: ProfileSidebarProps) {
   return (
     <nav
