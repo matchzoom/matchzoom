@@ -22,8 +22,10 @@
 | Framework       | Next.js 16 App Router            |
 | Language        | TypeScript (strict)              |
 | Styling         | TailwindCSS v4                   |
+| Component Base  | shadcn/ui 패턴 (cva + cn)        |
 | Data Fetching   | TanStack Query v5                |
 | Global State    | React Context / useState         |
+| Form            | react-hook-form + @hookform/resolvers |
 | Validation      | Zod v4                           |
 | Chart           | Recharts                         |
 | DB              | Supabase (PostgreSQL + pgvector) |
@@ -103,7 +105,6 @@ src/
 
 ## 6. 절대 금지 사항
 
-- `react-hook-form` 사용 금지 — 폼 상태는 `useState`
 - `@supabase/supabase-js` 설치 금지 — raw fetch만 사용
 - default export 금지 (`src/app/` 라우트 파일 제외)
 - 레이어 경계 역방향 참조 금지 (`shared`가 `features`를 import하는 것 등)
@@ -196,11 +197,10 @@ export const useBookmarkToggle = () => useMutation(...);
 
 ## 10. State Management
 
-<!-- TODO: 유저가 직접 작성 -->
-
 - 서버 상태: TanStack Query
 - UI/전역 상태: React Context
-- 폼 상태: useState
+- 폼 상태: react-hook-form (비제어)
+- 단순 로컬 UI 상태: useState
 
 ---
 
@@ -213,6 +213,56 @@ export const useBookmarkToggle = () => useMutation(...);
 3. CSS 변수 토큰만 사용한다 — 색상 하드코딩 절대 금지
 4. 아이콘은 `lucide-react`만 사용, 사이즈 16 / 20 / 24만 허용
 5. `forwardRef` 사용 금지 — React 19 방식으로 `ref`를 일반 prop으로 받는다
+
+### 컴포넌트 작성 패턴 (shadcn/ui 방식)
+
+모든 `shared/ui` 컴포넌트는 아래 패턴을 따른다.
+
+```ts
+// 1. cva로 variant 정의
+const componentVariants = cva('base-classes', {
+  variants: { variant: { ... }, size: { ... } },
+  defaultVariants: { variant: 'default', size: 'md' },
+});
+
+// 2. cn 유틸로 클래스 병합
+import { cn } from '@/shared/utils/cn';
+
+// 3. VariantProps 타입 합성
+type Props = HTMLAttributes<HTMLElement> & VariantProps<typeof componentVariants> & {
+  ref?: Ref<HTMLElement>;
+};
+
+// 4. 비제어 — 모든 네이티브 HTML 속성 그대로 전달
+export function Component({ variant, size, className, ref, ...props }: Props) {
+  return <element ref={ref} {...props} className={cn(componentVariants({ variant, size }), className)} />;
+}
+```
+
+### 폼 컴포넌트와 react-hook-form
+
+- `shared/ui` 폼 컴포넌트(Input, Checkbox, Radio)는 비제어로 작성 — `ref` prop 그대로 전달
+- 폼 로직은 `features/[x]/hooks/use[Feature]Form.ts`에서 `react-hook-form` 사용
+- Zod 스키마는 `features/[x]/utils/schema.ts`에 정의 후 `@hookform/resolvers/zod`로 연결
+
+```ts
+// features/survey/hooks/useSurveyForm.ts
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { SurveySchema } from '../utils/schema';
+
+export function useSurveyForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(SurveySchema),
+  });
+  return { register, handleSubmit, errors };
+}
+
+// features/survey/ui/SurveyForm.tsx
+const { register, handleSubmit, errors } = useSurveyForm();
+<Input {...register('name')} error={errors.name?.message} label="이름" required />
+<Checkbox {...register('agree')} error={errors.agree?.message} label="동의합니다" />
+```
 
 ---
 

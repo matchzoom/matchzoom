@@ -159,6 +159,26 @@ Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans
 | Ghost | bg transparent / text `--gray-700` | bg `--gray-100` | — | — | — |
 | Destructive | bg `--error` / text white | bg `#A81818` | — | — | — |
 
+### 컴포넌트 작성 기반 (shadcn/ui 패턴)
+
+모든 `shared/ui` 컴포넌트는 아래 3가지 원칙을 따른다.
+
+1. **cva (class-variance-authority)** — variant / size 분기
+2. **cn 유틸** (`@/shared/utils/cn`) — clsx + tailwind-merge 병합
+3. **비제어 (uncontrolled)** — `ref`를 일반 prop으로 받아 네이티브 요소에 전달
+
+react-hook-form `register()`가 반환하는 `{ ref, name, onChange, onBlur }`를 스프레드하면
+별도 래퍼 없이 즉시 연결된다.
+
+```ts
+// 사용 예
+<Input {...register('email')} error={errors.email?.message} label="이메일" required />
+<Checkbox {...register('agree')} error={errors.agree?.message} label="약관 동의" />
+<Radio {...register('gender')} value="male" label="남성" />
+```
+
+---
+
 ### 입력 필드 (Input / Select / Textarea)
 - 높이: Large `48px` / Medium `40px`
 - border: `1px solid --gray-300`
@@ -170,6 +190,30 @@ Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans
 - disabled: bg `--gray-100` / text `--gray-400`
 - 라벨: 필드 위 `14px / 600 / --gray-900`, margin-bottom `8px`
 - 필수 표시: 라벨 옆 `*` 색상 `--error`, `aria-required="true"`
+
+### 체크박스 (Checkbox)
+
+- 컨트롤 크기: `18×18px` / radius: `4px` (`--radius-sm`)
+- 비활성: border `1px solid --gray-300` / bg `--white`
+- 활성(checked): bg `--primary` / border `--primary` / 체크마크 white
+- 체크마크: CSS border 트릭 (rotate 45deg, border-right + border-bottom)
+- focus-visible: outline `2px solid --primary` / offset `2px`
+- disabled: bg `--gray-100` / border `--gray-300` / text `--gray-400`
+- error: border `--error` / checked 시 bg `--error`
+- 에러 메시지: `13px / --error`, `aria-live="polite"`
+- 구현: 네이티브 `<input type="checkbox">` sr-only + 시각적 span — `group-has-[:checked]` 패턴
+- 라벨: 체크박스 우측 `14px / 400 / --gray-900`, gap `8px`
+
+### 라디오 (Radio / RadioGroup)
+
+- 컨트롤 크기: `18×18px` / radius: `50%` (`rounded-full`)
+- 비활성: border `1px solid --gray-300` / bg `--white`
+- 활성(checked): border `--primary` / 내부 dot `8×8px bg --primary`
+- focus-visible: outline `2px solid --primary` / offset `2px`
+- disabled: bg `--gray-100` / border `--gray-300` / dot bg `--gray-400`
+- 구현: 네이티브 `<input type="radio">` sr-only + 시각적 span — `group-has-[:checked]` 패턴
+- 라벨: 라디오 우측 `14px / 400 / --gray-900`, gap `8px`
+- RadioGroup: `<fieldset>` + `<legend>` 사용, 에러는 `aria-live="polite"`
 
 ### Pill 선택 버튼
 - 높이: `40px` / 좌우 padding: `16px` / radius: `6px`
