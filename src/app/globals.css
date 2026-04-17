@@ -208,6 +208,11 @@ body {
     color 150ms ease;
 }
 
+/* cursor 유틸리티 — @layer utilities보다 cascade 우선순위가 높아야
+   브라우저 UA stylesheet을 확실히 덮어씌울 수 있다 */
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+
 /* 스킵 링크 (접근성) */
 .skip-link {
   position: absolute;
