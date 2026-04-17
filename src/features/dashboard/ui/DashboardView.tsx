@@ -3,8 +3,7 @@
 import { useDashboard } from '../hooks/useDashboard';
 import { useJobPostings } from '../hooks/useJobPostings';
 import { JobListSection } from './JobListSection';
-import { MatchedJobsCard } from './MatchedJobsCard';
-import { PersonalitySummaryCard } from './PersonalitySummaryCard';
+import { AIResultCard } from '@/shared/ui/AIResultCard';
 
 export function DashboardView() {
   const { childName, personalityAxes, personalitySummary, matchedJobs } =
@@ -18,14 +17,12 @@ export function DashboardView() {
           <h2 id="result-summary-heading" className="sr-only">
             검사 결과 요약
           </h2>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <PersonalitySummaryCard
-              childName={childName}
-              axes={personalityAxes}
-              summary={personalitySummary}
-            />
-            <MatchedJobsCard childName={childName} jobs={matchedJobs} />
-          </div>
+          <AIResultCard
+            childName={childName}
+            axes={personalityAxes}
+            summary={personalitySummary}
+            jobs={matchedJobs}
+          />
         </section>
 
         <section aria-labelledby="job-postings-heading">

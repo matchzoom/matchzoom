@@ -1,7 +1,8 @@
+import { Pencil } from 'lucide-react';
 import type { ChildProfile } from '@/shared/types/childProfile';
 import type { MatchedJob, PersonalityAxis } from '@/shared/types/job';
-import { PersonalitySummaryCard } from '@/shared/ui/PersonalitySummaryCard';
-import { MatchedJobsCard } from '@/shared/ui/MatchedJobsCard';
+import { AIResultCard } from '@/shared/ui/AIResultCard';
+import { Button } from '@/shared/ui/Button';
 
 type ProfileInfoTabProps = {
   childProfile: ChildProfile;
@@ -58,14 +59,30 @@ export function ProfileInfoTab({
   return (
     <div className="flex flex-col gap-6">
       {/* 프로필 헤더 */}
-      <header>
-        <h1 className="text-[1.125rem] font-bold leading-[1.35] text-gray-900">
-          {childProfile.name}님의 자녀 프로필
-        </h1>
-        <p className="mt-1 text-[0.875rem] text-gray-500">
-          마지막 검사일: {lastSurveyDate}
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[1.125rem] font-bold leading-[1.35] text-gray-900">
+            {childProfile.name}님의 자녀 프로필
+          </h1>
+          <p className="mt-1 text-[0.875rem] text-gray-500">
+            마지막 검사일: {lastSurveyDate}
+          </p>
+        </div>
+        <Button variant="secondary" size="sm" type="button">
+          <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
+          프로필 수정
+        </Button>
       </header>
+
+      {/* AI 성향 분석 결과 */}
+      <section aria-labelledby="ai-result-heading">
+        <AIResultCard
+          childName={childProfile.name}
+          axes={personalityAxes}
+          summary={personalitySummary}
+          jobs={matchedJobs}
+        />
+      </section>
 
       {/* 기본 정보 */}
       <Section id="basic-info-heading" title="기본 정보">
@@ -112,24 +129,6 @@ export function ProfileInfoTab({
           ))}
         </ul>
       </Section>
-
-      {/* AI 성향 분석 결과 */}
-      <section aria-labelledby="ai-result-heading">
-        <h2
-          id="ai-result-heading"
-          className="mb-5 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900"
-        >
-          AI 성향 분석 결과
-        </h2>
-        <div className="grid gap-5 lg:grid-cols-2">
-          <PersonalitySummaryCard
-            childName={childProfile.name}
-            axes={personalityAxes}
-            summary={personalitySummary}
-          />
-          <MatchedJobsCard childName={childProfile.name} jobs={matchedJobs} />
-        </div>
-      </section>
     </div>
   );
 }
