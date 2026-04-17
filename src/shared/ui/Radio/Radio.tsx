@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '@/shared/utils/cn';
 
-/* ─── Radio ─────────────────────────────────────────────────────────── */
+/* ─── Radio (Pill) ────────────────────────────────────────────────── */
 
 type RadioProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -11,7 +11,14 @@ type RadioProps = Omit<
   ref?: Ref<HTMLInputElement>;
 };
 
-export function Radio({ label, className, id, ref, ...props }: RadioProps) {
+export function Radio({
+  label,
+  className,
+  id,
+  ref,
+  disabled,
+  ...props
+}: RadioProps) {
   const inputId =
     id ??
     (label ? `radio-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
@@ -19,43 +26,31 @@ export function Radio({ label, className, id, ref, ...props }: RadioProps) {
   return (
     <label
       htmlFor={inputId}
-      className="group inline-flex cursor-pointer items-center gap-2 has-[:disabled]:cursor-not-allowed"
+      className={cn(
+        'transition-ui inline-flex h-10 items-center rounded-md border px-4',
+        'text-[0.875rem] font-normal leading-none',
+        disabled
+          ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+          : 'cursor-pointer border-gray-300 bg-white text-gray-700 hover:border-primary-border hover:bg-primary-bg',
+        'has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-static-white',
+        'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:[outline-offset:2px]',
+        className,
+      )}
     >
-      {/* 시각적 라디오 */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          'relative flex h-[1.125rem] w-[1.125rem] shrink-0 items-center justify-center rounded-full border transition-ui',
-          'border-gray-300 bg-white',
-          'group-has-[:checked]:border-primary',
-          'group-has-[:focus-visible]:outline group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-primary group-has-[:focus-visible]:[outline-offset:2px]',
-          'group-has-[:disabled]:border-gray-300 group-has-[:disabled]:bg-gray-100',
-          className,
-        )}
-      >
-        {/* 내부 dot */}
-        <span className="hidden h-2 w-2 rounded-full bg-primary group-has-[:checked]:block group-has-[:disabled]:bg-gray-400" />
-      </span>
-
-      {/* 실제 input — sr-only로 접근성 유지, ref 전달 */}
       <input
         type="radio"
         id={inputId}
         ref={ref}
+        disabled={disabled}
         className="sr-only"
         {...props}
       />
-
-      {label && (
-        <span className="text-[0.875rem] font-normal text-gray-900 group-has-[:disabled]:text-gray-400">
-          {label}
-        </span>
-      )}
+      {label}
     </label>
   );
 }
 
-/* ─── RadioGroup ─────────────────────────────────────────────────────── */
+/* ─── RadioGroup ──────────────────────────────────────────────────── */
 
 type RadioGroupProps = {
   label?: string;
@@ -77,7 +72,7 @@ export function RadioGroup({
   return (
     <fieldset className={cn('flex flex-col gap-0 border-0 p-0', className)}>
       {label && (
-        <legend className="mb-2 text-[0.875rem] font-semibold text-gray-900">
+        <legend className="mb-3 text-[0.875rem] font-semibold text-gray-900">
           {label}
           {required && (
             <span aria-hidden="true" className="ml-0.5 text-error">
@@ -87,7 +82,7 @@ export function RadioGroup({
         </legend>
       )}
 
-      <div className="flex flex-col gap-2" aria-describedby={errorId}>
+      <div className="flex flex-wrap gap-2" aria-describedby={errorId}>
         {children}
       </div>
 
@@ -96,7 +91,7 @@ export function RadioGroup({
           id={errorId}
           role="alert"
           aria-live="polite"
-          className="mt-1.5 text-[0.8125rem] text-error"
+          className="mt-2 text-[0.8125rem] text-error"
         >
           {error}
         </p>

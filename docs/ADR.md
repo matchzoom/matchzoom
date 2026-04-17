@@ -22,24 +22,6 @@
 
 ---
 
-## ADR-002: react-hook-form 사용 안 함
-
-**Status:** Accepted  
-**Date:** 2026-04-16
-
-**Decision:**  
-폼 상태는 `useState`, 검증은 Zod (제출 시점).
-
-**Reasons:**
-- 의존성 표면 최소화
-- step 간 데이터 유지는 상위 컴포넌트 useState로 처리
-
-**Consequences:**
-- controlled input 직접 작성
-- change handler 수동 구현
-
----
-
 ## ADR-003: TanStack Query로 모든 서버 상태 관리
 
 **Status:** Accepted  
