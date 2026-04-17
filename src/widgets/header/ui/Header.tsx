@@ -11,7 +11,7 @@ export function Header() {
   const isLoggedIn = userState === 'loggedIn' || userState === 'surveyed';
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-gray-200 bg-surface">
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
         <Link
           href="/"
