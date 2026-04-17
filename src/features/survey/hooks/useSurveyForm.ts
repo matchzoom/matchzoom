@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { getSigunguList } from '../utils/regions';
+import { step1Schema, step2Schema } from '../utils/schema';
+import { submitSurvey } from '../api/surveyApi';
 
 export type SurveyFormValues = {
-  // Step 1
   name: string;
-  age: string;
   gender: string;
   education: string;
   region_primary_sido: string;
@@ -14,7 +14,6 @@ export type SurveyFormValues = {
   region_secondary_sido: string;
   region_secondary_sigungu: string;
   barrier_free: boolean;
-  // Step 2
   disability_type: string;
   disability_level: string;
   mobility: string;
@@ -26,9 +25,10 @@ export type SurveyFormValues = {
   hope_activities_other: string;
 };
 
+type FormErrors = Partial<Record<keyof SurveyFormValues, string>>;
+
 const INITIAL: SurveyFormValues = {
   name: '',
-  age: '',
   gender: '',
   education: '',
   region_primary_sido: '',
@@ -47,15 +47,29 @@ const INITIAL: SurveyFormValues = {
   hope_activities_other: '',
 };
 
+function parseZodErrors<T extends object>(
+  issues: { path: PropertyKey[]; message: string }[],
+): Partial<Record<keyof T, string>> {
+  const result: Partial<Record<keyof T, string>> = {};
+  for (const issue of issues) {
+    const key = issue.path[0] as keyof T;
+    if (key && !result[key]) result[key] = issue.message;
+  }
+  return result;
+}
+
 export function useSurveyForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [values, setValues] = useState<SurveyFormValues>(INITIAL);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function setField<K extends keyof SurveyFormValues>(
     key: K,
     value: SurveyFormValues[K],
   ) {
     setValues((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
   function onPrimarySidoChange(sido: string) {
@@ -83,9 +97,27 @@ export function useSurveyForm() {
         ? prev.hope_activities_other
         : '',
     }));
+    setErrors((prev) => ({ ...prev, hope_activities: undefined }));
   }
 
   function onNextStep() {
+    const result = step1Schema.safeParse({
+      name: values.name,
+      gender: values.gender,
+      education: values.education,
+      region_primary_sido: values.region_primary_sido,
+      region_primary_sigungu: values.region_primary_sigungu,
+      region_secondary_sido: values.region_secondary_sido,
+      region_secondary_sigungu: values.region_secondary_sigungu,
+      barrier_free: values.barrier_free,
+    });
+
+    if (!result.success) {
+      setErrors(parseZodErrors<SurveyFormValues>(result.error.issues));
+      return;
+    }
+
+    setErrors({});
     setStep(2);
   }
 
@@ -93,16 +125,66 @@ export function useSurveyForm() {
     setStep(1);
   }
 
-  function onSubmit() {
-    // eslint-disable-next-line no-console
-    console.log('제출완료');
+  async function onSubmit() {
+    const result = step2Schema.safeParse({
+      disability_type: values.disability_type,
+      disability_level: values.disability_level,
+      mobility: values.mobility,
+      hand_usage: values.hand_usage,
+      stamina: values.stamina,
+      communication: values.communication,
+      instruction_level: values.instruction_level,
+      hope_activities: values.hope_activities,
+      hope_activities_other: values.hope_activities_other,
+    });
+
+    if (!result.success) {
+      setErrors(parseZodErrors<SurveyFormValues>(result.error.issues));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const activities = values.hope_activities.includes('기타')
+        ? [
+            ...values.hope_activities.filter((a) => a !== '기타'),
+            values.hope_activities_other.trim(),
+          ]
+        : values.hope_activities;
+
+      const regionSecondary =
+        values.region_secondary_sido && values.region_secondary_sigungu
+          ? `${values.region_secondary_sido} ${values.region_secondary_sigungu}`
+          : undefined;
+
+      await submitSurvey({
+        name: values.name,
+        gender: values.gender,
+        education: values.education,
+        region_primary: `${values.region_primary_sido} ${values.region_primary_sigungu}`,
+        region_secondary: regionSecondary,
+        is_barrier_free: values.barrier_free,
+        disability_type: values.disability_type,
+        disability_level: values.disability_level,
+        mobility: values.mobility,
+        hand_usage: values.hand_usage,
+        stamina: values.stamina,
+        communication: values.communication,
+        instruction_level: values.instruction_level,
+        hope_activities: activities,
+      });
+    } catch (err) {
+      console.error('[검사 제출 오류]', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return {
     step,
     values,
-    errors: {} as Partial<Record<keyof SurveyFormValues, string>>,
-    isSubmitting: false,
+    errors,
+    isSubmitting,
     setField,
     onPrimarySidoChange,
     onSecondarySidoChange,

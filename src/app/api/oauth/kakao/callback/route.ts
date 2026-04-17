@@ -40,11 +40,16 @@ export async function GET(request: NextRequest) {
     const nickname = kakaoUser.kakao_account?.profile?.nickname ?? '사용자';
 
     // Step 3: Supabase users 테이블 upsert (kakao_id 기준)
-    const users = await supabaseFetch<{ id: number }[]>('/rest/v1/users', {
-      method: 'POST',
-      body: JSON.stringify({ kakao_id: kakaoId, nickname }),
-      headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-    });
+    const users = await supabaseFetch<{ id: number }[]>(
+      '/rest/v1/users?on_conflict=kakao_id',
+      {
+        method: 'POST',
+        body: JSON.stringify({ kakao_id: kakaoId, nickname }),
+        headers: {
+          Prefer: 'resolution=merge-duplicates,return=representation',
+        },
+      },
+    );
 
     const userId = String(users[0].id);
 

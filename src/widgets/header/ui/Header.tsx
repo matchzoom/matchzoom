@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { User } from 'lucide-react';
 
-import { useMockState } from '@/shared/providers/mock-state-provider';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+import { useLogout } from '@/shared/hooks/useLogout';
 import { Button } from '@/shared/ui/Button';
 
 export function Header() {
-  const { userState } = useMockState();
-  const isLoggedIn = userState === 'loggedIn' || userState === 'surveyed';
+  const { data: user } = useCurrentUser();
+  const { mutate: logout, isPending } = useLogout();
 
   return (
     <header className="border-b border-gray-200 bg-surface">
@@ -20,13 +21,19 @@ export function Header() {
           마주봄
         </Link>
 
-        {!isLoggedIn && (
-          <Button variant="secondary" size="md">
+        {!user && (
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => {
+              window.location.href = '/api/oauth/kakao/authorize';
+            }}
+          >
             로그인
           </Button>
         )}
 
-        {isLoggedIn && (
+        {user && (
           <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
             <Link
               href="/profile"
@@ -35,6 +42,14 @@ export function Header() {
             >
               <User size={20} strokeWidth={1.5} aria-hidden="true" />
             </Link>
+            <Button
+              variant="secondary"
+              size="md"
+              disabled={isPending}
+              onClick={() => logout()}
+            >
+              {isPending ? '로그아웃 중...' : '로그아웃'}
+            </Button>
           </nav>
         )}
       </div>
