@@ -8,7 +8,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="bg-primary-bg py-16 md:py-20 lg:py-24"
+      className="bg-hero-bg py-16 md:py-20 lg:py-24"
     >
       <div className="mx-auto max-w-[1200px] px-4 md:px-5 lg:px-6">
         <div className="flex flex-col items-start gap-6 md:max-w-[640px]">

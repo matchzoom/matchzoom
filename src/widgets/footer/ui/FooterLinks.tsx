@@ -14,11 +14,6 @@ export function FooterLinks() {
     <>
       <ul className="flex flex-wrap gap-6">
         <li>
-          <a href="mailto:support@majuboom.kr" className={linkClass}>
-            문의하기
-          </a>
-        </li>
-        <li>
           <button
             type="button"
             onClick={() => setOpenModal('terms')}
