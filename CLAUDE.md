@@ -17,20 +17,20 @@
 
 ## 2. Tech Stack (비협상)
 
-| 영역            | 기술                             |
-| --------------- | -------------------------------- |
-| Framework       | Next.js 16 App Router            |
-| Language        | TypeScript (strict)              |
-| Styling         | TailwindCSS v4                   |
-| Component Base  | shadcn/ui 패턴 (cva + cn)        |
-| Data Fetching   | TanStack Query v5                |
-| Global State    | React Context / useState         |
+| 영역            | 기술                                  |
+| --------------- | ------------------------------------- |
+| Framework       | Next.js 16 App Router                 |
+| Language        | TypeScript (strict)                   |
+| Styling         | TailwindCSS v4                        |
+| Component Base  | shadcn/ui 패턴 (cva + cn)             |
+| Data Fetching   | TanStack Query v5                     |
+| Global State    | React Context / useState              |
 | Form            | react-hook-form + @hookform/resolvers |
-| Validation      | Zod v4                           |
-| Chart           | Recharts                         |
-| DB              | Supabase (PostgreSQL + pgvector) |
-| Deploy          | Vercel                           |
-| Package Manager | pnpm                             |
+| Validation      | Zod v4                                |
+| Chart           | Recharts                              |
+| DB              | Supabase (PostgreSQL + pgvector)      |
+| Deploy          | Vercel                                |
+| Package Manager | pnpm                                  |
 
 ---
 
@@ -176,19 +176,106 @@ export const useBookmarkToggle = () => useMutation(...);
 
 ---
 
-## 8. Supabase Rules
+## 8. API / Auth Rules (Canonical)
 
-<!-- TODO: 유저가 직접 작성 -->
+### 전체 요청 흐름
 
-- Base URL: `NEXT_PUBLIC_SUPABASE_URL`
-- Auth: `apikey` + `Authorization: Bearer` 헤더
-- 모든 fetch는 `shared/api/client.ts`의 `supabaseFetch()`를 통해서만
+```
+Client Component
+  ↓ bffFetch (credentials: include — HttpOnly 쿠키 자동 포함)
+Next.js BFF Route Handler (app/api/...)
+  ↓ createAuthorizedRoute — session JWT 검증 → userId 추출
+  ↓ supabaseFetch (Secret key — RLS 우회)
+Supabase (PostgreSQL)
+```
+
+### 쿠키 (Set-Cookie 헤더)
+
+세 가지 HttpOnly 쿠키를 함께 발급한다:
+
+| 쿠키                | 값                      | 만료  | 역할            |
+| ------------------- | ----------------------- | ----- | --------------- |
+| `session`           | 서명된 JWT `{ userId }` | 30일  | 유저 식별·인증  |
+| `kakaoAccessToken`  | 카카오 액세스 토큰      | 6시간 | 카카오 API 호출 |
+| `kakaoRefreshToken` | 카카오 리프레시 토큰    | 60일  | 토큰 갱신       |
+
+모든 쿠키: `HttpOnly; Secure(prod); SameSite=Strict; Path=/`
+
+### 환경 변수 (.env.local)
+
+```bash
+# Supabase
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_SECRET_KEY=eyJ...           # Secret key (구 service_role)
+
+# 카카오 OAuth
+KAKAO_REST_API_KEY=...
+KAKAO_CLIENT_SECRET=...
+KAKAO_REDIRECT_URI=http://localhost:3000/api/oauth/kakao/callback
+
+# JWT 서명 키 (openssl rand -base64 32)
+SESSION_SECRET=...
+
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 핵심 파일
+
+| 파일                                  | 역할                                              |
+| ------------------------------------- | ------------------------------------------------- |
+| `shared/api/coreFetch.ts`             | timeout(AbortController), 에러 파싱               |
+| `shared/api/bffFetch.ts`              | 클라이언트→BFF, 401 시 `/api/auth/refresh` 재시도 |
+| `shared/api/supabaseFetch.ts`         | BFF→Supabase, Secret key 주입                     |
+| `shared/api/kakaoFetch.ts`            | BFF→카카오 API (kauth / kapi)                     |
+| `shared/api/createAuthorizedRoute.ts` | BFF Route Handler HOF, session JWT 검증           |
+| `shared/utils/session.ts`             | JWT sign/verify (`jose`)                          |
+| `shared/utils/authCookies.ts`         | 쿠키 set/get/clear                                |
+
+### BFF Route Handler 작성 규칙
+
+- 반드시 `createAuthorizedRoute`로 감싼다
+- 모든 Supabase 쿼리에 `user_id=eq.{userId}` 필터 필수
+- PATCH / DELETE 시 `id` 단독 필터 절대 금지 — 반드시 `&user_id=eq.{userId}` 추가
+
+```ts
+export const GET = createAuthorizedRoute(async ({ userId }) => {
+  const rows = await supabaseFetch<Profile[]>(
+    `/rest/v1/profiles?user_id=eq.${userId}&select=*`,
+  );
+  return rows[0] ?? null;
+});
+```
+
+세부 CRUD 패턴 → `docs/CRUD_guide.md`
+
+### 인증 라우트
+
+| 라우트                           | 역할                                             |
+| -------------------------------- | ------------------------------------------------ |
+| `GET /api/oauth/kakao/authorize` | 카카오 로그인 페이지로 redirect                  |
+| `GET /api/oauth/kakao/callback`  | code→토큰 교환→upsert→session JWT 발급→쿠키 저장 |
+| `POST /api/auth/refresh`         | 카카오 토큰 갱신 + session JWT 재발급            |
+| `POST /api/auth/logout`          | 카카오 세션 무효화 + 쿠키 삭제                   |
+| `GET /api/users/me`              | 로그인 유저 정보 조회                            |
+
+### 유저 정보
+
+- 전역 유저 정보는 `useCurrentUser()` 훅 사용 (React Query, `shared/hooks/`)
+- Zustand 금지 — 서버 상태 전체 TanStack Query로 관리
+
+```ts
+const { data: user } = useCurrentUser();
+if (!user) return <GuestView />;
+```
+
+### middleware.ts
+
+- `session` JWT 서명 검증으로 보호 경로(`/profile`, `/survey`) 접근 제어
+- 만료·위변조 시 `/`로 redirect
 
 ---
 
 ## 9. Component Rules
-
-<!-- TODO: 유저가 직접 작성 -->
 
 - Server Component 기본
 - 인터랙티브한 경우에만 `'use client'` 추가
@@ -197,7 +284,7 @@ export const useBookmarkToggle = () => useMutation(...);
 
 ## 10. State Management
 
-- 서버 상태: TanStack Query
+- 서버 상태: **TanStack Query** (유저 정보 포함 — Zustand 사용 금지)
 - UI/전역 상태: React Context
 - 폼 상태: react-hook-form (비제어)
 - 단순 로컬 UI 상태: useState
@@ -266,7 +353,61 @@ const { register, handleSubmit, errors } = useSurveyForm();
 
 ---
 
-## 12. PR 생성 절차
+## 12. CRUD 규칙
+
+**CRUD 작업(`app/api/`, `features/*/api/`, `features/*/hooks/`)을 만들 때 반드시:**
+
+1. `docs/CRUD_guide.md` 전체를 읽고 시작한다
+2. 데이터 흐름: `Client → bffFetch → BFF Route Handler → supabaseFetch → Supabase`
+3. 클라이언트에서 Supabase 직접 호출 절대 금지
+
+### BFF Route Handler
+
+- `createAuthorizedRoute`를 반드시 사용한다 (`src/shared/api/createAuthorizedRoute.ts`)
+- `userId` 쿠키가 없으면 자동으로 401 반환
+- 모든 Supabase 쿼리에 `user_id=eq.{userId}` 필터 필수
+
+```ts
+// app/api/profiles/route.ts
+export const GET = createAuthorizedRoute(async ({ userId }) => {
+  const rows = await supabaseFetch<Profile[]>(
+    `/rest/v1/profiles?user_id=eq.${userId}&select=*`,
+  );
+  return rows[0] ?? null;
+});
+```
+
+### Feature API 레이어
+
+- `features/[x]/api/[resource]Api.ts` — `bffFetch` 호출 함수만
+- 함수 1개 = API 1개, 이름은 동사+명사: `getProfile`, `updateProfile`
+
+```ts
+// features/profile/api/profileApi.ts
+export const getProfile = (): Promise<Profile> =>
+  bffFetch<Profile>('/profiles', { method: 'GET' });
+```
+
+### 테스트 (필수)
+
+모든 BFF Route Handler와 feature API 함수는 **반드시 테스트를 작성**한다.
+
+- 위치: `features/[x]/__tests__/` 또는 `shared/api/__tests__/`
+- **3종 세트 필수**: 성공 / 401(미인증) / 에러(Supabase 오류)
+- BFF 테스트: `vi.mock('next/headers')` + `vi.mock('@/shared/api/supabaseFetch')`
+- Feature API 테스트: `vi.mock('@/shared/api/bffFetch')`
+- 테스트 없이 PR 금지
+
+```bash
+pnpm test:run   # CI용
+pnpm test       # watch 모드
+```
+
+세부 패턴은 `docs/CRUD_guide.md` 참고.
+
+---
+
+## 13. PR 생성 절차
 
 **"PR 올려줘" 요청 시 반드시 `/ship` 커맨드를 실행한다.**
 
@@ -293,4 +434,5 @@ const { register, handleSubmit, errors } = useSurveyForm();
 - 아키텍처: `docs/architecture.md`
 - 결정 기록: `docs/ADR.md`
 - UI 가이드: `docs/UI_guide.md`
+- CRUD 가이드: `docs/CRUD_guide.md`
 - 실행 상태: `status.json`
