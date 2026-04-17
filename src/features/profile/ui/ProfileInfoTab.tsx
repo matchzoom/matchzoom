@@ -71,7 +71,6 @@ export function ProfileInfoTab({
       <Section id="basic-info-heading" title="기본 정보">
         <dl>
           <InfoRow label="이름" value={childProfile.name} />
-          <InfoRow label="만 나이" value={`${childProfile.age}세`} />
           <InfoRow label="성별" value={childProfile.gender} />
           <InfoRow label="최종학력" value={childProfile.education} />
           <InfoRow label="희망 지역 1순위" value={region1Label} />

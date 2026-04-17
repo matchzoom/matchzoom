@@ -63,19 +63,6 @@ export function SurveyStep1({
           maxLength={20}
         />
 
-        {/* 만 나이 */}
-        <Input
-          label="만 나이"
-          required
-          type="number"
-          min={1}
-          max={99}
-          value={values.age}
-          onChange={(e) => setField('age', e.target.value)}
-          error={errors.age}
-          placeholder="숫자만 입력해주세요"
-        />
-
         {/* 성별 */}
         <RadioGroup label="성별" required error={errors.gender}>
           <Radio
