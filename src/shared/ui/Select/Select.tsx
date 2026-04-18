@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import type { Ref, SelectHTMLAttributes } from 'react';
 import { cn } from '@/shared/utils/cn';
 
-type SelectOption = { value: string; label: string };
+type SelectOption = { value: string; label: string; disabled?: boolean };
 
 type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
   label?: string;
@@ -47,7 +47,7 @@ export function Select({
         </label>
       )}
 
-      <div className="relative">
+      <div className="relative cursor-pointer has-[select:disabled]:cursor-not-allowed">
         <select
           ref={ref}
           id={selectId}
@@ -60,7 +60,7 @@ export function Select({
           {...props}
           className={cn(
             'w-full appearance-none rounded-md border px-4 pr-10',
-            'h-10 cursor-pointer text-[0.9375rem] font-normal',
+            'h-10 cursor-[inherit] text-[0.9375rem] font-normal',
             'bg-white text-gray-900',
             'transition-ui',
             'focus:border-primary focus-visible:[outline-offset:0]',
@@ -75,7 +75,7 @@ export function Select({
             </option>
           )}
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
+            <option key={opt.value} value={opt.value} disabled={opt.disabled}>
               {opt.label}
             </option>
           ))}

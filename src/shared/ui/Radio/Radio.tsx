@@ -54,6 +54,7 @@ export function Radio({
 
 type RadioGroupProps = {
   label?: string;
+  hint?: string;
   error?: string;
   required?: boolean;
   children: ReactNode;
@@ -62,6 +63,7 @@ type RadioGroupProps = {
 
 export function RadioGroup({
   label,
+  hint,
   error,
   required,
   children,
@@ -77,6 +79,11 @@ export function RadioGroup({
           {required && (
             <span aria-hidden="true" className="ml-0.5 text-error">
               *
+            </span>
+          )}
+          {hint && (
+            <span className="ml-2 text-[0.8125rem] font-normal text-gray-500">
+              {hint}
             </span>
           )}
         </legend>

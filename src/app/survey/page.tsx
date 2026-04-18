@@ -22,6 +22,7 @@ function SurveyContent() {
       setField={form.setField}
       onPrimarySidoChange={form.onPrimarySidoChange}
       onSecondarySidoChange={form.onSecondarySidoChange}
+      onSecondaryReset={form.onSecondaryReset}
       onHopeActivitiesChange={form.onHopeActivitiesChange}
       onNextStep={form.onNextStep}
       onPrevStep={form.onPrevStep}

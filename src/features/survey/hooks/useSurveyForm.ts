@@ -132,6 +132,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       region_primary_sido: sido,
       region_primary_sigungu: '',
     }));
+    setErrors((prev) => ({ ...prev, region_primary_sido: undefined }));
   }
 
   function onSecondarySidoChange(sido: string) {
@@ -139,6 +140,19 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       ...prev,
       region_secondary_sido: sido,
       region_secondary_sigungu: '',
+    }));
+  }
+
+  function onSecondaryReset() {
+    setValues((prev) => ({
+      ...prev,
+      region_secondary_sido: '',
+      region_secondary_sigungu: '',
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      region_secondary_sido: undefined,
+      region_secondary_sigungu: undefined,
     }));
   }
 
@@ -251,6 +265,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     setField,
     onPrimarySidoChange,
     onSecondarySidoChange,
+    onSecondaryReset,
     onHopeActivitiesChange,
     onNextStep,
     onPrevStep,

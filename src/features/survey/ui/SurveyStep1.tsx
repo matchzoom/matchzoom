@@ -25,6 +25,7 @@ type Props = {
   ) => void;
   onPrimarySidoChange: (sido: string) => void;
   onSecondarySidoChange: (sido: string) => void;
+  onSecondaryReset: () => void;
   onNextStep: () => void;
 };
 
@@ -35,6 +36,7 @@ export function SurveyStep1({
   setField,
   onPrimarySidoChange,
   onSecondarySidoChange,
+  onSecondaryReset,
   onNextStep,
 }: Props) {
   return (
@@ -47,14 +49,14 @@ export function SurveyStep1({
           기본 정보
         </h2>
         <p className="mt-1 text-[0.875rem] text-gray-500">
-          자녀의 기본 정보를 입력해주세요
+          검사자의 기본 정보를 입력해주세요
         </p>
       </div>
 
       <div className="flex flex-col gap-6">
         {/* 이름 */}
         <Input
-          label="자녀 이름"
+          label="이름"
           required
           value={values.name}
           onChange={(e) => setField('name', e.target.value)}
@@ -135,11 +137,20 @@ export function SurveyStep1({
 
         {/* 희망 지역 2순위 */}
         <fieldset className="flex flex-col gap-0 border-0 p-0">
-          <legend className="mb-3 text-[0.875rem] font-semibold text-gray-900">
+          <legend className="mb-3 flex items-center gap-2 text-[0.875rem] font-semibold text-gray-900">
             희망 지역 2순위
-            <span className="ml-1 text-[0.8125rem] font-normal text-gray-500">
+            <span className="text-[0.8125rem] font-normal text-gray-500">
               (선택)
             </span>
+            {values.region_secondary_sido && (
+              <button
+                type="button"
+                onClick={onSecondaryReset}
+                className="cursor-pointer text-[0.8125rem] font-normal text-gray-400 underline underline-offset-2 hover:text-gray-600"
+              >
+                초기화
+              </button>
+            )}
           </legend>
           <div className="flex gap-3">
             <div className="flex-1">
@@ -158,11 +169,16 @@ export function SurveyStep1({
                 options={sigunguList.secondary.map((v) => ({
                   value: v,
                   label: v,
+                  disabled:
+                    values.region_secondary_sido ===
+                      values.region_primary_sido &&
+                    v === values.region_primary_sigungu,
                 }))}
                 value={values.region_secondary_sigungu}
                 onChange={(e) =>
                   setField('region_secondary_sigungu', e.target.value)
                 }
+                error={errors.region_secondary_sigungu}
                 disabled={!values.region_secondary_sido}
               />
             </div>
