@@ -61,6 +61,7 @@ const HOPE_ACTIVITIES_OPTIONS = [
 ];
 
 type Props = {
+  mode: 'create' | 'edit';
   values: SurveyFormValues;
   errors: Partial<Record<keyof SurveyFormValues, string>>;
   setField: <K extends keyof SurveyFormValues>(
@@ -74,6 +75,7 @@ type Props = {
 };
 
 export function SurveyStep2({
+  mode,
   values,
   errors,
   setField,
@@ -82,6 +84,7 @@ export function SurveyStep2({
   onSubmit,
   isSubmitting,
 }: Props) {
+  const submitLabel = mode === 'edit' ? '수정 완료' : '검사 완료';
   function handleActivityChange(value: string, checked: boolean) {
     const next = checked
       ? [...values.hope_activities, value]
@@ -262,7 +265,7 @@ export function SurveyStep2({
           disabled={isSubmitting}
           aria-disabled={isSubmitting}
         >
-          {isSubmitting ? '처리 중...' : '검사 완료'}
+          {isSubmitting ? '처리 중...' : submitLabel}
         </Button>
       </div>
     </section>

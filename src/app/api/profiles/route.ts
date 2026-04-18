@@ -2,6 +2,13 @@ import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { CreateProfileBodySchema, type Profile } from '@/shared/types/profile';
 
+export const GET = createAuthorizedRoute(async ({ userId }) => {
+  const rows = await supabaseFetch<Profile[]>(
+    `/rest/v1/profiles?user_id=eq.${userId}&select=*`,
+  );
+  return rows[0] ?? null;
+});
+
 export const POST = createAuthorizedRoute(async ({ userId, body }) => {
   const parsed = CreateProfileBodySchema.safeParse(body);
   if (!parsed.success) {
