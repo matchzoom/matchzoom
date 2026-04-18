@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '../api/profileApi';
 import type { Profile } from '@/shared/types/profile';
-import type { ChildProfile } from '@/shared/types/childProfile';
+import type { UserProfile } from '@/shared/types/userProfile';
 import {
   MOCK_PERSONALITY_AXES,
   MOCK_PERSONALITY_SUMMARY,
@@ -15,23 +15,23 @@ function parseRegion(region: string): { city: string; district: string } {
   return { city: parts[0] ?? '', district: parts.slice(1).join(' ') };
 }
 
-function toChildProfile(p: Profile): ChildProfile {
+function toUserProfile(p: Profile): UserProfile {
   return {
     name: p.name,
     age: 0,
-    gender: p.gender as ChildProfile['gender'],
+    gender: p.gender as UserProfile['gender'],
     education: p.education,
     region1: parseRegion(p.region_primary),
     region2: p.region_secondary ? parseRegion(p.region_secondary) : undefined,
     barrierFree: p.is_barrier_free,
-    disabilityType: p.disability_type as ChildProfile['disabilityType'],
-    disabilityGrade: p.disability_level as ChildProfile['disabilityGrade'],
-    mobility: p.mobility as ChildProfile['mobility'],
-    handUse: p.hand_usage as ChildProfile['handUse'],
-    stamina: p.stamina as ChildProfile['stamina'],
-    speaking: p.communication as ChildProfile['speaking'],
+    disabilityType: p.disability_type as UserProfile['disabilityType'],
+    disabilityGrade: p.disability_level as UserProfile['disabilityGrade'],
+    mobility: p.mobility as UserProfile['mobility'],
+    handUse: p.hand_usage as UserProfile['handUse'],
+    stamina: p.stamina as UserProfile['stamina'],
+    speaking: p.communication as UserProfile['speaking'],
     instructionUnderstanding:
-      p.instruction_level as ChildProfile['instructionUnderstanding'],
+      p.instruction_level as UserProfile['instructionUnderstanding'],
     preferredActivities: p.hope_activities,
   };
 }
@@ -42,11 +42,11 @@ export function useProfile() {
     queryFn: getProfile,
   });
 
-  const childProfile = profile ? toChildProfile(profile) : null;
+  const userProfile = profile ? toUserProfile(profile) : null;
 
   return {
     profile,
-    childProfile,
+    userProfile,
     isLoading,
     lastSurveyDate: profile
       ? new Date(profile.updated_at).toLocaleDateString('ko-KR')

@@ -1,5 +1,6 @@
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { MockStateProvider } from '@/shared/providers/mock-state-provider';
+import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
 import './globals.css';
@@ -31,6 +32,7 @@ export default function RootLayout({
         </a>
         <QueryProvider>
           <MockStateProvider>
+            <NavigationTracker />
             <Header />
             <main id="main-content" className="flex-1">
               {children}

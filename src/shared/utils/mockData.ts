@@ -3,15 +3,9 @@ import type {
   JobPosting,
   PersonalityAxis,
 } from '@/shared/types/job';
-import type { UserProfile } from '@/shared/types/user';
-import type { ChildProfile } from '@/shared/types/childProfile';
+import type { UserProfile } from '@/shared/types/userProfile';
 
 export const MOCK_USER_PROFILE: UserProfile = {
-  name: '민준',
-  lastSurveyDate: '2026.04.10',
-};
-
-export const MOCK_CHILD_PROFILE: ChildProfile = {
   name: '민준',
   age: 17,
   gender: '남성',

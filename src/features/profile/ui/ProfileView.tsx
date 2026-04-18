@@ -18,7 +18,7 @@ export function ProfileView() {
   const [activeTab, setActiveTab] = useState<ProfileTab>('result');
 
   const {
-    childProfile,
+    userProfile,
     isLoading,
     lastSurveyDate,
     personalityAxes,
@@ -43,7 +43,7 @@ export function ProfileView() {
     );
   }
 
-  if (!childProfile) {
+  if (!userProfile) {
     return <ProfileEmptyView />;
   }
 
@@ -61,7 +61,7 @@ export function ProfileView() {
         <div className="min-w-0 flex-1">
           {activeTab === 'result' ? (
             <ProfileInfoTab
-              childProfile={childProfile}
+              userProfile={userProfile}
               lastSurveyDate={lastSurveyDate}
               personalityAxes={personalityAxes}
               personalitySummary={personalitySummary}

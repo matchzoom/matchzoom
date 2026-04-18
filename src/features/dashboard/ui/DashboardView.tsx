@@ -6,7 +6,7 @@ import { JobListSection } from './JobListSection';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 
 export function DashboardView() {
-  const { childName, personalityAxes, personalitySummary, matchedJobs } =
+  const { userName, personalityAxes, personalitySummary, matchedJobs } =
     useDashboard();
   const { postings, toggleBookmark } = useJobPostings();
 
@@ -18,7 +18,7 @@ export function DashboardView() {
             검사 결과 요약
           </h2>
           <AIResultCard
-            childName={childName}
+            userName={userName}
             axes={personalityAxes}
             summary={personalitySummary}
             jobs={matchedJobs}
@@ -30,7 +30,7 @@ export function DashboardView() {
             맞춤 채용공고
           </h2>
           <JobListSection
-            childName={childName}
+            userName={userName}
             postings={postings}
             onBookmarkToggle={toggleBookmark}
           />

@@ -5,14 +5,14 @@ import { Skeleton } from '@/shared/ui/Skeleton';
 import { JobCard } from './JobCard';
 
 type JobListSectionProps = {
-  childName: string;
+  userName: string;
   postings: JobPosting[];
   onBookmarkToggle: (id: number) => void;
   isLoading?: boolean;
 };
 
 export function JobListSection({
-  childName,
+  userName,
   postings,
   onBookmarkToggle,
   isLoading = false,
@@ -23,7 +23,7 @@ export function JobListSection({
         id="job-list-heading"
         className="mb-5 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900"
       >
-        {childName}님에게 맞는 채용공고
+        {userName}님에게 맞는 채용공고
       </h2>
 
       {isLoading ? (

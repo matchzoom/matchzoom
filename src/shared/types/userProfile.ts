@@ -1,4 +1,4 @@
-export type ChildProfile = {
+export type UserProfile = {
   name: string;
   age: number;
   gender: '남성' | '여성';

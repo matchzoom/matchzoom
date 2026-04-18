@@ -74,7 +74,7 @@ function profileToFormValues(p: Profile): SurveyFormValues {
     barrier_free: p.is_barrier_free,
     disability_type: p.disability_type,
     disability_level: p.disability_level,
-    mobility: p.mobility ?? '',
+    mobility: p.mobility,
     hand_usage: p.hand_usage,
     stamina: p.stamina,
     communication: p.communication,
@@ -100,6 +100,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2>(1);
   const [values, setValues] = useState<SurveyFormValues>(INITIAL);
+  const [initialValues, setInitialValues] = useState<SurveyFormValues>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -113,7 +114,9 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
 
   useEffect(() => {
     if (mode === 'edit' && existingProfile && !initialized) {
-      setValues(profileToFormValues(existingProfile));
+      const editValues = profileToFormValues(existingProfile);
+      setValues(editValues);
+      setInitialValues(editValues);
       setInitialized(true);
     }
   }, [mode, existingProfile, initialized]);
@@ -255,6 +258,9 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     router.push('/profile');
   }
 
+  const isDirty =
+    !isComplete && JSON.stringify(values) !== JSON.stringify(initialValues);
+
   return {
     mode,
     step,
@@ -262,6 +268,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     errors,
     isSubmitting,
     isComplete,
+    isDirty,
     setField,
     onPrimarySidoChange,
     onSecondarySidoChange,
