@@ -217,6 +217,9 @@ KAKAO_REDIRECT_URI=http://localhost:3000/api/oauth/kakao/callback
 SESSION_SECRET=...
 
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# OpenAI (AI 매칭)
+OPENAI_API_KEY=sk-...
 ```
 
 ### 핵심 파일
