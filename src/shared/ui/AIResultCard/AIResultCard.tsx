@@ -3,14 +3,14 @@ import { FitBadge } from '@/shared/ui/FitBadge';
 import { PersonalityRadarChart } from '@/shared/ui/PersonalityRadarChart';
 
 type AIResultCardProps = {
-  childName: string;
+  userName: string;
   axes: PersonalityAxis[];
   summary: string;
   jobs: MatchedJob[];
 };
 
 export function AIResultCard({
-  childName,
+  userName,
   axes,
   summary,
   jobs,
@@ -22,7 +22,7 @@ export function AIResultCard({
         {/* 좌: 레이더 차트 */}
         <div className="flex flex-col items-center p-6">
           <h3 className="mb-6 w-full border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-            {childName}님의 직업 성향
+            {userName}님의 직업 성향
           </h3>
           <PersonalityRadarChart data={axes} />
         </div>
@@ -30,7 +30,7 @@ export function AIResultCard({
         {/* 우: 맞는 직종 TOP 3 */}
         <div className="p-6">
           <h3 className="mb-6 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-            {childName}님에게 맞는 직종 TOP 3
+            {userName}님에게 맞는 직종 TOP 3
           </h3>
           <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
             {jobs.map((job, index) => (

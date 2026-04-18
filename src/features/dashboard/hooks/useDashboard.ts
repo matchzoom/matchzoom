@@ -7,8 +7,7 @@ import {
 
 export function useDashboard() {
   return {
-    childName: MOCK_USER_PROFILE.name,
-    lastSurveyDate: MOCK_USER_PROFILE.lastSurveyDate,
+    userName: MOCK_USER_PROFILE.name,
     personalityAxes: MOCK_PERSONALITY_AXES,
     personalitySummary: MOCK_PERSONALITY_SUMMARY,
     matchedJobs: MOCK_MATCHED_JOBS,

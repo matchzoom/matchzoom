@@ -10,6 +10,7 @@ type Props = {
   errors: Partial<Record<keyof SurveyFormValues, string>>;
   isSubmitting: boolean;
   isComplete: boolean;
+  isBlocking: boolean;
   sigunguList: { primary: string[]; secondary: string[] };
   setField: <K extends keyof SurveyFormValues>(
     key: K,
@@ -23,6 +24,8 @@ type Props = {
   onPrevStep: () => void;
   onSubmit: () => void;
   onCompleteConfirm: () => void;
+  onStay: () => void;
+  onLeave: () => void;
 };
 
 export function SurveyForm({
@@ -32,6 +35,7 @@ export function SurveyForm({
   errors,
   isSubmitting,
   isComplete,
+  isBlocking,
   sigunguList,
   setField,
   onPrimarySidoChange,
@@ -42,6 +46,8 @@ export function SurveyForm({
   onPrevStep,
   onSubmit,
   onCompleteConfirm,
+  onStay,
+  onLeave,
 }: Props) {
   const isEdit = mode === 'edit';
 
@@ -116,6 +122,23 @@ export function SurveyForm({
           cancelLabel="닫기"
           onConfirm={onCompleteConfirm}
           onClose={onCompleteConfirm}
+        />
+      )}
+
+      {isBlocking && (
+        <ConfirmModal
+          title="페이지를 이동하시겠어요?"
+          description={
+            <>
+              폼 작성을 그만하고 이동할까요?
+              <br />
+              작성 중인 내용은 저장되지 않아요.
+            </>
+          }
+          confirmLabel="이동하기"
+          cancelLabel="머무르기"
+          onConfirm={onLeave}
+          onClose={onStay}
         />
       )}
     </div>

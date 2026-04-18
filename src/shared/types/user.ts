@@ -1,6 +1,4 @@
-// DevStatePanel / mockData에서 사용 중인 레거시 타입 — 실제 API 연동 후 제거
 export type UserState = 'guest' | 'loggedIn' | 'surveyed';
-export type UserProfile = { name: string; lastSurveyDate: string };
 
 // Supabase users 테이블과 1:1 대응
 export type User = {

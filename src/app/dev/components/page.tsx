@@ -335,7 +335,7 @@ export default function ComponentsDevPage() {
         <Row label="기본">
           <div className="w-full">
             <AIResultCard
-              childName="김지수"
+              userName="김지수"
               axes={SAMPLE_AXES}
               summary="반복적이고 정확한 업무 처리에 강점이 있으며, 혼자 집중할 수 있는 환경에서 높은 성과를 냅니다."
               jobs={SAMPLE_MATCHED_JOBS}

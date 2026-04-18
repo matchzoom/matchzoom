@@ -4,11 +4,13 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SurveyForm } from '@/features/survey/ui/SurveyForm';
 import { useSurveyForm } from '@/features/survey/hooks/useSurveyForm';
+import { usePreventNavigation } from '@/features/survey/hooks/usePreventNavigation';
 
 function SurveyContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') === 'edit' ? 'edit' : 'create';
   const form = useSurveyForm(mode);
+  const { isBlocking, onStay, onLeave } = usePreventNavigation(form.isDirty);
 
   return (
     <SurveyForm
@@ -18,6 +20,7 @@ function SurveyContent() {
       errors={form.errors}
       isSubmitting={form.isSubmitting}
       isComplete={form.isComplete}
+      isBlocking={isBlocking}
       sigunguList={form.sigunguList}
       setField={form.setField}
       onPrimarySidoChange={form.onPrimarySidoChange}
@@ -28,6 +31,8 @@ function SurveyContent() {
       onPrevStep={form.onPrevStep}
       onSubmit={form.onSubmit}
       onCompleteConfirm={form.onCompleteConfirm}
+      onStay={onStay}
+      onLeave={onLeave}
     />
   );
 }

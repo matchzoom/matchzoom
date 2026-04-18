@@ -2,15 +2,15 @@ import type { MatchedJob } from '@/shared/types/job';
 import { FitBadge } from '@/shared/ui/FitBadge';
 
 type MatchedJobsCardProps = {
-  childName: string;
+  userName: string;
   jobs: MatchedJob[];
 };
 
-export function MatchedJobsCard({ childName, jobs }: MatchedJobsCardProps) {
+export function MatchedJobsCard({ userName, jobs }: MatchedJobsCardProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6">
       <h3 className="mb-6 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-        {childName}님에게 맞는 직종 TOP 3
+        {userName}님에게 맞는 직종 TOP 3
       </h3>
       <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
         {jobs.map((job, index) => (
