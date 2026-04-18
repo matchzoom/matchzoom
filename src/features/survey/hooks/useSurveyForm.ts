@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSigunguList } from '../utils/regions';
 import { step1Schema, step2Schema } from '../utils/schema';
+import {
+  DISABILITY_TYPE_VALUES,
+  HOPE_ACTIVITIES_VALUES,
+} from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
 import { getProfile } from '@/features/profile/api/profileApi';
 import type { Profile } from '@/shared/types/profile';
@@ -53,6 +57,18 @@ const INITIAL: SurveyFormValues = {
   hope_activities_other: '',
 };
 
+// 저장된 배열에서 선택지에 없는 커스텀 값을 찾아 반환
+function extractOther(values: string[], knownSet: Set<string>): string {
+  return values.find((v) => !knownSet.has(v)) ?? '';
+}
+
+// 커스텀 값을 '기타'로 치환해서 체크박스 상태에 맞는 배열로 복원
+function restoreOther(values: string[], knownSet: Set<string>): string[] {
+  const hasCustom = values.some((v) => !knownSet.has(v));
+  const known = values.filter((v) => knownSet.has(v));
+  return hasCustom ? [...known, '기타'] : known;
+}
+
 function profileToFormValues(p: Profile): SurveyFormValues {
   const [primarySido = '', ...primaryRest] = p.region_primary.split(' ');
   const primarySigungu = primaryRest.join(' ');
@@ -74,16 +90,22 @@ function profileToFormValues(p: Profile): SurveyFormValues {
     region_secondary_sido: secondarySido,
     region_secondary_sigungu: secondarySigungu,
     barrier_free: p.is_barrier_free,
-    disability_type: p.disability_type,
-    disability_type_other: '',
+    disability_type: restoreOther(p.disability_type, DISABILITY_TYPE_VALUES),
+    disability_type_other: extractOther(
+      p.disability_type,
+      DISABILITY_TYPE_VALUES,
+    ),
     disability_level: p.disability_level,
     mobility: p.mobility,
     hand_usage: p.hand_usage,
     stamina: p.stamina,
     communication: p.communication,
     instruction_level: p.instruction_level,
-    hope_activities: p.hope_activities,
-    hope_activities_other: '',
+    hope_activities: restoreOther(p.hope_activities, HOPE_ACTIVITIES_VALUES),
+    hope_activities_other: extractOther(
+      p.hope_activities,
+      HOPE_ACTIVITIES_VALUES,
+    ),
   };
 }
 
@@ -160,6 +182,21 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       region_secondary_sido: undefined,
       region_secondary_sigungu: undefined,
     }));
+  }
+
+  function onDisabilityTypeChange(value: string, checked: boolean) {
+    setValues((prev) => {
+      const next = checked
+        ? [...prev.disability_type, value]
+        : prev.disability_type.filter((v) => v !== value);
+      return {
+        ...prev,
+        disability_type: next,
+        disability_type_other:
+          value === '기타' && !checked ? '' : prev.disability_type_other,
+      };
+    });
+    setErrors((prev) => ({ ...prev, disability_type: undefined }));
   }
 
   function onHopeActivitiesChange(next: string | string[]) {
@@ -284,6 +321,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     onPrimarySidoChange,
     onSecondarySidoChange,
     onSecondaryReset,
+    onDisabilityTypeChange,
     onHopeActivitiesChange,
     onNextStep,
     onPrevStep,

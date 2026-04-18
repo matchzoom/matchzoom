@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DISABILITY_TYPE_VALUES, HOPE_ACTIVITIES_VALUES } from './options';
 
 export const step1Schema = z
   .object({
@@ -40,8 +41,18 @@ export const step2Schema = z
       }
       return true;
     },
+    { message: '기타 내용을 입력해주세요', path: ['disability_type_other'] },
+  )
+  .refine(
+    (data) => {
+      if (data.disability_type.includes('기타')) {
+        const val = (data.disability_type_other ?? '').trim();
+        return !DISABILITY_TYPE_VALUES.has(val);
+      }
+      return true;
+    },
     {
-      message: '기타 내용을 입력해주세요',
+      message: '이미 선택 가능한 항목이에요. 다른 내용을 입력해주세요',
       path: ['disability_type_other'],
     },
   )
@@ -52,8 +63,18 @@ export const step2Schema = z
       }
       return true;
     },
+    { message: '기타 내용을 입력해주세요', path: ['hope_activities_other'] },
+  )
+  .refine(
+    (data) => {
+      if (data.hope_activities.includes('기타')) {
+        const val = (data.hope_activities_other ?? '').trim();
+        return !HOPE_ACTIVITIES_VALUES.has(val);
+      }
+      return true;
+    },
     {
-      message: '기타 내용을 입력해주세요',
+      message: '이미 선택 가능한 항목이에요. 다른 내용을 입력해주세요',
       path: ['hope_activities_other'],
     },
   );

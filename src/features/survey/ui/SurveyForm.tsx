@@ -19,6 +19,7 @@ type Props = {
   onPrimarySidoChange: (sido: string) => void;
   onSecondarySidoChange: (sido: string) => void;
   onSecondaryReset: () => void;
+  onDisabilityTypeChange: (value: string, checked: boolean) => void;
   onHopeActivitiesChange: (v: string | string[]) => void;
   onNextStep: () => void;
   onPrevStep: () => void;
@@ -41,6 +42,7 @@ export function SurveyForm({
   onPrimarySidoChange,
   onSecondarySidoChange,
   onSecondaryReset,
+  onDisabilityTypeChange,
   onHopeActivitiesChange,
   onNextStep,
   onPrevStep,
@@ -103,6 +105,7 @@ export function SurveyForm({
           values={values}
           errors={errors}
           setField={setField}
+          onDisabilityTypeChange={onDisabilityTypeChange}
           onHopeActivitiesChange={onHopeActivitiesChange}
           onPrevStep={onPrevStep}
           onSubmit={onSubmit}
