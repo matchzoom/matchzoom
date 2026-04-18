@@ -1,15 +1,20 @@
 import { z } from 'zod';
 
-export const step1Schema = z.object({
-  name: z.string().min(1, '이름을 입력해주세요'),
-  gender: z.string().min(1, '성별을 선택해주세요'),
-  education: z.string().min(1, '최종학력을 선택해주세요'),
-  region_primary_sido: z.string().min(1, '시·도를 선택해주세요'),
-  region_primary_sigungu: z.string().min(1, '구·군·시를 선택해주세요'),
-  region_secondary_sido: z.string().optional(),
-  region_secondary_sigungu: z.string().optional(),
-  barrier_free: z.boolean(),
-});
+export const step1Schema = z
+  .object({
+    name: z.string().min(1, '이름을 입력해주세요'),
+    gender: z.string().min(1, '성별을 선택해주세요'),
+    education: z.string().min(1, '최종학력을 선택해주세요'),
+    region_primary_sido: z.string().min(1, '시·도를 선택해주세요'),
+    region_primary_sigungu: z.string().min(1, '구·군·시를 선택해주세요'),
+    region_secondary_sido: z.string().optional(),
+    region_secondary_sigungu: z.string().optional(),
+    barrier_free: z.boolean(),
+  })
+  .refine(
+    (data) => !(data.region_secondary_sido && !data.region_secondary_sigungu),
+    { message: '구·군·시를 선택해주세요', path: ['region_secondary_sigungu'] },
+  );
 
 export const step2Schema = z
   .object({

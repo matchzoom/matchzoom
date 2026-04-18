@@ -5,15 +5,19 @@ import { Radio, RadioGroup } from '@/shared/ui/Radio';
 import type { SurveyFormValues } from '../hooks/useSurveyForm';
 
 const DISABILITY_TYPE_OPTIONS = [
+  { value: '시각장애', label: '시각장애' },
+  { value: '청각장애', label: '청각장애' },
+  { value: '지체장애', label: '지체장애' },
+  { value: '언어장애', label: '언어장애' },
+  { value: '안면장애', label: '안면장애' },
   { value: '지적장애', label: '지적장애' },
   { value: '자폐성장애', label: '자폐성장애' },
-  { value: '기타 발달장애', label: '기타 발달장애' },
+  { value: '기타', label: '기타' },
 ];
 
 const DISABILITY_LEVEL_OPTIONS = [
-  { value: '경도', label: '경도' },
-  { value: '중등도', label: '중등도' },
-  { value: '중도', label: '중도' },
+  { value: '장애의 정도가 심함', label: '장애의 정도가 심함' },
+  { value: '장애의 정도가 심하지 않음', label: '장애의 정도가 심하지 않음' },
   { value: '모르겠어요', label: '모르겠어요' },
 ];
 
@@ -99,10 +103,10 @@ export function SurveyStep2({
           id="step2-heading"
           className="text-[1rem] font-semibold text-gray-900"
         >
-          자녀의 특성
+          장애 정보
         </h2>
         <p className="mt-1 text-[0.875rem] text-gray-500">
-          자녀의 신체 조건과 희망 활동을 알려주세요
+          신체 조건과 희망 활동을 알려주세요
         </p>
       </div>
 
@@ -122,7 +126,12 @@ export function SurveyStep2({
         </RadioGroup>
 
         {/* 장애 등급 */}
-        <RadioGroup label="장애 등급" required error={errors.disability_level}>
+        <RadioGroup
+          label="장애 정도"
+          required
+          error={errors.disability_level}
+          hint="정확히 모르셔도 괜찮아요. 추천 정확도를 높이기 위한 참고 정보예요."
+        >
           {DISABILITY_LEVEL_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}

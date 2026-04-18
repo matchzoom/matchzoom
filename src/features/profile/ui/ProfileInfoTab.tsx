@@ -64,7 +64,7 @@ export function ProfileInfoTab({
       <header className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-[1.125rem] font-bold leading-[1.35] text-gray-900">
-            {childProfile.name}님의 자녀 프로필
+            {childProfile.name}님의 프로필
           </h1>
           <p className="mt-1 text-[0.875rem] text-gray-500">
             마지막 검사일: {lastSurveyDate}

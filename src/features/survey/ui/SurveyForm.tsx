@@ -17,6 +17,7 @@ type Props = {
   ) => void;
   onPrimarySidoChange: (sido: string) => void;
   onSecondarySidoChange: (sido: string) => void;
+  onSecondaryReset: () => void;
   onHopeActivitiesChange: (v: string | string[]) => void;
   onNextStep: () => void;
   onPrevStep: () => void;
@@ -35,6 +36,7 @@ export function SurveyForm({
   setField,
   onPrimarySidoChange,
   onSecondarySidoChange,
+  onSecondaryReset,
   onHopeActivitiesChange,
   onNextStep,
   onPrevStep,
@@ -47,10 +49,10 @@ export function SurveyForm({
     <div className="mx-auto max-w-[640px] px-4 py-10 md:px-5 md:py-14 lg:px-6">
       {/* 페이지 타이틀 */}
       <h1 className="mb-2 text-[1.75rem] font-bold leading-[1.35] text-gray-900">
-        {isEdit ? '검사 내용 수정' : '자녀 특성 검사'}
+        {isEdit ? '검사 내용 수정' : '특성 검사'}
       </h1>
       <p className="mb-8 text-[0.9375rem] text-gray-500">
-        자녀의 특성을 입력하면 AI가 적합한 직종과 채용공고를 찾아드려요
+        장애 정보와 특성을 입력하면 AI가 적합한 직종과 채용공고를 찾아드려요
       </p>
 
       {/* 스텝 인디케이터 */}
@@ -60,7 +62,7 @@ export function SurveyForm({
             Step {step} / 2
           </span>
           <span className="text-[0.8125rem] text-gray-500">
-            {step === 1 ? '기본 정보' : '자녀의 특성'}
+            {step === 1 ? '기본 정보' : '장애 정보'}
           </span>
         </div>
         <div
@@ -86,6 +88,7 @@ export function SurveyForm({
           setField={setField}
           onPrimarySidoChange={onPrimarySidoChange}
           onSecondarySidoChange={onSecondarySidoChange}
+          onSecondaryReset={onSecondaryReset}
           onNextStep={onNextStep}
         />
       ) : (
