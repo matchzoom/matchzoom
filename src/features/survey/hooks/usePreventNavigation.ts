@@ -42,7 +42,7 @@ export function usePreventNavigation(isDirty: boolean) {
         e.preventDefault();
         const href = anchor.href;
         pendingActionRef.current = () => {
-          location.href = href;
+          router.push(href);
         };
         setIsBlocking(true);
       }
@@ -53,7 +53,7 @@ export function usePreventNavigation(isDirty: boolean) {
       history.pushState({ blocked: true }, '', location.href);
       setTimeout(() => {
         pendingActionRef.current = () => {
-          router.push(getPreviousUrl());
+          router.replace(getPreviousUrl());
         };
         setIsBlocking(true);
       }, 0);
