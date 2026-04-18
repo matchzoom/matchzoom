@@ -12,7 +12,7 @@ const body = {
   education: '고등학교 졸업',
   region_primary: '서울특별시 강남구',
   is_barrier_free: false,
-  disability_type: '지체',
+  disability_type: ['지체'],
   disability_level: '3급',
   mobility: '자유로움',
   hand_usage: '양손 가능',

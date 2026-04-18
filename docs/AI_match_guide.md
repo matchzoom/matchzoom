@@ -68,7 +68,7 @@ export const {name}Strategy: MatchStrategy = {
   region_primary: '서울특별시 강남구', // 희망 지역 1순위
   region_secondary: '서울특별시 마포구' | null, // 희망 지역 2순위
   is_barrier_free: false,       // 베리어프리 필요 여부
-  disability_type: '지적장애',   // 장애 유형
+  disability_type: ['지적장애'],  // 장애 유형 (복수 선택 가능)
   disability_level: '중등도',    // 장애 등급
   mobility: '자유로움',          // 이동 능력
   hand_usage: '세밀한 작업 가능',  // 손 사용
@@ -140,7 +140,7 @@ buildMessages: (profile) => ({
 ...`,
   user: `다음 사용자의 프로필을 분석해줘:
 이름: ${profile.name}
-장애 유형: ${profile.disability_type}
+장애 유형: ${profile.disability_type.join(', ')}
 ...`,
 })
 ```

@@ -58,7 +58,7 @@ export function SurveyForm({
         {isEdit ? '검사 내용 수정' : '특성 검사'}
       </h1>
       <p className="mb-8 text-[0.9375rem] text-gray-500">
-        장애 정보와 특성을 입력하면 AI가 적합한 직종과 채용공고를 찾아드려요
+        특성을 알려주시면 AI가 맞는 직종과 채용공고를 찾아드려요
       </p>
 
       {/* 스텝 인디케이터 */}
@@ -68,7 +68,7 @@ export function SurveyForm({
             Step {step} / 2
           </span>
           <span className="text-[0.8125rem] text-gray-500">
-            {step === 1 ? '기본 정보' : '장애 정보'}
+            {step === 1 ? '기본 정보' : '세부 정보'}
           </span>
         </div>
         <div
@@ -114,9 +114,15 @@ export function SurveyForm({
         <ConfirmModal
           title={isEdit ? '수정 완료' : '검사 완료'}
           description={
-            isEdit
-              ? '검사 내용이 수정되었습니다! 결과를 확인해보세요.'
-              : '검사가 완료되었습니다! 결과를 확인해보세요.'
+            isEdit ? (
+              <>
+                프로필이 수정되었어요.
+                <br />
+                변경된 내용에 맞춰 AI 결과도 업데이트돼요.
+              </>
+            ) : (
+              '검사가 완료되었습니다! 결과를 확인해보세요.'
+            )
           }
           confirmLabel="결과 보기"
           cancelLabel="닫기"

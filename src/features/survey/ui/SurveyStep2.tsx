@@ -103,7 +103,7 @@ export function SurveyStep2({
           id="step2-heading"
           className="text-[1rem] font-semibold text-gray-900"
         >
-          장애 정보
+          나의 특성
         </h2>
         <p className="mt-1 text-[0.875rem] text-gray-500">
           신체 조건과 희망 활동을 알려주세요
@@ -112,18 +112,42 @@ export function SurveyStep2({
 
       <div className="flex flex-col gap-8">
         {/* 장애 유형 */}
-        <RadioGroup label="장애 유형" required error={errors.disability_type}>
+        <CheckboxGroup
+          label="장애 유형"
+          required
+          error={errors.disability_type}
+        >
           {DISABILITY_TYPE_OPTIONS.map((opt) => (
-            <Radio
+            <Checkbox
               key={opt.value}
-              name="disability_type"
-              value={opt.value}
+              id={`disability_type-${opt.value}`}
               label={opt.label}
-              checked={values.disability_type === opt.value}
-              onChange={() => setField('disability_type', opt.value)}
+              checked={values.disability_type.includes(opt.value)}
+              onChange={(e) => {
+                const next = e.target.checked
+                  ? [...values.disability_type, opt.value]
+                  : values.disability_type.filter((v) => v !== opt.value);
+                setField('disability_type', next);
+                if (opt.value === '기타' && !e.target.checked) {
+                  setField('disability_type_other', '');
+                }
+              }}
             />
           ))}
-        </RadioGroup>
+        </CheckboxGroup>
+
+        {/* 장애 유형 — 기타 내용 */}
+        {values.disability_type.includes('기타') && (
+          <Input
+            label="기타 장애 유형"
+            required
+            value={values.disability_type_other}
+            onChange={(e) => setField('disability_type_other', e.target.value)}
+            error={errors.disability_type_other}
+            placeholder="장애 유형을 입력해주세요"
+            maxLength={100}
+          />
+        )}
 
         {/* 장애 등급 */}
         <RadioGroup
@@ -239,6 +263,7 @@ export function SurveyStep2({
           {HOPE_ACTIVITIES_OPTIONS.map((opt) => (
             <Checkbox
               key={opt.value}
+              id={`hope_activities-${opt.value}`}
               label={opt.label}
               checked={values.hope_activities.includes(opt.value)}
               onChange={(e) =>

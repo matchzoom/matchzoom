@@ -18,7 +18,8 @@ export type SurveyFormValues = {
   region_secondary_sido: string;
   region_secondary_sigungu: string;
   barrier_free: boolean;
-  disability_type: string;
+  disability_type: string[];
+  disability_type_other: string;
   disability_level: string;
   mobility: string;
   hand_usage: string;
@@ -40,7 +41,8 @@ const INITIAL: SurveyFormValues = {
   region_secondary_sido: '',
   region_secondary_sigungu: '',
   barrier_free: false,
-  disability_type: '',
+  disability_type: [],
+  disability_type_other: '',
   disability_level: '',
   mobility: '',
   hand_usage: '',
@@ -73,6 +75,7 @@ function profileToFormValues(p: Profile): SurveyFormValues {
     region_secondary_sigungu: secondarySigungu,
     barrier_free: p.is_barrier_free,
     disability_type: p.disability_type,
+    disability_type_other: '',
     disability_level: p.disability_level,
     mobility: p.mobility,
     hand_usage: p.hand_usage,
@@ -199,6 +202,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   async function onSubmit() {
     const result = step2Schema.safeParse({
       disability_type: values.disability_type,
+      disability_type_other: values.disability_type_other,
       disability_level: values.disability_level,
       mobility: values.mobility,
       hand_usage: values.hand_usage,
@@ -216,6 +220,13 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
 
     setIsSubmitting(true);
     try {
+      const disabilityTypes = values.disability_type.includes('기타')
+        ? [
+            ...values.disability_type.filter((t) => t !== '기타'),
+            values.disability_type_other.trim(),
+          ]
+        : values.disability_type;
+
       const activities = values.hope_activities.includes('기타')
         ? [
             ...values.hope_activities.filter((a) => a !== '기타'),
@@ -235,7 +246,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
         region_primary: `${values.region_primary_sido} ${values.region_primary_sigungu}`,
         region_secondary: regionSecondary,
         is_barrier_free: values.barrier_free,
-        disability_type: values.disability_type,
+        disability_type: disabilityTypes,
         disability_level: values.disability_level,
         mobility: values.mobility,
         hand_usage: values.hand_usage,

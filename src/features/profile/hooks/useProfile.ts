@@ -24,7 +24,7 @@ function toUserProfile(p: Profile): UserProfile {
     region1: parseRegion(p.region_primary),
     region2: p.region_secondary ? parseRegion(p.region_secondary) : undefined,
     barrierFree: p.is_barrier_free,
-    disabilityType: p.disability_type as UserProfile['disabilityType'],
+    disabilityType: p.disability_type,
     disabilityGrade: p.disability_level as UserProfile['disabilityGrade'],
     mobility: p.mobility as UserProfile['mobility'],
     handUse: p.hand_usage as UserProfile['handUse'],
