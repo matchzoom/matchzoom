@@ -26,6 +26,7 @@ function SurveyContent() {
       onPrimarySidoChange={form.onPrimarySidoChange}
       onSecondarySidoChange={form.onSecondarySidoChange}
       onSecondaryReset={form.onSecondaryReset}
+      onDisabilityTypeChange={form.onDisabilityTypeChange}
       onHopeActivitiesChange={form.onHopeActivitiesChange}
       onNextStep={form.onNextStep}
       onPrevStep={form.onPrevStep}

@@ -6,7 +6,7 @@ export type UserProfile = {
   region1: { city: string; district: string };
   region2?: { city: string; district: string };
   barrierFree: boolean;
-  disabilityType: '지적장애' | '자폐성장애' | '기타 발달장애';
+  disabilityType: string[];
   disabilityGrade: '경도' | '중등도' | '중도' | '모르겠어요';
   mobility: '자유로움' | '보조기구 사용' | '휠체어 사용';
   handUse: '세밀한 작업 가능' | '큰 동작만 가능' | '어려움';

@@ -302,7 +302,7 @@ create table profiles (
   region_primary    text        not null,
   region_secondary  text,
   is_barrier_free   boolean     not null default false,
-  disability_type   text        not null,
+  disability_type   text[]      not null default '{}',
   disability_level  text        not null,
   mobility          text        not null,
   hand_usage        text        not null,

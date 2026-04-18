@@ -13,7 +13,7 @@ export const MOCK_USER_PROFILE: UserProfile = {
   region1: { city: '서울', district: '강남구' },
   region2: { city: '서울', district: '마포구' },
   barrierFree: true,
-  disabilityType: '지적장애',
+  disabilityType: ['지적장애'],
   disabilityGrade: '중등도',
   mobility: '자유로움',
   handUse: '세밀한 작업 가능',

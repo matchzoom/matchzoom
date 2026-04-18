@@ -7,7 +7,7 @@ export const CreateProfileBodySchema = z.object({
   region_primary: z.string().min(1),
   region_secondary: z.string().optional(),
   is_barrier_free: z.boolean(),
-  disability_type: z.string().min(1),
+  disability_type: z.array(z.string()).min(1),
   disability_level: z.string().min(1),
   mobility: z.string().min(1),
   hand_usage: z.string().min(1),
@@ -28,7 +28,7 @@ export type Profile = {
   region_primary: string;
   region_secondary: string | null;
   is_barrier_free: boolean;
-  disability_type: string;
+  disability_type: string[];
   disability_level: string;
   mobility: string;
   hand_usage: string;

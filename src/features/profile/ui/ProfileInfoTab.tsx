@@ -13,15 +13,16 @@ type ProfileInfoTabProps = {
   onEdit: () => void;
 };
 
-type InfoRowProps = { label: string; value: string };
+type InfoRowProps = { label: string; value: string | string[] };
 
 function InfoRow({ label, value }: InfoRowProps) {
+  const display = Array.isArray(value) ? value.join(', ') : value;
   return (
     <div className="flex gap-4 py-2.5 border-b border-gray-100 last:border-b-0">
       <dt className="w-[140px] shrink-0 text-[0.875rem] text-gray-500">
         {label}
       </dt>
-      <dd className="text-[0.875rem] text-gray-900">{value}</dd>
+      <dd className="text-[0.875rem] text-gray-900">{display}</dd>
     </div>
   );
 }
