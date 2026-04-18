@@ -10,6 +10,7 @@ type ProfileInfoTabProps = {
   personalityAxes: PersonalityAxis[];
   personalitySummary: string;
   matchedJobs: MatchedJob[];
+  onEdit: () => void;
 };
 
 type InfoRowProps = { label: string; value: string };
@@ -50,6 +51,7 @@ export function ProfileInfoTab({
   personalityAxes,
   personalitySummary,
   matchedJobs,
+  onEdit,
 }: ProfileInfoTabProps) {
   const region1Label = `${childProfile.region1.city} ${childProfile.region1.district}`;
   const region2Label = childProfile.region2
@@ -68,7 +70,7 @@ export function ProfileInfoTab({
             마지막 검사일: {lastSurveyDate}
           </p>
         </div>
-        <Button variant="secondary" size="sm" type="button">
+        <Button variant="secondary" size="sm" type="button" onClick={onEdit}>
           <Pencil size={16} strokeWidth={1.5} aria-hidden="true" />
           프로필 수정
         </Button>

@@ -275,14 +275,85 @@ if (!user) return <GuestView />;
 
 ---
 
-## 9. Component Rules
+## 9. DB 스키마 (확정)
+
+BFF에서 `supabaseFetch` (Secret key)로만 접근. RLS 불필요 — 서버에서 `user_id` 필터링.
+
+### 테이블
+
+```sql
+-- users
+create table users (
+  id         bigint generated always as identity primary key,
+  nickname   text        not null,
+  created_at timestamptz not null default now()
+);
+
+-- profiles
+create table profiles (
+  id                bigint generated always as identity primary key,
+  user_id           bigint      not null unique references users(id) on delete cascade,
+  name              text        not null,
+  gender            text        not null,
+  education         text        not null,
+  region_primary    text        not null,
+  region_secondary  text,
+  is_barrier_free   boolean     not null default false,
+  disability_type   text        not null,
+  disability_level  text        not null,
+  mobility          text        not null,
+  hand_usage        text        not null,
+  stamina           text        not null,
+  communication     text        not null,
+  instruction_level text        not null,
+  hope_activities   text[]      not null default '{}',
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
+);
+
+-- bookmarks
+create table bookmarks (
+  id            bigint generated always as identity primary key,
+  user_id       bigint      not null references users(id) on delete cascade,
+  posting_title text        not null,
+  posting_url   text        not null,
+  created_at    timestamptz not null default now(),
+  unique (user_id, posting_url)
+);
+
+-- match_results
+create table match_results (
+  id           bigint generated always as identity primary key,
+  user_id      bigint      not null unique references users(id) on delete cascade,
+  radar_chart  jsonb       not null default '{}',
+  summary_text text        not null default '',
+  top3_jobs    jsonb       not null default '[]',
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+```
+
+### 트리거
+
+- `profiles.updated_at`, `match_results.updated_at` → `set_updated_at()` 트리거로 자동 갱신
+
+### 관계
+
+- `profiles.user_id` → `users.id` (1:1, cascade)
+- `bookmarks.user_id` → `users.id` (1:N, cascade)
+- `match_results.user_id` → `users.id` (1:1, cascade)
+- `bookmarks` unique 제약: `(user_id, posting_url)`
+
+---
+
+## 10. Component Rules
 
 - Server Component 기본
 - 인터랙티브한 경우에만 `'use client'` 추가
 
 ---
 
-## 10. State Management
+## 11. State Management
 
 - 서버 상태: **TanStack Query** (유저 정보 포함 — Zustand 사용 금지)
 - UI/전역 상태: React Context
@@ -291,7 +362,7 @@ if (!user) return <GuestView />;
 
 ---
 
-## 11. UI 작업 규칙
+## 12. UI 작업 규칙
 
 **UI 컴포넌트(`shared/ui/`, `features/*/ui/`, `widgets/`)를 만들 때 반드시:**
 
@@ -353,7 +424,7 @@ const { register, handleSubmit, errors } = useSurveyForm();
 
 ---
 
-## 12. CRUD 규칙
+## 13. CRUD 규칙
 
 **CRUD 작업(`app/api/`, `features/*/api/`, `features/*/hooks/`)을 만들 때 반드시:**
 
@@ -407,7 +478,7 @@ pnpm test       # watch 모드
 
 ---
 
-## 13. PR 생성 절차
+## 14. PR 생성 절차
 
 **"PR 올려줘" 요청 시 반드시 `/ship` 커맨드를 실행한다.**
 

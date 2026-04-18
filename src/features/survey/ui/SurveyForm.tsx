@@ -1,12 +1,15 @@
 import type { SurveyFormValues } from '../hooks/useSurveyForm';
+import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { SurveyStep1 } from './SurveyStep1';
 import { SurveyStep2 } from './SurveyStep2';
 
 type Props = {
+  mode: 'create' | 'edit';
   step: 1 | 2;
   values: SurveyFormValues;
   errors: Partial<Record<keyof SurveyFormValues, string>>;
   isSubmitting: boolean;
+  isComplete: boolean;
   sigunguList: { primary: string[]; secondary: string[] };
   setField: <K extends keyof SurveyFormValues>(
     key: K,
@@ -18,13 +21,16 @@ type Props = {
   onNextStep: () => void;
   onPrevStep: () => void;
   onSubmit: () => void;
+  onCompleteConfirm: () => void;
 };
 
 export function SurveyForm({
+  mode,
   step,
   values,
   errors,
   isSubmitting,
+  isComplete,
   sigunguList,
   setField,
   onPrimarySidoChange,
@@ -33,12 +39,15 @@ export function SurveyForm({
   onNextStep,
   onPrevStep,
   onSubmit,
+  onCompleteConfirm,
 }: Props) {
+  const isEdit = mode === 'edit';
+
   return (
     <div className="mx-auto max-w-[640px] px-4 py-10 md:px-5 md:py-14 lg:px-6">
       {/* 페이지 타이틀 */}
       <h1 className="mb-2 text-[1.75rem] font-bold leading-[1.35] text-gray-900">
-        자녀 특성 검사
+        {isEdit ? '검사 내용 수정' : '자녀 특성 검사'}
       </h1>
       <p className="mb-8 text-[0.9375rem] text-gray-500">
         자녀의 특성을 입력하면 AI가 적합한 직종과 채용공고를 찾아드려요
@@ -81,6 +90,7 @@ export function SurveyForm({
         />
       ) : (
         <SurveyStep2
+          mode={mode}
           values={values}
           errors={errors}
           setField={setField}
@@ -88,6 +98,21 @@ export function SurveyForm({
           onPrevStep={onPrevStep}
           onSubmit={onSubmit}
           isSubmitting={isSubmitting}
+        />
+      )}
+
+      {isComplete && (
+        <ConfirmModal
+          title={isEdit ? '수정 완료' : '검사 완료'}
+          description={
+            isEdit
+              ? '검사 내용이 수정되었습니다! 결과를 확인해보세요.'
+              : '검사가 완료되었습니다! 결과를 확인해보세요.'
+          }
+          confirmLabel="결과 보기"
+          cancelLabel="닫기"
+          onConfirm={onCompleteConfirm}
+          onClose={onCompleteConfirm}
         />
       )}
     </div>

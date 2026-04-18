@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSigunguList } from '../utils/regions';
 import { step1Schema, step2Schema } from '../utils/schema';
 import { submitSurvey } from '../api/surveyApi';
+import { getProfile } from '@/features/profile/api/profileApi';
+import type { Profile } from '@/shared/types/profile';
 
 export type SurveyFormValues = {
   name: string;
@@ -47,6 +51,39 @@ const INITIAL: SurveyFormValues = {
   hope_activities_other: '',
 };
 
+function profileToFormValues(p: Profile): SurveyFormValues {
+  const [primarySido = '', ...primaryRest] = p.region_primary.split(' ');
+  const primarySigungu = primaryRest.join(' ');
+
+  let secondarySido = '';
+  let secondarySigungu = '';
+  if (p.region_secondary) {
+    const [sido = '', ...rest] = p.region_secondary.split(' ');
+    secondarySido = sido;
+    secondarySigungu = rest.join(' ');
+  }
+
+  return {
+    name: p.name,
+    gender: p.gender,
+    education: p.education,
+    region_primary_sido: primarySido,
+    region_primary_sigungu: primarySigungu,
+    region_secondary_sido: secondarySido,
+    region_secondary_sigungu: secondarySigungu,
+    barrier_free: p.is_barrier_free,
+    disability_type: p.disability_type,
+    disability_level: p.disability_level,
+    mobility: p.mobility ?? '',
+    hand_usage: p.hand_usage,
+    stamina: p.stamina,
+    communication: p.communication,
+    instruction_level: p.instruction_level,
+    hope_activities: p.hope_activities,
+    hope_activities_other: '',
+  };
+}
+
 function parseZodErrors<T extends object>(
   issues: { path: PropertyKey[]; message: string }[],
 ): Partial<Record<keyof T, string>> {
@@ -58,11 +95,28 @@ function parseZodErrors<T extends object>(
   return result;
 }
 
-export function useSurveyForm() {
+export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2>(1);
   const [values, setValues] = useState<SurveyFormValues>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [initialized, setInitialized] = useState(mode === 'create');
+
+  const { data: existingProfile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    enabled: mode === 'edit',
+  });
+
+  useEffect(() => {
+    if (mode === 'edit' && existingProfile && !initialized) {
+      setValues(profileToFormValues(existingProfile));
+      setInitialized(true);
+    }
+  }, [mode, existingProfile, initialized]);
 
   function setField<K extends keyof SurveyFormValues>(
     key: K,
@@ -173,6 +227,9 @@ export function useSurveyForm() {
         instruction_level: values.instruction_level,
         hope_activities: activities,
       });
+
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      setIsComplete(true);
     } catch (err) {
       console.error('[검사 제출 오류]', err);
     } finally {
@@ -180,11 +237,17 @@ export function useSurveyForm() {
     }
   }
 
+  function onCompleteConfirm() {
+    router.push('/profile');
+  }
+
   return {
+    mode,
     step,
     values,
     errors,
     isSubmitting,
+    isComplete,
     setField,
     onPrimarySidoChange,
     onSecondarySidoChange,
@@ -192,6 +255,7 @@ export function useSurveyForm() {
     onNextStep,
     onPrevStep,
     onSubmit,
+    onCompleteConfirm,
     sigunguList: {
       primary: getSigunguList(values.region_primary_sido),
       secondary: getSigunguList(values.region_secondary_sido),
