@@ -24,13 +24,13 @@ const SAMPLE_JOB: JobPosting = {
   companyName: '(주)행복한일터',
   title:
     '사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)사무보조 직원 모집 (장애인 우대)',
-  workType: '온·오프라인',
   location: '서울 강남구',
   salary: '월 220만원',
   deadline: '2026-05-31',
-  views: 1240,
-  fitLevel: '잘 맞아요',
-  matchPoints: '꼼꼼한 성격, 문서 작성 능력',
+  empType: '정규직',
+  reqCareer: '무관',
+  reqEduc: '무관',
+  envConditions: ['양손작업 가능', '작은 물품 조립가능'],
   bookmarked: false,
 };
 
@@ -309,21 +309,13 @@ export default function ComponentsDevPage() {
           </div>
           <div className="w-full max-w-sm">
             <JobCard
-              job={{
-                ...SAMPLE_JOB,
-                fitLevel: '도전해볼 수 있어요',
-                bookmarked: true,
-              }}
+              job={{ ...SAMPLE_JOB, bookmarked: true }}
               onBookmarkToggle={() => {}}
             />
           </div>
           <div className="w-full max-w-sm">
             <JobCard
-              job={{
-                ...SAMPLE_JOB,
-                fitLevel: '힘들 수 있어요',
-                bookmarked: false,
-              }}
+              job={{ ...SAMPLE_JOB, envConditions: [] }}
               onBookmarkToggle={() => {}}
             />
           </div>

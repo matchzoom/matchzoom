@@ -8,7 +8,7 @@ import { AIResultCard } from '@/shared/ui/AIResultCard';
 export function DashboardView() {
   const { userName, personalityAxes, personalitySummary, matchedJobs } =
     useDashboard();
-  const { postings, toggleBookmark } = useJobPostings();
+  const { data: postings = [], isPending: isJobsLoading } = useJobPostings();
 
   return (
     <div className="py-10 md:py-16">
@@ -32,7 +32,8 @@ export function DashboardView() {
           <JobListSection
             userName={userName}
             postings={postings}
-            onBookmarkToggle={toggleBookmark}
+            onBookmarkToggle={() => {}}
+            isLoading={isJobsLoading}
           />
         </section>
       </div>

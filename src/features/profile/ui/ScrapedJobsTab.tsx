@@ -1,17 +1,13 @@
 import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
 
-import type { JobPosting } from '@/shared/types/job';
-import { JobCard } from '@/shared/ui/JobCard';
+import type { Bookmark } from '@/shared/types/bookmark';
 
 type ScrapedJobsTabProps = {
-  jobs: JobPosting[];
-  onBookmarkToggle: (id: number) => void;
+  jobs: Bookmark[];
 };
 
-export function ScrapedJobsTab({
-  jobs,
-  onBookmarkToggle,
-}: ScrapedJobsTabProps) {
+export function ScrapedJobsTab({ jobs }: ScrapedJobsTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <header>
@@ -36,13 +32,25 @@ export function ScrapedJobsTab({
           </Link>
         </div>
       ) : (
-        <ul
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          aria-label="스크랩한 채용공고 목록"
-        >
+        <ul className="flex flex-col gap-3" aria-label="스크랩한 채용공고 목록">
           {jobs.map((job) => (
             <li key={job.id}>
-              <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
+              <a
+                href={job.postingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-ui flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4 hover:border-primary-border"
+              >
+                <span className="line-clamp-1 text-[0.9375rem] font-medium text-gray-900">
+                  {job.postingTitle}
+                </span>
+                <ExternalLink
+                  size={16}
+                  strokeWidth={1.5}
+                  className="shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+              </a>
             </li>
           ))}
         </ul>
