@@ -4,38 +4,9 @@ vi.mock('@/shared/api/bffFetch', () => ({ bffFetch: vi.fn() }));
 
 import { bffFetch } from '@/shared/api/bffFetch';
 import { generateMatch, getMatchResult } from '../api/matchApi';
+import { mockMatchResult } from './match.fixtures';
 
 const mockBffFetch = vi.mocked(bffFetch);
-
-const mockMatchResult = {
-  id: 1,
-  user_id: 1,
-  radar_chart: {
-    repetition: 80,
-    interpersonal: 60,
-    physical: 40,
-    hand_detail: 70,
-    env_sensitivity: 50,
-  },
-  summary_text: '사무직에 적합합니다.',
-  top3_jobs: [
-    {
-      rank: 1,
-      job_name: '데이터 입력원',
-      match_pct: 90,
-      fit_level: '잘 맞아요',
-    },
-    {
-      rank: 2,
-      job_name: '전화상담원',
-      match_pct: 75,
-      fit_level: '도전해볼 수 있어요',
-    },
-    { rank: 3, job_name: '포장원', match_pct: 55, fit_level: '힘들 수 있어요' },
-  ],
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
-};
 
 describe('generateMatch', () => {
   beforeEach(() => vi.clearAllMocks());
