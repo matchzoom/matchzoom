@@ -10,6 +10,7 @@ import {
   HOPE_ACTIVITIES_VALUES,
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
+import { generateMatch } from '@/features/match/api/matchApi';
 import { getProfile } from '@/features/profile/api/profileApi';
 import type { Profile } from '@/shared/types/profile';
 
@@ -128,6 +129,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   const [initialValues, setInitialValues] = useState<SurveyFormValues>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMatching, setIsMatching] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [initialized, setInitialized] = useState(mode === 'create');
 
@@ -294,6 +296,16 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       });
 
       queryClient.invalidateQueries({ queryKey: ['profile'] });
+      setIsSubmitting(false);
+      setIsMatching(true);
+
+      try {
+        await generateMatch();
+        queryClient.invalidateQueries({ queryKey: ['match-result'] });
+      } finally {
+        setIsMatching(false);
+      }
+
       setIsComplete(true);
     } catch (err) {
       console.error('[검사 제출 오류]', err);
@@ -315,6 +327,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     values,
     errors,
     isSubmitting,
+    isMatching,
     isComplete,
     isDirty,
     setField,

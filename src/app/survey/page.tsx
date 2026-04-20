@@ -19,6 +19,7 @@ function SurveyContent() {
       values={form.values}
       errors={form.errors}
       isSubmitting={form.isSubmitting}
+      isMatching={form.isMatching}
       isComplete={form.isComplete}
       isBlocking={isBlocking}
       sigunguList={form.sigunguList}

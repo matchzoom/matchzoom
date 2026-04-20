@@ -40,10 +40,3 @@ export type MatchResult = {
   created_at: string;
   updated_at: string;
 };
-
-// --- 전략 선택 요청 바디 ---
-export const MatchRequestBodySchema = z.object({
-  strategy: z.enum(['wooseok', 'yujin', 'areum', 'jihyun']),
-});
-
-export type MatchRequestBody = z.infer<typeof MatchRequestBodySchema>;

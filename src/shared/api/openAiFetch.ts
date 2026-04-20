@@ -15,7 +15,7 @@ type OpenAiResponse = {
  */
 export const openAiFetch = async (
   messages: ChatMessage[],
-  model: string = 'gpt-4o-mini',
+  model: string = 'gpt-4o',
 ): Promise<string> => {
   const response = await coreFetch<OpenAiResponse>(
     'https://api.openai.com/v1/chat/completions',
