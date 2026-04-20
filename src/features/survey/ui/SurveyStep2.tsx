@@ -1,8 +1,9 @@
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { Button } from '@/shared/ui/Button';
 import { Checkbox, CheckboxGroup } from '@/shared/ui/Checkbox';
 import { Input } from '@/shared/ui/Input';
 import { Radio, RadioGroup } from '@/shared/ui/Radio';
-import type { SurveyFormValues } from '../hooks/useSurveyForm';
+import type { SurveyFormValues } from '../utils/schema';
 import {
   DISABILITY_TYPE_OPTIONS,
   DISABILITY_LEVEL_OPTIONS,
@@ -16,14 +17,12 @@ import {
 
 type Props = {
   mode: 'create' | 'edit';
-  values: SurveyFormValues;
-  errors: Partial<Record<keyof SurveyFormValues, string>>;
-  setField: <K extends keyof SurveyFormValues>(
-    key: K,
-    value: SurveyFormValues[K],
-  ) => void;
+  register: UseFormRegister<SurveyFormValues>;
+  errors: FieldErrors<SurveyFormValues>;
+  watchedDisabilityType: string[];
+  watchedHopeActivities: string[];
   onDisabilityTypeChange: (value: string, checked: boolean) => void;
-  onHopeActivitiesChange: (v: string | string[]) => void;
+  onHopeActivitiesChange: (value: string, checked: boolean) => void;
   onPrevStep: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
@@ -31,9 +30,10 @@ type Props = {
 
 export function SurveyStep2({
   mode,
-  values,
+  register,
   errors,
-  setField,
+  watchedDisabilityType,
+  watchedHopeActivities,
   onDisabilityTypeChange,
   onHopeActivitiesChange,
   onPrevStep,
@@ -41,12 +41,6 @@ export function SurveyStep2({
   isSubmitting,
 }: Props) {
   const submitLabel = mode === 'edit' ? '수정 완료' : '검사 완료';
-  function handleActivityChange(value: string, checked: boolean) {
-    const next = checked
-      ? [...values.hope_activities, value]
-      : values.hope_activities.filter((v) => v !== value);
-    onHopeActivitiesChange(next);
-  }
 
   return (
     <section aria-labelledby="step2-heading">
@@ -67,14 +61,14 @@ export function SurveyStep2({
         <CheckboxGroup
           label="장애 유형"
           required
-          error={errors.disability_type}
+          error={errors.disability_type?.message as string | undefined}
         >
           {DISABILITY_TYPE_OPTIONS.map((opt) => (
             <Checkbox
               key={opt.value}
               id={`disability_type-${opt.value}`}
               label={opt.label}
-              checked={values.disability_type.includes(opt.value)}
+              checked={watchedDisabilityType.includes(opt.value)}
               onChange={(e) =>
                 onDisabilityTypeChange(opt.value, e.target.checked)
               }
@@ -83,13 +77,12 @@ export function SurveyStep2({
         </CheckboxGroup>
 
         {/* 장애 유형 — 기타 내용 */}
-        {values.disability_type.includes('기타') && (
+        {watchedDisabilityType.includes('기타') && (
           <Input
             label="기타 장애 유형"
             required
-            value={values.disability_type_other}
-            onChange={(e) => setField('disability_type_other', e.target.value)}
-            error={errors.disability_type_other}
+            {...register('disability_type_other')}
+            error={errors.disability_type_other?.message}
             placeholder="장애 유형을 입력해주세요"
             maxLength={100}
           />
@@ -99,45 +92,39 @@ export function SurveyStep2({
         <RadioGroup
           label="장애 정도"
           required
-          error={errors.disability_level}
+          error={errors.disability_level?.message}
           hint="정확히 모르셔도 괜찮아요. 추천 정확도를 높이기 위한 참고 정보예요."
         >
           {DISABILITY_LEVEL_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="disability_level"
+              {...register('disability_level')}
               value={opt.value}
               label={opt.label}
-              checked={values.disability_level === opt.value}
-              onChange={() => setField('disability_level', opt.value)}
             />
           ))}
         </RadioGroup>
 
         {/* 이동 */}
-        <RadioGroup label="이동" required error={errors.mobility}>
+        <RadioGroup label="이동" required error={errors.mobility?.message}>
           {MOBILITY_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="mobility"
+              {...register('mobility')}
               value={opt.value}
               label={opt.label}
-              checked={values.mobility === opt.value}
-              onChange={() => setField('mobility', opt.value)}
             />
           ))}
         </RadioGroup>
 
         {/* 손 사용 */}
-        <RadioGroup label="손 사용" required error={errors.hand_usage}>
+        <RadioGroup label="손 사용" required error={errors.hand_usage?.message}>
           {HAND_USAGE_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="hand_usage"
+              {...register('hand_usage')}
               value={opt.value}
               label={opt.label}
-              checked={values.hand_usage === opt.value}
-              onChange={() => setField('hand_usage', opt.value)}
             />
           ))}
         </RadioGroup>
@@ -146,16 +133,14 @@ export function SurveyStep2({
         <RadioGroup
           label="체력 (일일 활동 가능 시간)"
           required
-          error={errors.stamina}
+          error={errors.stamina?.message}
         >
           {STAMINA_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="stamina"
+              {...register('stamina')}
               value={opt.value}
               label={opt.label}
-              checked={values.stamina === opt.value}
-              onChange={() => setField('stamina', opt.value)}
             />
           ))}
         </RadioGroup>
@@ -166,16 +151,14 @@ export function SurveyStep2({
         <RadioGroup
           label="의사소통 — 말하기"
           required
-          error={errors.communication}
+          error={errors.communication?.message}
         >
           {COMMUNICATION_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="communication"
+              {...register('communication')}
               value={opt.value}
               label={opt.label}
-              checked={values.communication === opt.value}
-              onChange={() => setField('communication', opt.value)}
             />
           ))}
         </RadioGroup>
@@ -184,16 +167,14 @@ export function SurveyStep2({
         <RadioGroup
           label="의사소통 — 지시 이해"
           required
-          error={errors.instruction_level}
+          error={errors.instruction_level?.message}
         >
           {INSTRUCTION_LEVEL_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="instruction_level"
+              {...register('instruction_level')}
               value={opt.value}
               label={opt.label}
-              checked={values.instruction_level === opt.value}
-              onChange={() => setField('instruction_level', opt.value)}
             />
           ))}
         </RadioGroup>
@@ -204,29 +185,28 @@ export function SurveyStep2({
         <CheckboxGroup
           label="희망 활동 유형"
           required
-          error={errors.hope_activities}
+          error={errors.hope_activities?.message as string | undefined}
         >
           {HOPE_ACTIVITIES_OPTIONS.map((opt) => (
             <Checkbox
               key={opt.value}
               id={`hope_activities-${opt.value}`}
               label={opt.label}
-              checked={values.hope_activities.includes(opt.value)}
+              checked={watchedHopeActivities.includes(opt.value)}
               onChange={(e) =>
-                handleActivityChange(opt.value, e.target.checked)
+                onHopeActivitiesChange(opt.value, e.target.checked)
               }
             />
           ))}
         </CheckboxGroup>
 
         {/* 기타 활동 내용 */}
-        {values.hope_activities.includes('기타') && (
+        {watchedHopeActivities.includes('기타') && (
           <Input
             label="기타 희망 활동"
             required
-            value={values.hope_activities_other}
-            onChange={(e) => setField('hope_activities_other', e.target.value)}
-            error={errors.hope_activities_other}
+            {...register('hope_activities_other')}
+            error={errors.hope_activities_other?.message}
             placeholder="어떤 활동을 원하시나요?"
             maxLength={100}
           />

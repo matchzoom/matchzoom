@@ -1,32 +1,39 @@
-import type { SurveyFormValues } from '../hooks/useSurveyForm';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { LoadingOverlay } from '@/shared/ui/LoadingOverlay';
+import type { SurveyFormValues } from '../utils/schema';
 import { SurveyStep1 } from './SurveyStep1';
 import { SurveyStep2 } from './SurveyStep2';
 
 type Props = {
   mode: 'create' | 'edit';
   step: 1 | 2;
-  values: SurveyFormValues;
-  errors: Partial<Record<keyof SurveyFormValues, string>>;
+  register: UseFormRegister<SurveyFormValues>;
+  errors: FieldErrors<SurveyFormValues>;
   isSubmitting: boolean;
   isMatching: boolean;
+  isMatchError: boolean;
   isComplete: boolean;
   isBlocking: boolean;
   sigunguList: { primary: string[]; secondary: string[] };
-  setField: <K extends keyof SurveyFormValues>(
-    key: K,
-    value: SurveyFormValues[K],
-  ) => void;
+  watchedPrimarySido: string;
+  watchedPrimarySigungu: string;
+  watchedSecondarySido: string;
+  watchedSecondarySigungu: string;
+  watchedDisabilityType: string[];
+  watchedHopeActivities: string[];
   onPrimarySidoChange: (sido: string) => void;
+  onPrimarySigunguChange: (sigungu: string) => void;
   onSecondarySidoChange: (sido: string) => void;
+  onSecondarySigunguChange: (sigungu: string) => void;
   onSecondaryReset: () => void;
   onDisabilityTypeChange: (value: string, checked: boolean) => void;
-  onHopeActivitiesChange: (v: string | string[]) => void;
+  onHopeActivitiesChange: (value: string, checked: boolean) => void;
   onNextStep: () => void;
   onPrevStep: () => void;
   onSubmit: () => void;
   onCompleteConfirm: () => void;
+  onMatchErrorClose: () => void;
   onStay: () => void;
   onLeave: () => void;
 };
@@ -34,16 +41,24 @@ type Props = {
 export function SurveyForm({
   mode,
   step,
-  values,
+  register,
   errors,
   isSubmitting,
   isMatching,
+  isMatchError,
   isComplete,
   isBlocking,
   sigunguList,
-  setField,
+  watchedPrimarySido,
+  watchedPrimarySigungu,
+  watchedSecondarySido,
+  watchedSecondarySigungu,
+  watchedDisabilityType,
+  watchedHopeActivities,
   onPrimarySidoChange,
+  onPrimarySigunguChange,
   onSecondarySidoChange,
+  onSecondarySigunguChange,
   onSecondaryReset,
   onDisabilityTypeChange,
   onHopeActivitiesChange,
@@ -51,6 +66,7 @@ export function SurveyForm({
   onPrevStep,
   onSubmit,
   onCompleteConfirm,
+  onMatchErrorClose,
   onStay,
   onLeave,
 }: Props) {
@@ -97,21 +113,27 @@ export function SurveyForm({
         {/* 폼 컨텐츠 */}
         {step === 1 ? (
           <SurveyStep1
-            values={values}
+            register={register}
             errors={errors}
             sigunguList={sigunguList}
-            setField={setField}
+            watchedPrimarySido={watchedPrimarySido}
+            watchedPrimarySigungu={watchedPrimarySigungu}
+            watchedSecondarySido={watchedSecondarySido}
+            watchedSecondarySigungu={watchedSecondarySigungu}
             onPrimarySidoChange={onPrimarySidoChange}
+            onPrimarySigunguChange={onPrimarySigunguChange}
             onSecondarySidoChange={onSecondarySidoChange}
+            onSecondarySigunguChange={onSecondarySigunguChange}
             onSecondaryReset={onSecondaryReset}
             onNextStep={onNextStep}
           />
         ) : (
           <SurveyStep2
             mode={mode}
-            values={values}
+            register={register}
             errors={errors}
-            setField={setField}
+            watchedDisabilityType={watchedDisabilityType}
+            watchedHopeActivities={watchedHopeActivities}
             onDisabilityTypeChange={onDisabilityTypeChange}
             onHopeActivitiesChange={onHopeActivitiesChange}
             onPrevStep={onPrevStep}
@@ -138,6 +160,24 @@ export function SurveyForm({
             cancelLabel="닫기"
             onConfirm={onCompleteConfirm}
             onClose={onCompleteConfirm}
+          />
+        )}
+
+        {isMatchError && (
+          <ConfirmModal
+            title="AI 분석에 실패했어요"
+            description={
+              <>
+                검사 정보는 저장되었어요.
+                <br />
+                AI 직업 분석 중 오류가 발생했습니다.
+                <br />
+                잠시 후 다시 시도해주세요.
+              </>
+            }
+            confirmLabel="확인"
+            onConfirm={onMatchErrorClose}
+            onClose={onMatchErrorClose}
           />
         )}
 
