@@ -360,7 +360,7 @@ create table match_results (
 
 - 서버 상태: **TanStack Query** (유저 정보 포함 — Zustand 사용 금지)
 - UI/전역 상태: React Context
-- 폼 상태: react-hook-form (비제어)
+- 폼 상태: **react-hook-form (비제어, 필수)** — `useState`로 폼 상태 직접 관리 금지
 - 단순 로컬 UI 상태: useState
 
 ---
@@ -400,7 +400,9 @@ export function Component({ variant, size, className, ref, ...props }: Props) {
 }
 ```
 
-### 폼 컴포넌트와 react-hook-form
+### 폼 컴포넌트와 react-hook-form (필수)
+
+**모든 폼 훅은 반드시 react-hook-form을 사용한다. `useState`로 폼 값·에러·제출 상태를 직접 관리하는 것은 절대 금지.**
 
 - `shared/ui` 폼 컴포넌트(Input, Checkbox, Radio)는 비제어로 작성 — `ref` prop 그대로 전달
 - 폼 로직은 `features/[x]/hooks/use[Feature]Form.ts`에서 `react-hook-form` 사용

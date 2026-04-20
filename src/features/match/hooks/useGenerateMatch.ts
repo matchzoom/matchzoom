@@ -2,13 +2,12 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { generateMatch } from '../api/matchApi';
-import type { MatchRequestBody } from '@/shared/types/match';
 
 export function useGenerateMatch() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: MatchRequestBody) => generateMatch(body),
+    mutationFn: () => generateMatch(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['match-result'] });
     },

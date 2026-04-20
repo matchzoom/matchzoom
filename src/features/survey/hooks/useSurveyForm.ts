@@ -2,67 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSigunguList } from '../utils/regions';
-import { step1Schema, step2Schema } from '../utils/schema';
+import {
+  surveySchema,
+  STEP1_FIELDS,
+  type SurveyFormValues,
+} from '../utils/schema';
 import {
   DISABILITY_TYPE_VALUES,
   HOPE_ACTIVITIES_VALUES,
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
+import { generateMatch } from '@/features/match/api/matchApi';
 import { getProfile } from '@/features/profile/api/profileApi';
 import type { Profile } from '@/shared/types/profile';
 
-export type SurveyFormValues = {
-  name: string;
-  gender: string;
-  education: string;
-  region_primary_sido: string;
-  region_primary_sigungu: string;
-  region_secondary_sido: string;
-  region_secondary_sigungu: string;
-  barrier_free: boolean;
-  disability_type: string[];
-  disability_type_other: string;
-  disability_level: string;
-  mobility: string;
-  hand_usage: string;
-  stamina: string;
-  communication: string;
-  instruction_level: string;
-  hope_activities: string[];
-  hope_activities_other: string;
-};
+export type { SurveyFormValues };
 
-type FormErrors = Partial<Record<keyof SurveyFormValues, string>>;
-
-const INITIAL: SurveyFormValues = {
-  name: '',
-  gender: '',
-  education: '',
-  region_primary_sido: '',
-  region_primary_sigungu: '',
-  region_secondary_sido: '',
-  region_secondary_sigungu: '',
-  barrier_free: false,
-  disability_type: [],
-  disability_type_other: '',
-  disability_level: '',
-  mobility: '',
-  hand_usage: '',
-  stamina: '',
-  communication: '',
-  instruction_level: '',
-  hope_activities: [],
-  hope_activities_other: '',
-};
-
-// 저장된 배열에서 선택지에 없는 커스텀 값을 찾아 반환
 function extractOther(values: string[], knownSet: Set<string>): string {
   return values.find((v) => !knownSet.has(v)) ?? '';
 }
 
-// 커스텀 값을 '기타'로 치환해서 체크박스 상태에 맞는 배열로 복원
 function restoreOther(values: string[], knownSet: Set<string>): string[] {
   const hasCustom = values.some((v) => !knownSet.has(v));
   const known = values.filter((v) => knownSet.has(v));
@@ -109,27 +72,47 @@ function profileToFormValues(p: Profile): SurveyFormValues {
   };
 }
 
-function parseZodErrors<T extends object>(
-  issues: { path: PropertyKey[]; message: string }[],
-): Partial<Record<keyof T, string>> {
-  const result: Partial<Record<keyof T, string>> = {};
-  for (const issue of issues) {
-    const key = issue.path[0] as keyof T;
-    if (key && !result[key]) result[key] = issue.message;
-  }
-  return result;
-}
+const INITIAL: SurveyFormValues = {
+  name: '',
+  gender: '',
+  education: '',
+  region_primary_sido: '',
+  region_primary_sigungu: '',
+  region_secondary_sido: '',
+  region_secondary_sigungu: '',
+  barrier_free: false,
+  disability_type: [],
+  disability_type_other: '',
+  disability_level: '',
+  mobility: '',
+  hand_usage: '',
+  stamina: '',
+  communication: '',
+  instruction_level: '',
+  hope_activities: [],
+  hope_activities_other: '',
+};
 
 export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2>(1);
-  const [values, setValues] = useState<SurveyFormValues>(INITIAL);
-  const [initialValues, setInitialValues] = useState<SurveyFormValues>(INITIAL);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMatching, setIsMatching] = useState(false);
+  const [isMatchError, setIsMatchError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [initialized, setInitialized] = useState(mode === 'create');
+
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<SurveyFormValues>({
+    resolver: zodResolver(surveySchema),
+    defaultValues: INITIAL,
+  });
 
   const { data: existingProfile } = useQuery({
     queryKey: ['profile'],
@@ -138,188 +121,163 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   });
 
   useEffect(() => {
-    if (mode === 'edit' && existingProfile && !initialized) {
-      const editValues = profileToFormValues(existingProfile);
-      setValues(editValues);
-      setInitialValues(editValues);
-      setInitialized(true);
+    if (mode === 'edit' && existingProfile) {
+      reset(profileToFormValues(existingProfile));
     }
-  }, [mode, existingProfile, initialized]);
+  }, [mode, existingProfile, reset]);
 
-  function setField<K extends keyof SurveyFormValues>(
-    key: K,
-    value: SurveyFormValues[K],
-  ) {
-    setValues((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
-  }
+  const watchedPrimarySido = watch('region_primary_sido');
+  const watchedPrimarySigungu = watch('region_primary_sigungu');
+  const watchedSecondarySido = watch('region_secondary_sido');
+  const watchedSecondarySigungu = watch('region_secondary_sigungu');
+  const watchedDisabilityType = watch('disability_type');
+  const watchedHopeActivities = watch('hope_activities');
 
   function onPrimarySidoChange(sido: string) {
-    setValues((prev) => ({
-      ...prev,
-      region_primary_sido: sido,
-      region_primary_sigungu: '',
-    }));
-    setErrors((prev) => ({ ...prev, region_primary_sido: undefined }));
+    setValue('region_primary_sido', sido, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue('region_primary_sigungu', '', { shouldDirty: true });
+  }
+
+  function onPrimarySigunguChange(sigungu: string) {
+    setValue('region_primary_sigungu', sigungu, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   }
 
   function onSecondarySidoChange(sido: string) {
-    setValues((prev) => ({
-      ...prev,
-      region_secondary_sido: sido,
-      region_secondary_sigungu: '',
-    }));
+    setValue('region_secondary_sido', sido, { shouldDirty: true });
+    setValue('region_secondary_sigungu', '', { shouldDirty: true });
+  }
+
+  function onSecondarySigunguChange(sigungu: string) {
+    setValue('region_secondary_sigungu', sigungu, { shouldDirty: true });
   }
 
   function onSecondaryReset() {
-    setValues((prev) => ({
-      ...prev,
-      region_secondary_sido: '',
-      region_secondary_sigungu: '',
-    }));
-    setErrors((prev) => ({
-      ...prev,
-      region_secondary_sido: undefined,
-      region_secondary_sigungu: undefined,
-    }));
+    setValue('region_secondary_sido', '', { shouldDirty: true });
+    setValue('region_secondary_sigungu', '', { shouldDirty: true });
   }
 
   function onDisabilityTypeChange(value: string, checked: boolean) {
-    setValues((prev) => {
-      const next = checked
-        ? [...prev.disability_type, value]
-        : prev.disability_type.filter((v) => v !== value);
-      return {
-        ...prev,
-        disability_type: next,
-        disability_type_other:
-          value === '기타' && !checked ? '' : prev.disability_type_other,
-      };
+    const current = watch('disability_type');
+    const next = checked
+      ? [...current, value]
+      : current.filter((v) => v !== value);
+    setValue('disability_type', next, {
+      shouldDirty: true,
+      shouldValidate: true,
     });
-    setErrors((prev) => ({ ...prev, disability_type: undefined }));
-  }
-
-  function onHopeActivitiesChange(next: string | string[]) {
-    const activities = Array.isArray(next) ? next : [next];
-    setValues((prev) => ({
-      ...prev,
-      hope_activities: activities,
-      hope_activities_other: activities.includes('기타')
-        ? prev.hope_activities_other
-        : '',
-    }));
-    setErrors((prev) => ({ ...prev, hope_activities: undefined }));
-  }
-
-  function onNextStep() {
-    const result = step1Schema.safeParse({
-      name: values.name,
-      gender: values.gender,
-      education: values.education,
-      region_primary_sido: values.region_primary_sido,
-      region_primary_sigungu: values.region_primary_sigungu,
-      region_secondary_sido: values.region_secondary_sido,
-      region_secondary_sigungu: values.region_secondary_sigungu,
-      barrier_free: values.barrier_free,
-    });
-
-    if (!result.success) {
-      setErrors(parseZodErrors<SurveyFormValues>(result.error.issues));
-      return;
+    if (value === '기타' && !checked) {
+      setValue('disability_type_other', '', { shouldDirty: true });
     }
+  }
 
-    setErrors({});
-    setStep(2);
+  function onHopeActivitiesChange(value: string, checked: boolean) {
+    const current = watch('hope_activities');
+    const next = checked
+      ? [...current, value]
+      : current.filter((v) => v !== value);
+    setValue('hope_activities', next, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    if (value === '기타' && !checked) {
+      setValue('hope_activities_other', '', { shouldDirty: true });
+    }
+  }
+
+  async function onNextStep() {
+    const valid = await trigger([...STEP1_FIELDS]);
+    if (valid) setStep(2);
   }
 
   function onPrevStep() {
     setStep(1);
   }
 
-  async function onSubmit() {
-    const result = step2Schema.safeParse({
-      disability_type: values.disability_type,
-      disability_type_other: values.disability_type_other,
-      disability_level: values.disability_level,
-      mobility: values.mobility,
-      hand_usage: values.hand_usage,
-      stamina: values.stamina,
-      communication: values.communication,
-      instruction_level: values.instruction_level,
-      hope_activities: values.hope_activities,
-      hope_activities_other: values.hope_activities_other,
+  const onSubmit = handleSubmit(async (data) => {
+    const disabilityTypes = data.disability_type.includes('기타')
+      ? [
+          ...data.disability_type.filter((t) => t !== '기타'),
+          data.disability_type_other.trim(),
+        ]
+      : data.disability_type;
+
+    const activities = data.hope_activities.includes('기타')
+      ? [
+          ...data.hope_activities.filter((a) => a !== '기타'),
+          data.hope_activities_other.trim(),
+        ]
+      : data.hope_activities;
+
+    const regionSecondary =
+      data.region_secondary_sido && data.region_secondary_sigungu
+        ? `${data.region_secondary_sido} ${data.region_secondary_sigungu}`
+        : undefined;
+
+    await submitSurvey({
+      name: data.name,
+      gender: data.gender,
+      education: data.education,
+      region_primary: `${data.region_primary_sido} ${data.region_primary_sigungu}`,
+      region_secondary: regionSecondary,
+      is_barrier_free: data.barrier_free,
+      disability_type: disabilityTypes,
+      disability_level: data.disability_level,
+      mobility: data.mobility,
+      hand_usage: data.hand_usage,
+      stamina: data.stamina,
+      communication: data.communication,
+      instruction_level: data.instruction_level,
+      hope_activities: activities,
     });
 
-    if (!result.success) {
-      setErrors(parseZodErrors<SurveyFormValues>(result.error.issues));
-      return;
-    }
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    setIsMatching(true);
 
-    setIsSubmitting(true);
     try {
-      const disabilityTypes = values.disability_type.includes('기타')
-        ? [
-            ...values.disability_type.filter((t) => t !== '기타'),
-            values.disability_type_other.trim(),
-          ]
-        : values.disability_type;
-
-      const activities = values.hope_activities.includes('기타')
-        ? [
-            ...values.hope_activities.filter((a) => a !== '기타'),
-            values.hope_activities_other.trim(),
-          ]
-        : values.hope_activities;
-
-      const regionSecondary =
-        values.region_secondary_sido && values.region_secondary_sigungu
-          ? `${values.region_secondary_sido} ${values.region_secondary_sigungu}`
-          : undefined;
-
-      await submitSurvey({
-        name: values.name,
-        gender: values.gender,
-        education: values.education,
-        region_primary: `${values.region_primary_sido} ${values.region_primary_sigungu}`,
-        region_secondary: regionSecondary,
-        is_barrier_free: values.barrier_free,
-        disability_type: disabilityTypes,
-        disability_level: values.disability_level,
-        mobility: values.mobility,
-        hand_usage: values.hand_usage,
-        stamina: values.stamina,
-        communication: values.communication,
-        instruction_level: values.instruction_level,
-        hope_activities: activities,
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await generateMatch();
+      queryClient.invalidateQueries({ queryKey: ['match-result'] });
       setIsComplete(true);
-    } catch (err) {
-      console.error('[검사 제출 오류]', err);
+    } catch {
+      setIsMatchError(true);
     } finally {
-      setIsSubmitting(false);
+      setIsMatching(false);
     }
-  }
+  });
 
   function onCompleteConfirm() {
     router.push('/profile');
   }
 
-  const isDirty =
-    !isComplete && JSON.stringify(values) !== JSON.stringify(initialValues);
+  function onMatchErrorClose() {
+    setIsMatchError(false);
+  }
 
   return {
     mode,
     step,
-    values,
+    register,
     errors,
     isSubmitting,
+    isMatching,
+    isMatchError,
     isComplete,
-    isDirty,
-    setField,
+    isDirty: !isComplete && isDirty,
+    watchedPrimarySido,
+    watchedPrimarySigungu,
+    watchedSecondarySido,
+    watchedSecondarySigungu,
+    watchedDisabilityType,
+    watchedHopeActivities,
     onPrimarySidoChange,
+    onPrimarySigunguChange,
     onSecondarySidoChange,
+    onSecondarySigunguChange,
     onSecondaryReset,
     onDisabilityTypeChange,
     onHopeActivitiesChange,
@@ -327,9 +285,10 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     onPrevStep,
     onSubmit,
     onCompleteConfirm,
+    onMatchErrorClose,
     sigunguList: {
-      primary: getSigunguList(values.region_primary_sido),
-      secondary: getSigunguList(values.region_secondary_sido),
+      primary: getSigunguList(watchedPrimarySido),
+      secondary: getSigunguList(watchedSecondarySido),
     },
   };
 }

@@ -2,13 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '../api/profileApi';
+import { useMatchResult } from '@/features/match/hooks/useMatchResult';
+import {
+  toPersonalityAxes,
+  toMatchedJobs,
+} from '@/features/match/utils/convert';
 import type { Profile } from '@/shared/types/profile';
 import type { UserProfile } from '@/shared/types/userProfile';
-import {
-  MOCK_PERSONALITY_AXES,
-  MOCK_PERSONALITY_SUMMARY,
-  MOCK_MATCHED_JOBS,
-} from '@/shared/utils/mockData';
 
 function parseRegion(region: string): { city: string; district: string } {
   const parts = region.split(' ');
@@ -37,22 +37,26 @@ function toUserProfile(p: Profile): UserProfile {
 }
 
 export function useProfile() {
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
   });
 
-  const userProfile = profile ? toUserProfile(profile) : null;
+  const { data: matchResult, isLoading: isMatchLoading } = useMatchResult({
+    enabled: !!profile,
+  });
 
   return {
     profile,
-    userProfile,
-    isLoading,
+    userProfile: profile ? toUserProfile(profile) : null,
+    isLoading: isProfileLoading || isMatchLoading,
     lastSurveyDate: profile
       ? new Date(profile.updated_at).toLocaleDateString('ko-KR')
       : '',
-    personalityAxes: MOCK_PERSONALITY_AXES,
-    personalitySummary: MOCK_PERSONALITY_SUMMARY,
-    matchedJobs: MOCK_MATCHED_JOBS,
+    personalityAxes: matchResult
+      ? toPersonalityAxes(matchResult.radar_chart)
+      : [],
+    personalitySummary: matchResult?.summary_text ?? '',
+    matchedJobs: matchResult ? toMatchedJobs(matchResult.top3_jobs) : [],
   };
 }

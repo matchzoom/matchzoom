@@ -16,15 +16,24 @@ function SurveyContent() {
     <SurveyForm
       mode={form.mode}
       step={form.step}
-      values={form.values}
+      register={form.register}
       errors={form.errors}
       isSubmitting={form.isSubmitting}
+      isMatching={form.isMatching}
+      isMatchError={form.isMatchError}
       isComplete={form.isComplete}
       isBlocking={isBlocking}
       sigunguList={form.sigunguList}
-      setField={form.setField}
+      watchedPrimarySido={form.watchedPrimarySido}
+      watchedPrimarySigungu={form.watchedPrimarySigungu}
+      watchedSecondarySido={form.watchedSecondarySido}
+      watchedSecondarySigungu={form.watchedSecondarySigungu}
+      watchedDisabilityType={form.watchedDisabilityType}
+      watchedHopeActivities={form.watchedHopeActivities}
       onPrimarySidoChange={form.onPrimarySidoChange}
+      onPrimarySigunguChange={form.onPrimarySigunguChange}
       onSecondarySidoChange={form.onSecondarySidoChange}
+      onSecondarySigunguChange={form.onSecondarySigunguChange}
       onSecondaryReset={form.onSecondaryReset}
       onDisabilityTypeChange={form.onDisabilityTypeChange}
       onHopeActivitiesChange={form.onHopeActivitiesChange}
@@ -32,6 +41,7 @@ function SurveyContent() {
       onPrevStep={form.onPrevStep}
       onSubmit={form.onSubmit}
       onCompleteConfirm={form.onCompleteConfirm}
+      onMatchErrorClose={form.onMatchErrorClose}
       onStay={onStay}
       onLeave={onLeave}
     />

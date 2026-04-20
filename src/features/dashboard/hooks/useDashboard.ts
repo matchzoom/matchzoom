@@ -1,15 +1,30 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { getProfile } from '@/features/profile/api/profileApi';
+import { useMatchResult } from '@/features/match/hooks/useMatchResult';
 import {
-  MOCK_USER_PROFILE,
-  MOCK_PERSONALITY_AXES,
-  MOCK_PERSONALITY_SUMMARY,
-  MOCK_MATCHED_JOBS,
-} from '@/shared/utils/mockData';
+  toPersonalityAxes,
+  toMatchedJobs,
+} from '@/features/match/utils/convert';
 
 export function useDashboard() {
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+  });
+
+  const { data: matchResult, isLoading: isMatchLoading } = useMatchResult({
+    enabled: !!profile,
+  });
+
   return {
-    userName: MOCK_USER_PROFILE.name,
-    personalityAxes: MOCK_PERSONALITY_AXES,
-    personalitySummary: MOCK_PERSONALITY_SUMMARY,
-    matchedJobs: MOCK_MATCHED_JOBS,
+    userName: profile?.name ?? '',
+    isLoading: isProfileLoading || isMatchLoading,
+    personalityAxes: matchResult
+      ? toPersonalityAxes(matchResult.radar_chart)
+      : [],
+    personalitySummary: matchResult?.summary_text ?? '',
+    matchedJobs: matchResult ? toMatchedJobs(matchResult.top3_jobs) : [],
   };
 }

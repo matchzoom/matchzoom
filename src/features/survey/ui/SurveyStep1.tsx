@@ -1,10 +1,11 @@
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { Button } from '@/shared/ui/Button';
 import { Checkbox } from '@/shared/ui/Checkbox';
 import { Input } from '@/shared/ui/Input';
 import { Radio, RadioGroup } from '@/shared/ui/Radio';
 import { Select } from '@/shared/ui/Select';
 import { SIDO_LIST } from '../utils/regions';
-import type { SurveyFormValues } from '../hooks/useSurveyForm';
+import type { SurveyFormValues } from '../utils/schema';
 
 const EDUCATION_OPTIONS = [
   { value: '특수학교 초등부', label: '특수학교 초등부' },
@@ -16,26 +17,33 @@ const EDUCATION_OPTIONS = [
 const SIDO_OPTIONS = SIDO_LIST.map((v) => ({ value: v, label: v }));
 
 type Props = {
-  values: SurveyFormValues;
-  errors: Partial<Record<keyof SurveyFormValues, string>>;
+  register: UseFormRegister<SurveyFormValues>;
+  errors: FieldErrors<SurveyFormValues>;
   sigunguList: { primary: string[]; secondary: string[] };
-  setField: <K extends keyof SurveyFormValues>(
-    key: K,
-    value: SurveyFormValues[K],
-  ) => void;
+  watchedPrimarySido: string;
+  watchedPrimarySigungu: string;
+  watchedSecondarySido: string;
+  watchedSecondarySigungu: string;
   onPrimarySidoChange: (sido: string) => void;
+  onPrimarySigunguChange: (sigungu: string) => void;
   onSecondarySidoChange: (sido: string) => void;
+  onSecondarySigunguChange: (sigungu: string) => void;
   onSecondaryReset: () => void;
   onNextStep: () => void;
 };
 
 export function SurveyStep1({
-  values,
+  register,
   errors,
   sigunguList,
-  setField,
+  watchedPrimarySido,
+  watchedPrimarySigungu,
+  watchedSecondarySido,
+  watchedSecondarySigungu,
   onPrimarySidoChange,
+  onPrimarySigunguChange,
   onSecondarySidoChange,
+  onSecondarySigunguChange,
   onSecondaryReset,
   onNextStep,
 }: Props) {
@@ -58,41 +66,26 @@ export function SurveyStep1({
         <Input
           label="이름"
           required
-          value={values.name}
-          onChange={(e) => setField('name', e.target.value)}
-          error={errors.name}
+          {...register('name')}
+          error={errors.name?.message}
           placeholder="이름을 입력해주세요"
           maxLength={20}
         />
 
         {/* 성별 */}
-        <RadioGroup label="성별" required error={errors.gender}>
-          <Radio
-            name="gender"
-            value="남성"
-            label="남성"
-            checked={values.gender === '남성'}
-            onChange={() => setField('gender', '남성')}
-          />
-          <Radio
-            name="gender"
-            value="여성"
-            label="여성"
-            checked={values.gender === '여성'}
-            onChange={() => setField('gender', '여성')}
-          />
+        <RadioGroup label="성별" required error={errors.gender?.message}>
+          <Radio {...register('gender')} value="남성" label="남성" />
+          <Radio {...register('gender')} value="여성" label="여성" />
         </RadioGroup>
 
         {/* 최종학력 */}
-        <RadioGroup label="최종학력" required error={errors.education}>
+        <RadioGroup label="최종학력" required error={errors.education?.message}>
           {EDUCATION_OPTIONS.map((opt) => (
             <Radio
               key={opt.value}
-              name="education"
+              {...register('education')}
               value={opt.value}
               label={opt.label}
-              checked={values.education === opt.value}
-              onChange={() => setField('education', opt.value)}
             />
           ))}
         </RadioGroup>
@@ -111,9 +104,9 @@ export function SurveyStep1({
                 aria-label="시·도 (1순위)"
                 placeholder="시·도 선택"
                 options={SIDO_OPTIONS}
-                value={values.region_primary_sido}
+                value={watchedPrimarySido}
                 onChange={(e) => onPrimarySidoChange(e.target.value)}
-                error={errors.region_primary_sido}
+                error={errors.region_primary_sido?.message}
               />
             </div>
             <div className="flex-1">
@@ -124,12 +117,10 @@ export function SurveyStep1({
                   value: v,
                   label: v,
                 }))}
-                value={values.region_primary_sigungu}
-                onChange={(e) =>
-                  setField('region_primary_sigungu', e.target.value)
-                }
-                error={errors.region_primary_sigungu}
-                disabled={!values.region_primary_sido}
+                value={watchedPrimarySigungu}
+                onChange={(e) => onPrimarySigunguChange(e.target.value)}
+                error={errors.region_primary_sigungu?.message}
+                disabled={!watchedPrimarySido}
               />
             </div>
           </div>
@@ -142,7 +133,7 @@ export function SurveyStep1({
             <span className="text-[0.8125rem] font-normal text-gray-500">
               (선택)
             </span>
-            {values.region_secondary_sido && (
+            {watchedSecondarySido && (
               <button
                 type="button"
                 onClick={onSecondaryReset}
@@ -158,7 +149,7 @@ export function SurveyStep1({
                 aria-label="시·도 (2순위)"
                 placeholder="시·도 선택"
                 options={SIDO_OPTIONS}
-                value={values.region_secondary_sido}
+                value={watchedSecondarySido}
                 onChange={(e) => onSecondarySidoChange(e.target.value)}
               />
             </div>
@@ -170,16 +161,13 @@ export function SurveyStep1({
                   value: v,
                   label: v,
                   disabled:
-                    values.region_secondary_sido ===
-                      values.region_primary_sido &&
-                    v === values.region_primary_sigungu,
+                    watchedSecondarySido === watchedPrimarySido &&
+                    v === watchedPrimarySigungu,
                 }))}
-                value={values.region_secondary_sigungu}
-                onChange={(e) =>
-                  setField('region_secondary_sigungu', e.target.value)
-                }
-                error={errors.region_secondary_sigungu}
-                disabled={!values.region_secondary_sido}
+                value={watchedSecondarySigungu}
+                onChange={(e) => onSecondarySigunguChange(e.target.value)}
+                error={errors.region_secondary_sigungu?.message}
+                disabled={!watchedSecondarySido}
               />
             </div>
           </div>
@@ -192,8 +180,7 @@ export function SurveyStep1({
           </p>
           <Checkbox
             label="베리어 프리(무장애) 경로만 이용 가능해요"
-            checked={values.barrier_free}
-            onChange={(e) => setField('barrier_free', e.target.checked)}
+            {...register('barrier_free')}
           />
         </div>
       </div>
