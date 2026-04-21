@@ -25,7 +25,7 @@ export function ProfileView() {
     personalitySummary,
     matchedJobs,
   } = useProfile();
-  const { scrapedJobs, toggleBookmark } = useScrapedJobs();
+  const { data: scrapedJobs = [] } = useScrapedJobs();
 
   if (isLoading) {
     return (
@@ -69,10 +69,7 @@ export function ProfileView() {
               onEdit={handleEdit}
             />
           ) : (
-            <ScrapedJobsTab
-              jobs={scrapedJobs}
-              onBookmarkToggle={toggleBookmark}
-            />
+            <ScrapedJobsTab jobs={scrapedJobs} />
           )}
         </div>
       </div>
