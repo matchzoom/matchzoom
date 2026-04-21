@@ -56,9 +56,9 @@ export async function GET(request: NextRequest) {
     // Step 4: session JWT 서명
     const sessionJwt = await signSession(userId);
 
-    // Step 5: HttpOnly 쿠키 저장 후 /profile로 redirect
+    // Step 5: HttpOnly 쿠키 저장 후 / 로 redirect
     // Set-Cookie: session=...; SameSite=Strict; HttpOnly; Secure
-    const response = NextResponse.redirect(new URL('/profile', request.url));
+    const response = NextResponse.redirect(new URL('/', request.url));
     setAuthCookies({
       response,
       sessionJwt,
