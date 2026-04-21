@@ -29,7 +29,7 @@ export function JobRegionFilter({
 
   return (
     <>
-      <p className="mb-2 flex items-center gap-1 text-[0.8125rem] text-gray-400">
+      <p className="mb-6 flex items-center gap-1 text-[0.875rem] text-gray-400">
         <Info
           size={14}
           strokeWidth={1.5}
@@ -84,7 +84,7 @@ export function JobRegionFilter({
         <div
           role="group"
           aria-label="적합도 필터"
-          className="mb-4 flex flex-wrap gap-2"
+          className="mb-8 flex flex-wrap gap-2"
         >
           {fitLevelList.map((fitLevel) => (
             <button
@@ -104,7 +104,6 @@ export function JobRegionFilter({
           ))}
         </div>
       )}
-      <hr className="mb-5 mt-4 border-t-2 border-gray-200" />
     </>
   );
 }
