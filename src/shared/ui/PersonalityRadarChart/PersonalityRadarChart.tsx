@@ -16,7 +16,10 @@ type PersonalityRadarChartProps = {
 
 export function PersonalityRadarChart({ data }: PersonalityRadarChartProps) {
   return (
-    <div className="w-full max-w-[320px]" aria-hidden="true">
+    <div
+      className="w-full max-w-[320px] [&_*]:focus:outline-none"
+      aria-hidden="true"
+    >
       <ResponsiveContainer width="100%" height={260}>
         <RadarChart
           data={data}
