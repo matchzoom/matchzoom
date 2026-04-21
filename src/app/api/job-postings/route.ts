@@ -8,6 +8,7 @@ type RawItem = {
   busplaName?: string;
   compAddr?: string;
   empType?: string;
+  regagnName?: string;
   envBothHands?: string;
   envEyesight?: string;
   envHandWork?: string;
@@ -111,30 +112,39 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
       .map((item) => toPosting(item, undefined, undefined));
   }
 
-  // 지역 키워드 추출 (구 단위 우선, 없으면 시/도)
-  function extractKeywords(region: string): {
-    district: string | null;
-    city: string;
-  } {
-    const parts = region.split(' ');
-    return { city: parts[0], district: parts[1] ?? null };
-  }
-
-  const primary = extractKeywords(profile.region_primary);
-  const secondary = profile.region_secondary
-    ? extractKeywords(profile.region_secondary)
-    : null;
-
-  const matchesRegion = (addr: string | undefined): boolean => {
-    if (!addr) return false;
-    const matchRegion = (r: { city: string; district: string | null }) =>
-      r.district
-        ? addr.includes(r.city) && addr.includes(r.district)
-        : addr.includes(r.city);
-    return matchRegion(primary) || (secondary ? matchRegion(secondary) : false);
+  const REGION_ABBR: Record<string, string> = {
+    경기: '경기도',
+    강원: '강원도',
+    충북: '충청북도',
+    충남: '충청남도',
+    전북: '전라북도',
+    전남: '전라남도',
+    경북: '경상북도',
+    경남: '경상남도',
+    제주: '제주도',
   };
 
-  const pool = unique.filter((item) => matchesRegion(item.compAddr));
+  function agencyCity(regagnName: string): string | null {
+    const m = regagnName.match(/한국장애인고용공단\s([가-힣]{2})/);
+    if (!m) return null;
+    const abbr = m[1];
+    return REGION_ABBR[abbr] ?? abbr;
+  }
+
+  const primaryCity = profile.region_primary.split(' ')[0];
+  const secondaryCity = profile.region_secondary?.split(' ')[0] ?? null;
+
+  const matchesRegion = (regagnName: string | undefined): boolean => {
+    if (!regagnName) return false;
+    const city = agencyCity(regagnName);
+    if (!city) return false;
+    const matches = (profileCity: string) => profileCity.startsWith(city);
+    return (
+      matches(primaryCity) || (secondaryCity ? matches(secondaryCity) : false)
+    );
+  };
+
+  const pool = unique.filter((item) => matchesRegion(item.regagnName));
 
   // 점수 내림차순 정렬 후 상위 20개
   const sorted = pool
