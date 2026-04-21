@@ -36,7 +36,8 @@ export default function Home() {
     staleTime: 1000 * 60 * 5,
   });
 
-  if (userLoading || (user && profileLoading)) return null;
+  if (userLoading) return null;
+  if (user && profileLoading) return <DashboardView />;
 
   if (user && profile) return <DashboardView />;
 

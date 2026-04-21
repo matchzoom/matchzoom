@@ -1,12 +1,14 @@
 import type { MatchedJob, PersonalityAxis } from '@/shared/types/job';
 import { FitBadge } from '@/shared/ui/FitBadge';
 import { PersonalityRadarChart } from '@/shared/ui/PersonalityRadarChart';
+import { Skeleton } from '@/shared/ui/Skeleton';
 
 type AIResultCardProps = {
   userName: string;
   axes: PersonalityAxis[];
   summary: string;
   jobs: MatchedJob[];
+  isLoading?: boolean;
 };
 
 export function AIResultCard({
@@ -14,7 +16,10 @@ export function AIResultCard({
   axes,
   summary,
   jobs,
+  isLoading = false,
 }: AIResultCardProps) {
+  const displayName = isLoading ? '사용자' : userName;
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white">
       {/* 상단: 직업 성향 + 맞는 직종 TOP 3 */}
@@ -22,40 +27,59 @@ export function AIResultCard({
         {/* 좌: 레이더 차트 */}
         <div className="flex flex-col items-center p-6">
           <h3 className="mb-6 w-full border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-            {userName}님의 직업 성향
+            {displayName}님의 직업 성향
           </h3>
-          <PersonalityRadarChart data={axes} />
+          {isLoading ? (
+            <Skeleton className="h-[240px] w-[240px] rounded-full" />
+          ) : (
+            <PersonalityRadarChart data={axes} />
+          )}
         </div>
 
         {/* 우: 맞는 직종 TOP 3 */}
         <div className="p-6">
           <h3 className="mb-6 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-            {userName}님에게 맞는 직종 TOP 3
+            {displayName}님에게 맞는 직종 TOP 3
           </h3>
-          <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
-            {jobs.map((job, index) => (
-              <li
-                key={job.id}
-                className="flex items-center gap-4 rounded-md border border-gray-200 bg-white px-4 py-3"
-              >
-                <span
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-[0.75rem] font-semibold text-gray-500 tabular-nums"
-                  aria-label={`${index + 1}위`}
+          {isLoading ? (
+            <ol className="flex flex-col gap-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-4 rounded-md border border-gray-200 px-4 py-3"
                 >
-                  {index + 1}
-                </span>
-                <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
-                  {job.name}
-                </span>
-                <div className="flex items-center gap-3">
-                  <FitBadge level={job.fitLevel} />
-                  <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
-                    {job.matchRate}%
+                  <Skeleton className="h-6 w-6 shrink-0 rounded-sm" />
+                  <Skeleton className="h-5 flex-1 rounded-sm" />
+                  <Skeleton className="h-5 w-20 rounded-sm" />
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
+              {jobs.map((job, index) => (
+                <li
+                  key={job.id}
+                  className="flex items-center gap-4 rounded-md border border-gray-200 bg-white px-4 py-3"
+                >
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-[0.75rem] font-semibold text-gray-500 tabular-nums"
+                    aria-label={`${index + 1}위`}
+                  >
+                    {index + 1}
                   </span>
-                </div>
-              </li>
-            ))}
-          </ol>
+                  <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
+                    {job.name}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <FitBadge level={job.fitLevel} />
+                    <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
+                      {job.matchRate}%
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
 
@@ -64,9 +88,16 @@ export function AIResultCard({
         <p className="mb-2 text-[0.875rem] font-semibold text-gray-500">
           AI 성향 요약
         </p>
-        <p className="text-[0.9375rem] leading-[1.6] text-gray-900">
-          &ldquo;{summary}&rdquo;
-        </p>
+        {isLoading ? (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-4 w-full rounded-sm" />
+            <Skeleton className="h-4 w-4/5 rounded-sm" />
+          </div>
+        ) : (
+          <p className="text-[0.9375rem] leading-[1.6] text-gray-900">
+            &ldquo;{summary}&rdquo;
+          </p>
+        )}
       </div>
     </div>
   );

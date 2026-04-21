@@ -11,6 +11,7 @@ import { AIResultCard } from '@/shared/ui/AIResultCard';
 export function DashboardView() {
   const {
     userName,
+    isLoading: isDashboardLoading,
     personalityAxes,
     personalitySummary,
     matchedJobs,
@@ -43,6 +44,7 @@ export function DashboardView() {
             axes={personalityAxes}
             summary={personalitySummary}
             jobs={matchedJobs}
+            isLoading={isDashboardLoading}
           />
         </section>
 
@@ -55,6 +57,7 @@ export function DashboardView() {
             postings={filteredPostings}
             onBookmarkToggle={handleBookmarkToggle}
             isLoading={isJobsLoading}
+            isLoadingUser={isDashboardLoading}
             sigunguList={availableSigungu}
             selectedSigungu={selectedSigungu}
             onSelectSigungu={handleSelectSigungu}
