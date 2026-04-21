@@ -43,17 +43,18 @@ export function JobListSection({
         {isLoadingUser ? '사용자' : userName}님에게 맞는 채용공고
       </h2>
 
-      {isLoading ? (
+      <p className="mb-6 flex items-center gap-1 text-[0.875rem] text-gray-400">
+        <Info
+          size={14}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="shrink-0"
+        />
+        주소는 본사 기준이에요. 실제 근무지는 공고에서 확인해주세요.
+      </p>
+
+      {isLoading || isLoadingUser ? (
         <div className="mb-8">
-          <p className="mb-6 flex items-center gap-1 text-[0.875rem] text-gray-400">
-            <Info
-              size={14}
-              strokeWidth={1.5}
-              aria-hidden="true"
-              className="shrink-0"
-            />
-            주소는 본사 기준이에요. 실제 근무지는 공고에서 확인해주세요.
-          </p>
           <div className="mb-2 flex flex-wrap gap-2">
             <Skeleton className="h-8 w-10 rounded-sm" />
             <div className="w-px self-stretch bg-gray-200" />
@@ -85,7 +86,7 @@ export function JobListSection({
         />
       ) : null}
 
-      {isLoading ? (
+      {isLoading || isLoadingUser ? (
         <ul
           aria-busy="true"
           aria-label="채용공고 로딩 중"
