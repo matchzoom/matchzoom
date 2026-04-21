@@ -30,9 +30,10 @@ export default function Home() {
   const { data: user, isLoading: userLoading } = useCurrentUser();
 
   const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ['profile'],
+    queryKey: ['profile', user?.id],
     queryFn: getProfile,
     enabled: !!user,
+    staleTime: 1000 * 60 * 5,
   });
 
   if (userLoading || (user && profileLoading)) return null;
