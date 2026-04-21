@@ -34,7 +34,7 @@ export function JobListSection({
     <section aria-labelledby="job-list-heading">
       <h2
         id="job-list-heading"
-        className="mb-5 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900"
+        className="mb-1 text-[1.375rem] font-semibold leading-[1.5] text-gray-900"
       >
         {userName}님에게 맞는 채용공고
       </h2>

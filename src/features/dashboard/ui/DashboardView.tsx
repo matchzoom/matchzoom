@@ -33,7 +33,7 @@ export function DashboardView() {
 
   return (
     <div className="py-10 md:py-16">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 md:px-5 lg:px-6">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-[60px] px-4 md:px-5 lg:px-6">
         <section aria-labelledby="result-summary-heading">
           <h2 id="result-summary-heading" className="sr-only">
             검사 결과 요약
