@@ -11,16 +11,22 @@ import {
 
 import type { PersonalityAxis } from '@/shared/types/job';
 
-type TooltipProps = {
+type ChartTooltipProps = {
   active?: boolean;
   payload?: Array<{ payload: PersonalityAxis }>;
 };
 
-function ChartTooltip({ active, payload }: TooltipProps) {
+function ChartTooltip({ active, payload }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
   const { subject, value, fullMark } = payload[0].payload;
   return (
-    <div className="rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm">
+    <div
+      className="rounded-md px-3 py-2 shadow-sm"
+      style={{
+        background: 'var(--white, white)',
+        border: '1px solid var(--gray-200)',
+      }}
+    >
       <p className="text-[0.8125rem] font-semibold text-gray-700">{subject}</p>
       <p className="text-[0.8125rem] font-semibold text-primary">
         {value}
@@ -67,7 +73,7 @@ export function PersonalityRadarChart({ data }: PersonalityRadarChartProps) {
               r: 5,
               fill: 'var(--primary)',
               strokeWidth: 2,
-              stroke: 'white',
+              stroke: 'var(--white, white)',
             }}
           />
         </RadarChart>
