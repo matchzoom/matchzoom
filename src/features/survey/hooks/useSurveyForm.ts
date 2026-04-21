@@ -186,6 +186,9 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     });
 
     queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['job-postings'] });
+    localStorage.removeItem('matchzoom-job-sigungu-filter');
+    localStorage.removeItem('matchzoom-job-fitlevel-filter');
     setIsMatching(true);
 
     try {
