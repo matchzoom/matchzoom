@@ -164,6 +164,7 @@ function toPosting(
     reqEduc: item.reqEduc ?? '',
     envConditions: ENV_KEYS.map((k) => item[k] as string).filter(Boolean),
     fitLevel: profile && score !== undefined ? toFitLevel(score) : undefined,
+    detailUrl: `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent(item.busplaName ?? '')}`,
     bookmarked: false,
   };
 }

@@ -35,6 +35,15 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
       aria-label={job.title}
       className="relative flex h-full w-full flex-col rounded-lg border border-gray-200 bg-white p-5 transition-ui hover:border-primary-border"
     >
+      {job.detailUrl && (
+        <a
+          href={job.detailUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${job.title} 상세 보기`}
+          className="absolute inset-0 rounded-lg"
+        />
+      )}
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1.5">
           {job.fitLevel && (
@@ -55,7 +64,7 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
           onClick={() => onBookmarkToggle(job.id)}
           aria-label={job.bookmarked ? '북마크 해제' : '북마크 추가'}
           aria-pressed={job.bookmarked}
-          className="transition-ui -mr-1 shrink-0 cursor-pointer rounded-sm text-gray-400 hover:text-primary"
+          className="transition-ui relative z-10 -mr-1 shrink-0 cursor-pointer rounded-sm text-gray-400 hover:text-primary"
         >
           {job.bookmarked ? (
             <BookmarkCheck
