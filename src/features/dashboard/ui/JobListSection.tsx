@@ -1,7 +1,5 @@
 'use client';
 
-import { Info } from 'lucide-react';
-
 import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { JobCard } from './JobCard';
@@ -42,16 +40,6 @@ export function JobListSection({
       >
         {isLoadingUser ? '사용자' : userName}님에게 맞는 채용공고
       </h2>
-
-      <p className="mb-6 flex items-center gap-1 text-[0.875rem] text-gray-400">
-        <Info
-          size={14}
-          strokeWidth={1.5}
-          aria-hidden="true"
-          className="shrink-0"
-        />
-        주소는 본사 기준이에요. 실제 근무지는 공고에서 확인해주세요.
-      </p>
 
       {isLoading || isLoadingUser ? (
         <div className="mb-8">
