@@ -10,20 +10,13 @@ import {
 import type { Profile } from '@/shared/types/profile';
 import type { UserProfile } from '@/shared/types/userProfile';
 
-function parseRegion(region: string): { city: string; district: string } {
-  const parts = region.split(' ');
-  return { city: parts[0] ?? '', district: parts.slice(1).join(' ') };
-}
-
 function toUserProfile(p: Profile): UserProfile {
   return {
     name: p.name,
     age: 0,
     gender: p.gender as UserProfile['gender'],
     education: p.education,
-    region1: parseRegion(p.region_primary),
-    region2: p.region_secondary ? parseRegion(p.region_secondary) : undefined,
-    barrierFree: p.is_barrier_free,
+    region: p.region_primary,
     disabilityType: p.disability_type,
     disabilityGrade: p.disability_level as UserProfile['disabilityGrade'],
     mobility: p.mobility as UserProfile['mobility'],

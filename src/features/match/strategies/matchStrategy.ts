@@ -41,7 +41,7 @@ export const matchStrategy: MatchStrategy = {
 
 **mobility = "휠체어 사용" 또는 "보조기구 필요"**
 → 배제: 대형마트 매장정리 및 상품관리, 환경정리(이동 많음), 우편물 분류(현장), 공공자전거세척, 이동보조기기 분해 세척 및 소독, 급식지원(서빙), 교통약자승하차지원, 병원 내 환자이송보조 및 안내, 버스청결관리, 재래시장관리
-→ 우선: 앉아서 수행 가능한 직무, 베리어프리 표준사업장 직무
+→ 우선: 앉아서 수행 가능한 직무, 표준사업장 직무
 
 **hand_usage = "큰 동작만 가능"**
 → 배제: 사무 보조, 문서파기(정밀), 부품 조립, 제품 검수 보조, 제과제빵 보조, 장난감 세척(소형), 점역·교정사, 간식 포장 및 점검
@@ -251,7 +251,7 @@ export const matchStrategy: MatchStrategy = {
 1. STEP 2 하드 제약 통과한 직무만 후보에 올린다.
 2. hope_activities와의 의미적 일치도
 3. disability_type의 전형적 적합도
-4. 베리어프리/표준사업장에서 근무 가능 여부
+4. 표준사업장에서 근무 가능 여부
 
 ## 5-2. hope_activities → 화이트리스트 매핑
 - "물건 정리·분류" → [A] 계열
@@ -283,7 +283,6 @@ export const matchStrategy: MatchStrategy = {
 - region_primary가 수도권(서울·경기·인천) 또는 광역시 → +20 (대부분 직종 모집 활발)
 - region_primary가 그 외 시 지역 → +15
 - region_primary가 군·도서 지역 → +10
-- is_barrier_free = true이고 해당 직무가 표준사업장 주력 직종(사무 보조, 세탁, 부품 조립 등) → +5 추가 (최종 상한 20 유지)
 
 **[③ 학력·경력 적합성] 최대 +20**
 - 학력이 직무 요구 수준 이상 → +20
@@ -517,8 +516,7 @@ hope_activities 중 다음은 **무시**:
 ## 기본 정보
 - 성별: ${profile.gender}
 - 학력: ${profile.education}
-- 희망 지역: ${profile.region_primary}${profile.region_secondary ? ` / ${profile.region_secondary}` : ''}
-- 베리어프리 필요: ${profile.is_barrier_free ? '예' : '아니오'}
+- 희망 지역: ${profile.region_primary}
 
 ## 장애 정보 (STEP 3 장애 유형별 radar 보정 필수)
 - 유형: ${profile.disability_type}

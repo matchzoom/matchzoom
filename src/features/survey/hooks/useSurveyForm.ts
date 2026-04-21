@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSigunguList } from '../utils/regions';
+import { SIDO_LIST } from '../utils/regions';
 import {
   surveySchema,
   STEP1_FIELDS,
@@ -33,26 +33,11 @@ function restoreOther(values: string[], knownSet: Set<string>): string[] {
 }
 
 function profileToFormValues(p: Profile): SurveyFormValues {
-  const [primarySido = '', ...primaryRest] = p.region_primary.split(' ');
-  const primarySigungu = primaryRest.join(' ');
-
-  let secondarySido = '';
-  let secondarySigungu = '';
-  if (p.region_secondary) {
-    const [sido = '', ...rest] = p.region_secondary.split(' ');
-    secondarySido = sido;
-    secondarySigungu = rest.join(' ');
-  }
-
   return {
     name: p.name,
     gender: p.gender,
     education: p.education,
-    region_primary_sido: primarySido,
-    region_primary_sigungu: primarySigungu,
-    region_secondary_sido: secondarySido,
-    region_secondary_sigungu: secondarySigungu,
-    barrier_free: p.is_barrier_free,
+    region_primary: p.region_primary.split(' ')[0] ?? '',
     disability_type: restoreOther(p.disability_type, DISABILITY_TYPE_VALUES),
     disability_type_other: extractOther(
       p.disability_type,
@@ -76,11 +61,7 @@ const INITIAL: SurveyFormValues = {
   name: '',
   gender: '',
   education: '',
-  region_primary_sido: '',
-  region_primary_sigungu: '',
-  region_secondary_sido: '',
-  region_secondary_sigungu: '',
-  barrier_free: false,
+  region_primary: '',
   disability_type: [],
   disability_type_other: '',
   disability_level: '',
@@ -126,40 +107,15 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     }
   }, [mode, existingProfile, reset]);
 
-  const watchedPrimarySido = watch('region_primary_sido');
-  const watchedPrimarySigungu = watch('region_primary_sigungu');
-  const watchedSecondarySido = watch('region_secondary_sido');
-  const watchedSecondarySigungu = watch('region_secondary_sigungu');
+  const watchedPrimaryRegion = watch('region_primary');
   const watchedDisabilityType = watch('disability_type');
   const watchedHopeActivities = watch('hope_activities');
 
-  function onPrimarySidoChange(sido: string) {
-    setValue('region_primary_sido', sido, {
+  function onPrimaryRegionChange(sido: string) {
+    setValue('region_primary', sido, {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue('region_primary_sigungu', '', { shouldDirty: true });
-  }
-
-  function onPrimarySigunguChange(sigungu: string) {
-    setValue('region_primary_sigungu', sigungu, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }
-
-  function onSecondarySidoChange(sido: string) {
-    setValue('region_secondary_sido', sido, { shouldDirty: true });
-    setValue('region_secondary_sigungu', '', { shouldDirty: true });
-  }
-
-  function onSecondarySigunguChange(sigungu: string) {
-    setValue('region_secondary_sigungu', sigungu, { shouldDirty: true });
-  }
-
-  function onSecondaryReset() {
-    setValue('region_secondary_sido', '', { shouldDirty: true });
-    setValue('region_secondary_sigungu', '', { shouldDirty: true });
   }
 
   function onDisabilityTypeChange(value: string, checked: boolean) {
@@ -214,18 +170,11 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
         ]
       : data.hope_activities;
 
-    const regionSecondary =
-      data.region_secondary_sido && data.region_secondary_sigungu
-        ? `${data.region_secondary_sido} ${data.region_secondary_sigungu}`
-        : undefined;
-
     await submitSurvey({
       name: data.name,
       gender: data.gender,
       education: data.education,
-      region_primary: `${data.region_primary_sido} ${data.region_primary_sigungu}`,
-      region_secondary: regionSecondary,
-      is_barrier_free: data.barrier_free,
+      region_primary: data.region_primary,
       disability_type: disabilityTypes,
       disability_level: data.disability_level,
       mobility: data.mobility,
@@ -268,17 +217,10 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     isMatchError,
     isComplete,
     isDirty: !isComplete && isDirty,
-    watchedPrimarySido,
-    watchedPrimarySigungu,
-    watchedSecondarySido,
-    watchedSecondarySigungu,
+    watchedPrimaryRegion,
     watchedDisabilityType,
     watchedHopeActivities,
-    onPrimarySidoChange,
-    onPrimarySigunguChange,
-    onSecondarySidoChange,
-    onSecondarySigunguChange,
-    onSecondaryReset,
+    onPrimaryRegionChange,
     onDisabilityTypeChange,
     onHopeActivitiesChange,
     onNextStep,
@@ -286,9 +228,6 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     onSubmit,
     onCompleteConfirm,
     onMatchErrorClose,
-    sigunguList: {
-      primary: getSigunguList(watchedPrimarySido),
-      secondary: getSigunguList(watchedSecondarySido),
-    },
+    sidoList: SIDO_LIST,
   };
 }

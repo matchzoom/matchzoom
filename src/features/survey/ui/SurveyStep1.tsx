@@ -1,10 +1,8 @@
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { Button } from '@/shared/ui/Button';
-import { Checkbox } from '@/shared/ui/Checkbox';
 import { Input } from '@/shared/ui/Input';
 import { Radio, RadioGroup } from '@/shared/ui/Radio';
 import { Select } from '@/shared/ui/Select';
-import { SIDO_LIST } from '../utils/regions';
 import type { SurveyFormValues } from '../utils/schema';
 
 const EDUCATION_OPTIONS = [
@@ -14,37 +12,21 @@ const EDUCATION_OPTIONS = [
   { value: '일반학교 졸업', label: '일반학교 졸업' },
 ];
 
-const SIDO_OPTIONS = SIDO_LIST.map((v) => ({ value: v, label: v }));
-
 type Props = {
   register: UseFormRegister<SurveyFormValues>;
   errors: FieldErrors<SurveyFormValues>;
-  sigunguList: { primary: string[]; secondary: string[] };
-  watchedPrimarySido: string;
-  watchedPrimarySigungu: string;
-  watchedSecondarySido: string;
-  watchedSecondarySigungu: string;
-  onPrimarySidoChange: (sido: string) => void;
-  onPrimarySigunguChange: (sigungu: string) => void;
-  onSecondarySidoChange: (sido: string) => void;
-  onSecondarySigunguChange: (sigungu: string) => void;
-  onSecondaryReset: () => void;
+  sidoList: string[];
+  watchedPrimaryRegion: string;
+  onPrimaryRegionChange: (sido: string) => void;
   onNextStep: () => void;
 };
 
 export function SurveyStep1({
   register,
   errors,
-  sigunguList,
-  watchedPrimarySido,
-  watchedPrimarySigungu,
-  watchedSecondarySido,
-  watchedSecondarySigungu,
-  onPrimarySidoChange,
-  onPrimarySigunguChange,
-  onSecondarySidoChange,
-  onSecondarySigunguChange,
-  onSecondaryReset,
+  sidoList,
+  watchedPrimaryRegion,
+  onPrimaryRegionChange,
   onNextStep,
 }: Props) {
   return (
@@ -90,99 +72,17 @@ export function SurveyStep1({
           ))}
         </RadioGroup>
 
-        {/* 희망 지역 1순위 */}
-        <fieldset className="flex flex-col gap-0 border-0 p-0">
-          <legend className="mb-3 text-[0.875rem] font-semibold text-gray-900">
-            희망 지역 1순위
-            <span aria-hidden="true" className="ml-0.5 text-error">
-              *
-            </span>
-          </legend>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Select
-                aria-label="시·도 (1순위)"
-                placeholder="시·도 선택"
-                options={SIDO_OPTIONS}
-                value={watchedPrimarySido}
-                onChange={(e) => onPrimarySidoChange(e.target.value)}
-                error={errors.region_primary_sido?.message}
-              />
-            </div>
-            <div className="flex-1">
-              <Select
-                aria-label="구·군·시 (1순위)"
-                placeholder="구·군·시 선택"
-                options={sigunguList.primary.map((v) => ({
-                  value: v,
-                  label: v,
-                }))}
-                value={watchedPrimarySigungu}
-                onChange={(e) => onPrimarySigunguChange(e.target.value)}
-                error={errors.region_primary_sigungu?.message}
-                disabled={!watchedPrimarySido}
-              />
-            </div>
-          </div>
-        </fieldset>
-
-        {/* 희망 지역 2순위 */}
-        <fieldset className="flex flex-col gap-0 border-0 p-0">
-          <legend className="mb-3 flex items-center gap-2 text-[0.875rem] font-semibold text-gray-900">
-            희망 지역 2순위
-            <span className="text-[0.8125rem] font-normal text-gray-500">
-              (선택)
-            </span>
-            {watchedSecondarySido && (
-              <button
-                type="button"
-                onClick={onSecondaryReset}
-                className="cursor-pointer text-[0.8125rem] font-normal text-gray-400 underline underline-offset-2 hover:text-gray-600"
-              >
-                초기화
-              </button>
-            )}
-          </legend>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Select
-                aria-label="시·도 (2순위)"
-                placeholder="시·도 선택"
-                options={SIDO_OPTIONS}
-                value={watchedSecondarySido}
-                onChange={(e) => onSecondarySidoChange(e.target.value)}
-              />
-            </div>
-            <div className="flex-1">
-              <Select
-                aria-label="구·군·시 (2순위)"
-                placeholder="구·군·시 선택"
-                options={sigunguList.secondary.map((v) => ({
-                  value: v,
-                  label: v,
-                  disabled:
-                    watchedSecondarySido === watchedPrimarySido &&
-                    v === watchedPrimarySigungu,
-                }))}
-                value={watchedSecondarySigungu}
-                onChange={(e) => onSecondarySigunguChange(e.target.value)}
-                error={errors.region_secondary_sigungu?.message}
-                disabled={!watchedSecondarySido}
-              />
-            </div>
-          </div>
-        </fieldset>
-
-        {/* 베리어 프리 */}
-        <div className="flex flex-col gap-2">
-          <p className="text-[0.875rem] font-semibold text-gray-900">
-            이동 경로
-          </p>
-          <Checkbox
-            label="베리어 프리(무장애) 경로만 이용 가능해요"
-            {...register('barrier_free')}
-          />
-        </div>
+        {/* 희망 지역 */}
+        <Select
+          aria-label="희망 지역"
+          label="희망 지역"
+          required
+          placeholder="시·도 선택"
+          options={sidoList.map((v) => ({ value: v, label: v }))}
+          value={watchedPrimaryRegion}
+          onChange={(e) => onPrimaryRegionChange(e.target.value)}
+          error={errors.region_primary?.message}
+        />
       </div>
 
       {/* 다음 버튼 */}

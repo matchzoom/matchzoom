@@ -3,9 +3,7 @@ export type UserProfile = {
   age: number;
   gender: '남성' | '여성';
   education: string;
-  region1: { city: string; district: string };
-  region2?: { city: string; district: string };
-  barrierFree: boolean;
+  region: string;
   disabilityType: string[];
   disabilityGrade: '경도' | '중등도' | '중도' | '모르겠어요';
   mobility: '자유로움' | '보조기구 사용' | '휠체어 사용';
