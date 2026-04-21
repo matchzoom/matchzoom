@@ -18,6 +18,10 @@ export function useDashboard() {
     enabled: !!profile,
   });
 
+  const profileProvinces = profile?.region_primary
+    ? [profile.region_primary.trim().split(/\s+/)[0]]
+    : [];
+
   return {
     userName: profile?.name ?? '',
     isLoading: isProfileLoading || isMatchLoading,
@@ -26,5 +30,6 @@ export function useDashboard() {
       : [],
     personalitySummary: matchResult?.summary_text ?? '',
     matchedJobs: matchResult ? toMatchedJobs(matchResult.top3_jobs) : [],
+    profileProvinces,
   };
 }

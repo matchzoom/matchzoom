@@ -2,14 +2,33 @@
 
 import { useDashboard } from '../hooks/useDashboard';
 import { useJobPostings } from '../hooks/useJobPostings';
+import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
+import { useJobFitFilter } from '../hooks/useJobFitFilter';
 import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
 import { JobListSection } from './JobListSection';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 
 export function DashboardView() {
-  const { userName, personalityAxes, personalitySummary, matchedJobs } =
-    useDashboard();
+  const {
+    userName,
+    personalityAxes,
+    personalitySummary,
+    matchedJobs,
+    profileProvinces,
+  } = useDashboard();
   const { data: postings = [], isPending: isJobsLoading } = useJobPostings();
+  const {
+    availableSigungu,
+    selectedSigungu,
+    filteredPostings: regionFiltered,
+    handleSelectSigungu,
+  } = useJobRegionFilter(postings, profileProvinces);
+  const {
+    availableFitLevels,
+    selectedFitLevel,
+    filteredPostings,
+    handleSelectFitLevel,
+  } = useJobFitFilter(regionFiltered);
   const handleBookmarkToggle = useBookmarkToggle();
 
   return (
@@ -33,9 +52,15 @@ export function DashboardView() {
           </h2>
           <JobListSection
             userName={userName}
-            postings={postings}
+            postings={filteredPostings}
             onBookmarkToggle={handleBookmarkToggle}
             isLoading={isJobsLoading}
+            sigunguList={availableSigungu}
+            selectedSigungu={selectedSigungu}
+            onSelectSigungu={handleSelectSigungu}
+            fitLevelList={availableFitLevels}
+            selectedFitLevel={selectedFitLevel}
+            onSelectFitLevel={handleSelectFitLevel}
           />
         </section>
       </div>

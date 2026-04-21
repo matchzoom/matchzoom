@@ -1,14 +1,21 @@
 'use client';
 
-import type { JobPosting } from '@/shared/types/job';
+import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { JobCard } from './JobCard';
+import { JobRegionFilter } from './JobRegionFilter';
 
 type JobListSectionProps = {
   userName: string;
   postings: JobPosting[];
   onBookmarkToggle: (job: JobPosting) => void;
   isLoading?: boolean;
+  sigunguList?: string[];
+  selectedSigungu?: string | null;
+  onSelectSigungu?: (sigungu: string | null) => void;
+  fitLevelList?: FitLevel[];
+  selectedFitLevel?: FitLevel | null;
+  onSelectFitLevel?: (fitLevel: FitLevel | null) => void;
 };
 
 export function JobListSection({
@@ -16,6 +23,12 @@ export function JobListSection({
   postings,
   onBookmarkToggle,
   isLoading = false,
+  sigunguList = [],
+  selectedSigungu = null,
+  onSelectSigungu,
+  fitLevelList = [],
+  selectedFitLevel = null,
+  onSelectFitLevel,
 }: JobListSectionProps) {
   return (
     <section aria-labelledby="job-list-heading">
@@ -25,6 +38,17 @@ export function JobListSection({
       >
         {userName}님에게 맞는 채용공고
       </h2>
+
+      {!isLoading && onSelectSigungu && onSelectFitLevel && (
+        <JobRegionFilter
+          sigunguList={sigunguList}
+          selectedSigungu={selectedSigungu}
+          onSelectSigungu={onSelectSigungu}
+          fitLevelList={fitLevelList}
+          selectedFitLevel={selectedFitLevel}
+          onSelectFitLevel={onSelectFitLevel}
+        />
+      )}
 
       {isLoading ? (
         <ul
