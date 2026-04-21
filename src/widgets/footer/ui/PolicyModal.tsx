@@ -77,6 +77,14 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
     const modal = modalRef.current;
     if (!modal) return;
 
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const siblings = Array.from(document.body.children).filter(
+      (el) => !el.contains(modal),
+    ) as HTMLElement[];
+    siblings.forEach((el) => el.setAttribute('inert', ''));
+
     const focusableSelectors =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const focusableElements =
@@ -107,7 +115,11 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+      siblings.forEach((el) => el.removeAttribute('inert'));
+    };
   }, [onClose]);
 
   return (
