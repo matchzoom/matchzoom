@@ -31,6 +31,16 @@ export function ConfirmModal({
     const modal = modalRef.current;
     if (!modal) return;
 
+    // 스크롤 잠금
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // 모달 외 요소 포커스 차단
+    const siblings = Array.from(document.body.children).filter(
+      (el) => !el.contains(modal),
+    ) as HTMLElement[];
+    siblings.forEach((el) => el.setAttribute('inert', ''));
+
     const focusableSelectors =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const focusableElements =
@@ -61,7 +71,11 @@ export function ConfirmModal({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+      siblings.forEach((el) => el.removeAttribute('inert'));
+    };
   }, [onClose]);
 
   return (

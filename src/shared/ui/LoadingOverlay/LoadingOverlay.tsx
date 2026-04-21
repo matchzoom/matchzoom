@@ -1,8 +1,20 @@
+'use client';
+
+import { useEffect } from 'react';
+
 type Props = {
   message?: string;
 };
 
 export function LoadingOverlay({ message }: Props) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80"
