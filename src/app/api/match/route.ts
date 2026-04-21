@@ -4,8 +4,11 @@ import { openAiFetch } from '@/shared/api/openAiFetch';
 import { AiMatchResponseSchema, type MatchResult } from '@/shared/types/match';
 import type { Profile } from '@/shared/types/profile';
 import { matchStrategy } from '@/features/match/strategies';
+import { TEST_USER_ID, TEST_MATCH } from '@/shared/utils/testUser';
 
 export const GET = createAuthorizedRoute(async ({ userId }) => {
+  if (userId === TEST_USER_ID) return TEST_MATCH;
+
   const rows = await supabaseFetch<MatchResult[]>(
     `/rest/v1/match_results?user_id=eq.${userId}&select=*`,
   );
