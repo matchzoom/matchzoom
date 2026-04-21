@@ -12,13 +12,16 @@ export function Header() {
   const { mutate: logout, isPending } = useLogout();
 
   return (
-    <header className="border-b border-gray-200 bg-surface">
+    <header className="border-b border-primary-border bg-hero-bg">
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
         <Link
           href="/"
-          className="cursor-pointer rounded-sm text-[1.125rem] font-bold leading-none text-gray-900"
+          className="cursor-pointer rounded-sm text-[1.7rem] font-bold leading-none text-gray-900"
         >
-          마주봄
+          마주
+          <span className="ml-[2px] inline-flex h-[1.4em] w-[1.4em] items-center justify-center rounded-full bg-primary text-[0.9em] font-bold text-static-white">
+            봄
+          </span>
         </Link>
 
         {!user && (

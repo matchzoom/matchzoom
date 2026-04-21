@@ -47,6 +47,10 @@
 
   /* Hero */
   --hero-bg: #E8F0FE;
+
+  /* Footer */
+  --footer-bg: #162040;
+  --footer-text: #A8B8D8;
 }
 
 /* 라이트 모드 명시 */
@@ -165,6 +169,10 @@
 
   /* Hero */
   --color-hero-bg: var(--hero-bg);
+
+  /* Footer */
+  --color-footer-bg:   var(--footer-bg);
+  --color-footer-text: var(--footer-text);
 
   /* Border radius — 4 / 6 / 8 만 사용 */
   --radius-sm: 4px;
