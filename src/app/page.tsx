@@ -1,13 +1,21 @@
 'use client';
 
-import { useMockState } from '@/shared/providers/mock-state-provider';
-import { DevStatePanel } from '@/shared/ui/DevStatePanel';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+import { getProfile } from '@/features/profile/api/profileApi';
 import { DashboardView } from '@/features/dashboard';
 import { HeroSection, ServiceIntroSection } from '@/features/landing';
 
-function LandingView() {
+function LandingView({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const router = useRouter();
+
   const handleCtaClick = () => {
-    console.warn('[마주봄 목업] "검사 시작" CTA 클릭 → /survey로 이동 예정');
+    if (isLoggedIn) {
+      router.push('/survey');
+    } else {
+      window.location.href = '/api/oauth/kakao/authorize';
+    }
   };
 
   return (
@@ -19,12 +27,17 @@ function LandingView() {
 }
 
 export default function Home() {
-  const { userState } = useMockState();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
 
-  return (
-    <>
-      {userState === 'surveyed' ? <DashboardView /> : <LandingView />}
-      <DevStatePanel />
-    </>
-  );
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    enabled: !!user,
+  });
+
+  if (userLoading || (user && profileLoading)) return null;
+
+  if (user && profile) return <DashboardView />;
+
+  return <LandingView isLoggedIn={!!user} />;
 }

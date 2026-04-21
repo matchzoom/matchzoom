@@ -1,5 +1,4 @@
 import { QueryProvider } from '@/shared/providers/query-provider';
-import { MockStateProvider } from '@/shared/providers/mock-state-provider';
 import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
@@ -31,14 +30,12 @@ export default function RootLayout({
           본문 바로가기
         </a>
         <QueryProvider>
-          <MockStateProvider>
-            <NavigationTracker />
-            <Header />
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </MockStateProvider>
+          <NavigationTracker />
+          <Header />
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
+          <Footer />
         </QueryProvider>
       </body>
     </html>
