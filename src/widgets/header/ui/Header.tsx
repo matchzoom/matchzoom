@@ -5,11 +5,16 @@ import { User } from 'lucide-react';
 
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { useLogout } from '@/shared/hooks/useLogout';
+import { useTestLogin } from '@/shared/hooks/useTestLogin';
+import { useTestLogout } from '@/shared/hooks/useTestLogout';
 import { Button } from '@/shared/ui/Button';
 
 export function Header() {
   const { data: user } = useCurrentUser();
-  const { mutate: logout, isPending } = useLogout();
+  const { mutate: logout, isPending: isLogoutPending } = useLogout();
+  const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
+  const { mutate: testLogout, isPending: isTestLogoutPending } =
+    useTestLogout();
 
   return (
     <header className="border-b border-primary-border bg-hero-bg">
@@ -25,18 +30,51 @@ export function Header() {
         </Link>
 
         {!user && (
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={() => {
-              window.location.href = '/api/oauth/kakao/authorize';
-            }}
-          >
-            로그인
-          </Button>
+          <nav aria-label="로그인 메뉴" className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="md"
+              disabled={isTestLoginPending}
+              onClick={() => testLogin()}
+            >
+              {isTestLoginPending ? '로그인 중...' : '테스트 계정으로 로그인'}
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                window.location.href = '/api/oauth/kakao/authorize';
+              }}
+            >
+              로그인
+            </Button>
+          </nav>
         )}
 
-        {user && (
+        {user && user.isTestUser && (
+          <nav
+            aria-label="테스트 계정 메뉴"
+            className="flex items-center gap-3"
+          >
+            <Link
+              href="/profile"
+              aria-label="프로필 페이지로 이동"
+              className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+            >
+              <User size={20} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+            <Button
+              variant="ghost"
+              size="md"
+              disabled={isTestLogoutPending}
+              onClick={() => testLogout()}
+            >
+              {isTestLogoutPending ? '로그아웃 중...' : '테스트 계정 로그아웃'}
+            </Button>
+          </nav>
+        )}
+
+        {user && !user.isTestUser && (
           <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
             <Link
               href="/profile"
@@ -48,10 +86,10 @@ export function Header() {
             <Button
               variant="secondary"
               size="md"
-              disabled={isPending}
+              disabled={isLogoutPending}
               onClick={() => logout()}
             >
-              {isPending ? '로그아웃 중...' : '로그아웃'}
+              {isLogoutPending ? '로그아웃 중...' : '로그아웃'}
             </Button>
           </nav>
         )}

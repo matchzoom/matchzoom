@@ -106,6 +106,7 @@ export function ServiceIntroSection() {
                         src={step.image}
                         alt={step.title}
                         fill
+                        sizes="560px"
                         className={step.imageClass ?? 'object-cover object-top'}
                       />
                     ) : (

@@ -9,4 +9,4 @@ export type User = {
 };
 
 // 클라이언트에 노출하는 유저 정보 (kakao_id 제외)
-export type CurrentUser = Omit<User, 'kakao_id'>;
+export type CurrentUser = Omit<User, 'kakao_id'> & { isTestUser?: boolean };

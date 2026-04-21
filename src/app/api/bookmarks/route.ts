@@ -1,6 +1,7 @@
 import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { isApiError } from '@/shared/utils/errorGuards';
+import { TEST_USER_ID } from '@/shared/utils/testUser';
 
 type BookmarkRow = {
   id: number;
@@ -21,6 +22,8 @@ type AddBookmarkBody = {
 };
 
 export const GET = createAuthorizedRoute(async ({ userId }) => {
+  if (userId === TEST_USER_ID) return [];
+
   const rows = await supabaseFetch<BookmarkRow[]>(
     `/rest/v1/bookmarks?user_id=eq.${userId}&select=id,posting_title,posting_url,company_name,deadline,fit_level,created_at&order=created_at.desc`,
   );
@@ -38,6 +41,8 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
 
 export const POST = createAuthorizedRoute<AddBookmarkBody>(
   async ({ userId, body }) => {
+    if (userId === TEST_USER_ID) return;
+
     try {
       await supabaseFetch<BookmarkRow[]>('/rest/v1/bookmarks', {
         method: 'POST',
@@ -61,6 +66,8 @@ export const POST = createAuthorizedRoute<AddBookmarkBody>(
 );
 
 export const DELETE = createAuthorizedRoute(async ({ userId, request }) => {
+  if (userId === TEST_USER_ID) return;
+
   const { searchParams } = new URL(request.url);
   const postingUrl = searchParams.get('postingUrl');
 

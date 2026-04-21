@@ -45,6 +45,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
               height={520}
               className="h-auto w-[460px]"
               priority
+              sizes="460px"
             />
           </div>
         </div>

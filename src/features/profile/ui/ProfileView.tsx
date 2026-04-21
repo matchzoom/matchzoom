@@ -11,6 +11,7 @@ import { ProfileInfoTab } from './ProfileInfoTab';
 import { ProfileEmptyView } from './ProfileEmptyView';
 import { ScrapedJobsTab } from './ScrapedJobsTab';
 import { Skeleton } from '@/shared/ui/Skeleton';
+import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 type ProfileTab = 'result' | 'scraps';
 
@@ -27,7 +28,11 @@ export function ProfileView() {
     matchedJobs,
   } = useProfile();
   const { data: scrapedJobs = [] } = useScrapedJobs();
-  const handleBookmarkRemove = useBookmarkRemove();
+  const {
+    remove: handleBookmarkRemove,
+    loginModalOpen,
+    closeLoginModal,
+  } = useBookmarkRemove();
 
   if (isLoading) {
     return (
@@ -80,6 +85,19 @@ export function ProfileView() {
           )}
         </div>
       </div>
+
+      {loginModalOpen && (
+        <ConfirmModal
+          title="로그인이 필요해요"
+          description="스크랩은 실제 로그인이 필요합니다."
+          confirmLabel="로그인하기"
+          cancelLabel="닫기"
+          onConfirm={() => {
+            window.location.href = '/api/oauth/kakao/authorize';
+          }}
+          onClose={closeLoginModal}
+        />
+      )}
     </div>
   );
 }

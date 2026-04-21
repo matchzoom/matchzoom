@@ -1,12 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { Bookmark } from '@/shared/types/bookmark';
 import { removeBookmark } from '../api/bookmarksApi';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 
 export function useBookmarkRemove() {
   const queryClient = useQueryClient();
+  const { data: user } = useCurrentUser();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: (postingUrl: string) => removeBookmark(postingUrl),
@@ -30,5 +34,15 @@ export function useBookmarkRemove() {
     },
   });
 
-  return (postingUrl: string) => mutate(postingUrl);
+  return {
+    remove: (postingUrl: string) => {
+      if (user?.isTestUser) {
+        setLoginModalOpen(true);
+        return;
+      }
+      mutate(postingUrl);
+    },
+    loginModalOpen,
+    closeLoginModal: () => setLoginModalOpen(false),
+  };
 }
