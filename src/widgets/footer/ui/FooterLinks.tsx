@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { PolicyModal } from './PolicyModal';
 
 const linkClass =
-  'transition-ui cursor-pointer text-[0.875rem] text-gray-700 underline-offset-2 hover:text-gray-900 hover:underline';
+  'transition-ui cursor-pointer text-[0.875rem] text-footer-text underline-offset-2 hover:text-static-white hover:underline';
 
 export function FooterLinks() {
   const [openModal, setOpenModal] = useState<'terms' | 'privacy' | null>(null);
