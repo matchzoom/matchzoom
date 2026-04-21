@@ -4,6 +4,7 @@ import { useDashboard } from '../hooks/useDashboard';
 import { useJobPostings } from '../hooks/useJobPostings';
 import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
 import { useJobFitFilter } from '../hooks/useJobFitFilter';
+import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
 import { JobListSection } from './JobListSection';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 
@@ -28,6 +29,7 @@ export function DashboardView() {
     filteredPostings,
     handleSelectFitLevel,
   } = useJobFitFilter(regionFiltered);
+  const handleBookmarkToggle = useBookmarkToggle();
 
   return (
     <div className="py-10 md:py-16">
@@ -51,7 +53,7 @@ export function DashboardView() {
           <JobListSection
             userName={userName}
             postings={filteredPostings}
-            onBookmarkToggle={() => {}}
+            onBookmarkToggle={handleBookmarkToggle}
             isLoading={isJobsLoading}
             sigunguList={availableSigungu}
             selectedSigungu={selectedSigungu}

@@ -80,9 +80,12 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
     throw new Error('JOB_API_BASE_URL 또는 JOB_API_KEY 환경변수가 없습니다.');
   }
 
-  const [profileRows, jobXml] = await Promise.all([
+  const [profileRows, bookmarkRows, jobXml] = await Promise.all([
     supabaseFetch<ProfileRow[]>(
       `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
+    ),
+    supabaseFetch<{ posting_url: string }[]>(
+      `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
     ),
     fetch(
       `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=100&pageNo=1`,
@@ -91,6 +94,7 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
   ]);
 
   const profile = profileRows[0];
+  const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
   const parsed = parser.parse(jobXml);
   const raw: RawItem | RawItem[] = parsed?.response?.body?.items?.item ?? [];
   const allItems = Array.isArray(raw) ? raw : [raw];
@@ -108,7 +112,7 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
   if (!profile) {
     return unique
       .slice(0, 20)
-      .map((item) => toPosting(item, undefined, undefined));
+      .map((item) => toPosting(item, undefined, undefined, bookmarkedUrls));
   }
 
   const REGION_ABBR: Record<string, string> = {
@@ -147,14 +151,18 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
     .sort((a, b) => b.score - a.score)
     .slice(0, 20);
 
-  return sorted.map(({ item, score }) => toPosting(item, profile, score));
+  return sorted.map(({ item, score }) =>
+    toPosting(item, profile, score, bookmarkedUrls),
+  );
 });
 
 function toPosting(
   item: RawItem,
   profile: ProfileRow | undefined,
   score: number | undefined,
+  bookmarkedUrls: Set<string>,
 ) {
+  const detailUrl = `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent(item.busplaName ?? '')}`;
   return {
     id: item.rno,
     companyName: item.busplaName ?? '',
@@ -169,7 +177,7 @@ function toPosting(
     reqEduc: item.reqEduc ?? '',
     envConditions: ENV_KEYS.map((k) => item[k] as string).filter(Boolean),
     fitLevel: profile && score !== undefined ? toFitLevel(score) : undefined,
-    detailUrl: `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent(item.busplaName ?? '')}`,
-    bookmarked: false,
+    detailUrl,
+    bookmarked: bookmarkedUrls.has(detailUrl),
   };
 }
