@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { X } from 'lucide-react';
 
 import { Button } from '@/shared/ui/Button';
+import { useModalAccessibility } from '@/shared/hooks/useModalAccessibility';
 
 type ConfirmModalProps = {
   title: string;
@@ -27,56 +28,7 @@ export function ConfirmModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const headingId = `confirm-modal-${title.replace(/\s/g, '-')}`;
 
-  useEffect(() => {
-    const modal = modalRef.current;
-    if (!modal) return;
-
-    // 스크롤 잠금
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    // 모달 외 요소 포커스 차단
-    const siblings = Array.from(document.body.children).filter(
-      (el) => !el.contains(modal),
-    ) as HTMLElement[];
-    siblings.forEach((el) => el.setAttribute('inert', ''));
-
-    const focusableSelectors =
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const focusableElements =
-      modal.querySelectorAll<HTMLElement>(focusableSelectors);
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-
-    firstFocusable?.focus();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-      if (e.key === 'Tab') {
-        if (e.shiftKey) {
-          if (document.activeElement === firstFocusable) {
-            e.preventDefault();
-            lastFocusable?.focus();
-          }
-        } else {
-          if (document.activeElement === lastFocusable) {
-            e.preventDefault();
-            firstFocusable?.focus();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = prevOverflow;
-      siblings.forEach((el) => el.removeAttribute('inert'));
-    };
-  }, [onClose]);
+  useModalAccessibility(modalRef, onClose);
 
   return (
     <div

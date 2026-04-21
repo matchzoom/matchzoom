@@ -12,12 +12,15 @@ import { ProfileEmptyView } from './ProfileEmptyView';
 import { ScrapedJobsTab } from './ScrapedJobsTab';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 
 type ProfileTab = 'result' | 'scraps';
 
 export function ProfileView() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<ProfileTab>('result');
+  const [editLoginModalOpen, setEditLoginModalOpen] = useState(false);
+  const { data: user } = useCurrentUser();
 
   const {
     userProfile,
@@ -55,6 +58,10 @@ export function ProfileView() {
   }
 
   function handleEdit() {
+    if (user?.isTestUser) {
+      setEditLoginModalOpen(true);
+      return;
+    }
     router.push('/survey?mode=edit');
   }
 
@@ -96,6 +103,19 @@ export function ProfileView() {
             window.location.href = '/api/oauth/kakao/authorize';
           }}
           onClose={closeLoginModal}
+        />
+      )}
+
+      {editLoginModalOpen && (
+        <ConfirmModal
+          title="로그인이 필요해요"
+          description="검사 수정은 실제 로그인이 필요합니다."
+          confirmLabel="로그인하기"
+          cancelLabel="닫기"
+          onConfirm={() => {
+            window.location.href = '/api/oauth/kakao/authorize';
+          }}
+          onClose={() => setEditLoginModalOpen(false)}
         />
       )}
     </div>

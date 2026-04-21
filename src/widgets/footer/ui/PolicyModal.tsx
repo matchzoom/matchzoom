@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { X } from 'lucide-react';
+
+import { useModalAccessibility } from '@/shared/hooks/useModalAccessibility';
 
 type PolicyContent = {
   title: string;
@@ -73,42 +75,7 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const headingId = `policy-modal-${type}`;
 
-  useEffect(() => {
-    const modal = modalRef.current;
-    if (!modal) return;
-
-    const focusableSelectors =
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const focusableElements =
-      modal.querySelectorAll<HTMLElement>(focusableSelectors);
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-
-    firstFocusable?.focus();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-      if (e.key === 'Tab') {
-        if (e.shiftKey) {
-          if (document.activeElement === firstFocusable) {
-            e.preventDefault();
-            lastFocusable?.focus();
-          }
-        } else {
-          if (document.activeElement === lastFocusable) {
-            e.preventDefault();
-            firstFocusable?.focus();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  useModalAccessibility(modalRef, onClose);
 
   return (
     <div
