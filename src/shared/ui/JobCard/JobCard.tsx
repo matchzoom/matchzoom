@@ -26,7 +26,7 @@ function formatCareer(raw: string): string {
 
 type JobCardProps = {
   job: JobPosting;
-  onBookmarkToggle: (id: number) => void;
+  onBookmarkToggle: (job: JobPosting) => void;
 };
 
 export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
@@ -44,7 +44,7 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
           className="absolute inset-0 rounded-lg"
         />
       )}
-      <header className="flex items-start justify-between gap-3">
+      <header className="flex items-start justify-between gap-3 pb-3">
         <div className="flex flex-col gap-1.5">
           {job.fitLevel && (
             <FitBadge level={job.fitLevel} className="self-start" />
@@ -57,11 +57,13 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
           <h3 className="line-clamp-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
             {job.title}
           </h3>
-          <p className="text-[0.875rem] text-gray-500">{job.companyName}</p>
+          {job.companyName && (
+            <p className="text-[0.875rem] text-gray-500">{job.companyName}</p>
+          )}
         </div>
         <button
           type="button"
-          onClick={() => onBookmarkToggle(job.id)}
+          onClick={() => onBookmarkToggle(job)}
           aria-label={job.bookmarked ? '북마크 해제' : '북마크 추가'}
           aria-pressed={job.bookmarked}
           className="transition-ui relative z-10 -mr-1 shrink-0 cursor-pointer rounded-sm text-gray-400 hover:text-primary"
@@ -79,48 +81,58 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
         </button>
       </header>
 
-      <dl className="mt-3 flex min-w-0 flex-col gap-1.5 pb-3">
-        <div className="flex min-w-0 items-center gap-1">
-          <MapPin
-            size={16}
-            strokeWidth={1.5}
-            className="shrink-0 text-gray-400"
-            aria-hidden="true"
-          />
-          <dt className="sr-only">지역</dt>
-          <dd className="truncate text-[0.8125rem] text-gray-500">
-            {job.location}
-          </dd>
-        </div>
-        {job.reqCareer && (
-          <div className="flex items-center gap-1">
-            <Briefcase
-              size={16}
-              strokeWidth={1.5}
-              className="shrink-0 text-gray-400"
-              aria-hidden="true"
-            />
-            <dt className="sr-only">경력</dt>
-            <dd className="text-[0.8125rem] text-gray-500">
-              {formatCareer(job.reqCareer)}
-            </dd>
-          </div>
-        )}
-      </dl>
+      {(job.location || job.reqCareer) && (
+        <dl className="flex min-w-0 flex-col gap-1.5 pb-3">
+          {job.location && (
+            <div className="flex min-w-0 items-center gap-1">
+              <MapPin
+                size={16}
+                strokeWidth={1.5}
+                className="shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              <dt className="sr-only">지역</dt>
+              <dd className="truncate text-[0.8125rem] text-gray-500">
+                {job.location}
+              </dd>
+            </div>
+          )}
+          {job.reqCareer && (
+            <div className="flex items-center gap-1">
+              <Briefcase
+                size={16}
+                strokeWidth={1.5}
+                className="shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              <dt className="sr-only">경력</dt>
+              <dd className="text-[0.8125rem] text-gray-500">
+                {formatCareer(job.reqCareer)}
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
 
-      <footer className="mt-auto border-t border-gray-100 pt-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-gray-400">
-            <Calendar size={14} strokeWidth={1.5} aria-hidden="true" />
-            <span className="text-[0.75rem]">
-              <span className="sr-only">마감일</span>~{job.deadline}
-            </span>
+      {(job.deadline || job.salary) && (
+        <footer className="mt-auto border-t border-gray-100 pt-3">
+          <div className="flex items-center justify-between">
+            {job.deadline && (
+              <div className="flex items-center gap-1 text-gray-400">
+                <Calendar size={14} strokeWidth={1.5} aria-hidden="true" />
+                <span className="text-[0.75rem]">
+                  <span className="sr-only">마감일</span>~{job.deadline}
+                </span>
+              </div>
+            )}
+            {job.salary && (
+              <span className="text-[0.75rem] font-medium text-gray-700">
+                {job.salary}
+              </span>
+            )}
           </div>
-          <span className="text-[0.75rem] font-medium text-gray-700">
-            {job.salary}
-          </span>
-        </div>
-      </footer>
+        </footer>
+      )}
     </article>
   );
 }

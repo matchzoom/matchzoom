@@ -2,6 +2,7 @@
 
 import { useDashboard } from '../hooks/useDashboard';
 import { useJobPostings } from '../hooks/useJobPostings';
+import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
 import { JobListSection } from './JobListSection';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 
@@ -9,6 +10,7 @@ export function DashboardView() {
   const { userName, personalityAxes, personalitySummary, matchedJobs } =
     useDashboard();
   const { data: postings = [], isPending: isJobsLoading } = useJobPostings();
+  const handleBookmarkToggle = useBookmarkToggle();
 
   return (
     <div className="py-10 md:py-16">
@@ -32,7 +34,7 @@ export function DashboardView() {
           <JobListSection
             userName={userName}
             postings={postings}
-            onBookmarkToggle={() => {}}
+            onBookmarkToggle={handleBookmarkToggle}
             isLoading={isJobsLoading}
           />
         </section>

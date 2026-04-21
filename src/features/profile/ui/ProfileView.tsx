@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useProfile } from '../hooks/useProfile';
 import { useScrapedJobs } from '../hooks/useScrapedJobs';
+import { useBookmarkRemove } from '../hooks/useBookmarkRemove';
 import { ProfileSidebar } from './ProfileSidebar';
 import { ProfileInfoTab } from './ProfileInfoTab';
 import { ProfileEmptyView } from './ProfileEmptyView';
@@ -26,6 +27,7 @@ export function ProfileView() {
     matchedJobs,
   } = useProfile();
   const { data: scrapedJobs = [] } = useScrapedJobs();
+  const handleBookmarkRemove = useBookmarkRemove();
 
   if (isLoading) {
     return (
@@ -69,7 +71,12 @@ export function ProfileView() {
               onEdit={handleEdit}
             />
           ) : (
-            <ScrapedJobsTab jobs={scrapedJobs} />
+            <ScrapedJobsTab
+              jobs={scrapedJobs}
+              onBookmarkToggle={(job) =>
+                handleBookmarkRemove(job.detailUrl ?? '')
+              }
+            />
           )}
         </div>
       </div>

@@ -7,7 +7,7 @@ import { JobCard } from './JobCard';
 type JobListSectionProps = {
   userName: string;
   postings: JobPosting[];
-  onBookmarkToggle: (id: number) => void;
+  onBookmarkToggle: (job: JobPosting) => void;
   isLoading?: boolean;
 };
 
