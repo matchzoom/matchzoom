@@ -15,18 +15,11 @@ type Props = {
   isMatchError: boolean;
   isComplete: boolean;
   isBlocking: boolean;
-  sigunguList: { primary: string[]; secondary: string[] };
-  watchedPrimarySido: string;
-  watchedPrimarySigungu: string;
-  watchedSecondarySido: string;
-  watchedSecondarySigungu: string;
+  sidoList: string[];
+  watchedPrimaryRegion: string;
   watchedDisabilityType: string[];
   watchedHopeActivities: string[];
-  onPrimarySidoChange: (sido: string) => void;
-  onPrimarySigunguChange: (sigungu: string) => void;
-  onSecondarySidoChange: (sido: string) => void;
-  onSecondarySigunguChange: (sigungu: string) => void;
-  onSecondaryReset: () => void;
+  onPrimaryRegionChange: (sido: string) => void;
   onDisabilityTypeChange: (value: string, checked: boolean) => void;
   onHopeActivitiesChange: (value: string, checked: boolean) => void;
   onNextStep: () => void;
@@ -48,18 +41,11 @@ export function SurveyForm({
   isMatchError,
   isComplete,
   isBlocking,
-  sigunguList,
-  watchedPrimarySido,
-  watchedPrimarySigungu,
-  watchedSecondarySido,
-  watchedSecondarySigungu,
+  sidoList,
+  watchedPrimaryRegion,
   watchedDisabilityType,
   watchedHopeActivities,
-  onPrimarySidoChange,
-  onPrimarySigunguChange,
-  onSecondarySidoChange,
-  onSecondarySigunguChange,
-  onSecondaryReset,
+  onPrimaryRegionChange,
   onDisabilityTypeChange,
   onHopeActivitiesChange,
   onNextStep,
@@ -115,16 +101,9 @@ export function SurveyForm({
           <SurveyStep1
             register={register}
             errors={errors}
-            sigunguList={sigunguList}
-            watchedPrimarySido={watchedPrimarySido}
-            watchedPrimarySigungu={watchedPrimarySigungu}
-            watchedSecondarySido={watchedSecondarySido}
-            watchedSecondarySigungu={watchedSecondarySigungu}
-            onPrimarySidoChange={onPrimarySidoChange}
-            onPrimarySigunguChange={onPrimarySigunguChange}
-            onSecondarySidoChange={onSecondarySidoChange}
-            onSecondarySigunguChange={onSecondarySigunguChange}
-            onSecondaryReset={onSecondaryReset}
+            sidoList={sidoList}
+            watchedPrimaryRegion={watchedPrimaryRegion}
+            onPrimaryRegionChange={onPrimaryRegionChange}
             onNextStep={onNextStep}
           />
         ) : (

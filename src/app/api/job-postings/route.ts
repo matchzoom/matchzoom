@@ -30,7 +30,6 @@ type ProfileRow = {
   stamina: string;
   communication: string;
   region_primary: string;
-  region_secondary: string | null;
 };
 
 const ENV_KEYS: (keyof RawItem)[] = [
@@ -83,7 +82,7 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
 
   const [profileRows, jobXml] = await Promise.all([
     supabaseFetch<ProfileRow[]>(
-      `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary,region_secondary`,
+      `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
     ),
     fetch(
       `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=100&pageNo=1`,
@@ -114,14 +113,14 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
 
   const REGION_ABBR: Record<string, string> = {
     경기: '경기도',
-    강원: '강원도',
+    강원: '강원특별자치도',
     충북: '충청북도',
     충남: '충청남도',
-    전북: '전라북도',
+    전북: '전북특별자치도',
     전남: '전라남도',
     경북: '경상북도',
     경남: '경상남도',
-    제주: '제주도',
+    제주: '제주특별자치도',
   };
 
   function agencyCity(regagnName: string): string | null {
@@ -132,16 +131,12 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
   }
 
   const primaryCity = profile.region_primary.split(' ')[0];
-  const secondaryCity = profile.region_secondary?.split(' ')[0] ?? null;
 
   const matchesRegion = (regagnName: string | undefined): boolean => {
     if (!regagnName) return false;
     const city = agencyCity(regagnName);
     if (!city) return false;
-    const matches = (profileCity: string) => profileCity.startsWith(city);
-    return (
-      matches(primaryCity) || (secondaryCity ? matches(secondaryCity) : false)
-    );
+    return primaryCity.startsWith(city);
   };
 
   const pool = unique.filter((item) => matchesRegion(item.regagnName));

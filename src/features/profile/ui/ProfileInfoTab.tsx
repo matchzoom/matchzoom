@@ -54,11 +54,6 @@ export function ProfileInfoTab({
   matchedJobs,
   onEdit,
 }: ProfileInfoTabProps) {
-  const region1Label = `${userProfile.region1.city} ${userProfile.region1.district}`;
-  const region2Label = userProfile.region2
-    ? `${userProfile.region2.city} ${userProfile.region2.district}`
-    : '없음';
-
   return (
     <div className="flex flex-col gap-6">
       {/* 프로필 헤더 */}
@@ -93,12 +88,7 @@ export function ProfileInfoTab({
           <InfoRow label="이름" value={userProfile.name} />
           <InfoRow label="성별" value={userProfile.gender} />
           <InfoRow label="최종학력" value={userProfile.education} />
-          <InfoRow label="희망 지역 1순위" value={region1Label} />
-          <InfoRow label="희망 지역 2순위" value={region2Label} />
-          <InfoRow
-            label="이동 경로 베리어 프리"
-            value={userProfile.barrierFree ? '해당' : '해당 없음'}
-          />
+          <InfoRow label="희망 지역" value={userProfile.region} />
         </dl>
       </Section>
 

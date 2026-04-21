@@ -6,11 +6,7 @@ export const surveySchema = z
     name: z.string().min(1, '이름을 입력해주세요'),
     gender: z.string().min(1, '성별을 선택해주세요'),
     education: z.string().min(1, '최종학력을 선택해주세요'),
-    region_primary_sido: z.string().min(1, '시·도를 선택해주세요'),
-    region_primary_sigungu: z.string().min(1, '구·군·시를 선택해주세요'),
-    region_secondary_sido: z.string(),
-    region_secondary_sigungu: z.string(),
-    barrier_free: z.boolean(),
+    region_primary: z.string().min(1, '시·도를 선택해주세요'),
     disability_type: z
       .array(z.string())
       .min(1, '장애 유형을 1개 이상 선택해주세요'),
@@ -26,10 +22,6 @@ export const surveySchema = z
       .min(1, '희망 활동을 1개 이상 선택해주세요'),
     hope_activities_other: z.string(),
   })
-  .refine(
-    (data) => !(data.region_secondary_sido && !data.region_secondary_sigungu),
-    { message: '구·군·시를 선택해주세요', path: ['region_secondary_sigungu'] },
-  )
   .refine(
     (data) => {
       if (data.disability_type.includes('기타')) {
@@ -81,9 +73,5 @@ export const STEP1_FIELDS = [
   'name',
   'gender',
   'education',
-  'region_primary_sido',
-  'region_primary_sigungu',
-  'region_secondary_sido',
-  'region_secondary_sigungu',
-  'barrier_free',
+  'region_primary',
 ] as const;

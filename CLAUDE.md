@@ -300,8 +300,6 @@ create table profiles (
   gender            text        not null,
   education         text        not null,
   region_primary    text        not null,
-  region_secondary  text,
-  is_barrier_free   boolean     not null default false,
   disability_type   text[]      not null default '{}',
   disability_level  text        not null,
   mobility          text        not null,

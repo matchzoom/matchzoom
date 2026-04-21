@@ -67,9 +67,7 @@ export const {name}Strategy: MatchStrategy = {
   name: '홍길동',              // 이름
   gender: '남성',              // 성별
   education: '특수학교 고등부 졸업', // 최종학력
-  region_primary: '서울특별시 강남구', // 희망 지역 1순위
-  region_secondary: '서울특별시 마포구' | null, // 희망 지역 2순위
-  is_barrier_free: false,       // 베리어프리 필요 여부
+  region_primary: '서울특별시', // 희망 지역 (시·도)
   disability_type: ['지적장애'],  // 장애 유형 (복수 선택 가능)
   disability_level: '중등도',    // 장애 등급
   mobility: '자유로움',          // 이동 능력
