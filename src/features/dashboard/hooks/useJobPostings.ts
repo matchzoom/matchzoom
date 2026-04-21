@@ -7,6 +7,7 @@ import { getJobPostings } from '../api/jobPostingsApi';
 export function useJobPostings() {
   return useQuery({
     queryKey: ['job-postings'],
-    queryFn: getJobPostings,
+    queryFn: ({ signal }) => getJobPostings(signal),
+    staleTime: 5 * 60 * 1000,
   });
 }

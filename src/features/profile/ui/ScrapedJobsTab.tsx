@@ -1,13 +1,36 @@
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
 
 import type { Bookmark } from '@/shared/types/bookmark';
+import type { JobPosting } from '@/shared/types/job';
+import { JobCard } from '@/shared/ui/JobCard';
+
+function toJobPosting(bookmark: Bookmark): JobPosting {
+  return {
+    id: bookmark.id,
+    title: bookmark.postingTitle,
+    companyName: bookmark.companyName,
+    location: '',
+    salary: '',
+    deadline: bookmark.deadline,
+    empType: '',
+    reqCareer: '',
+    reqEduc: '',
+    envConditions: [],
+    fitLevel: bookmark.fitLevel || undefined,
+    detailUrl: bookmark.postingUrl,
+    bookmarked: true,
+  };
+}
 
 type ScrapedJobsTabProps = {
   jobs: Bookmark[];
+  onBookmarkToggle: (job: JobPosting) => void;
 };
 
-export function ScrapedJobsTab({ jobs }: ScrapedJobsTabProps) {
+export function ScrapedJobsTab({
+  jobs,
+  onBookmarkToggle,
+}: ScrapedJobsTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <header>
@@ -32,25 +55,16 @@ export function ScrapedJobsTab({ jobs }: ScrapedJobsTabProps) {
           </Link>
         </div>
       ) : (
-        <ul className="flex flex-col gap-3" aria-label="스크랩한 채용공고 목록">
+        <ul
+          className="grid gap-6 sm:grid-cols-2"
+          aria-label="스크랩한 채용공고 목록"
+        >
           {jobs.map((job) => (
             <li key={job.id}>
-              <a
-                href={job.postingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-ui flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4 hover:border-primary-border"
-              >
-                <span className="line-clamp-1 text-[0.9375rem] font-medium text-gray-900">
-                  {job.postingTitle}
-                </span>
-                <ExternalLink
-                  size={16}
-                  strokeWidth={1.5}
-                  className="shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-              </a>
+              <JobCard
+                job={toJobPosting(job)}
+                onBookmarkToggle={onBookmarkToggle}
+              />
             </li>
           ))}
         </ul>
