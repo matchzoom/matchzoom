@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { JobPosting } from '@/shared/types/job';
+import { STORAGE_KEY_JOB_SIGUNGU_FILTER } from '@/shared/utils/storageKeys';
 
-const STORAGE_KEY = 'matchzoom-job-sigungu-filter';
+const STORAGE_KEY = STORAGE_KEY_JOB_SIGUNGU_FILTER;
 
 function extractSigungu(location: string): string | null {
   const parts = location.trim().split(/\s+/);
