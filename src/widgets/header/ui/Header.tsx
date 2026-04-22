@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User } from 'lucide-react';
+import { User, Sun, Moon } from 'lucide-react';
 
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { useLogout } from '@/shared/hooks/useLogout';
 import { useTestLogin } from '@/shared/hooks/useTestLogin';
 import { useTestLogout } from '@/shared/hooks/useTestLogout';
+import { useDarkMode } from '@/shared/hooks/useDarkMode';
 import { Button } from '@/shared/ui/Button';
 
 export function Header() {
@@ -18,6 +19,7 @@ export function Header() {
   const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
   const { mutate: testLogout, isPending: isTestLogoutPending } =
     useTestLogout();
+  const { theme, toggle: toggleTheme } = useDarkMode();
 
   return (
     <header
@@ -34,70 +36,115 @@ export function Header() {
           </span>
         </Link>
 
-        {!user && (
-          <nav aria-label="로그인 메뉴" className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="md"
-              disabled={isTestLoginPending}
-              onClick={() => testLogin()}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[0.75rem] font-semibold leading-none text-gray-500">
+              {theme === 'dark' ? '다크 모드' : '라이트 모드'}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={theme === 'dark'}
+              aria-label={
+                theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'
+              }
+              onClick={toggleTheme}
+              className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-[12px] ${theme === 'dark' ? 'bg-primary' : 'bg-gray-300'}`}
+              style={{ transition: 'background-color 150ms ease' }}
             >
-              {isTestLoginPending ? '로그인 중...' : '테스트 계정으로 로그인'}
-            </Button>
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => {
-                window.location.href = '/api/oauth/kakao/authorize';
-              }}
-            >
-              로그인
-            </Button>
-          </nav>
-        )}
+              <span
+                className="absolute top-[3px] flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white"
+                style={{
+                  left: theme === 'dark' ? '22px' : '3px',
+                  transition: 'left 150ms ease',
+                }}
+              >
+                {theme === 'dark' ? (
+                  <Moon
+                    size={10}
+                    strokeWidth={1.5}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Sun
+                    size={10}
+                    strokeWidth={1.5}
+                    className="text-gray-400"
+                    aria-hidden="true"
+                  />
+                )}
+              </span>
+            </button>
+          </div>
 
-        {user && user.isTestUser && (
-          <nav
-            aria-label="테스트 계정 메뉴"
-            className="flex items-center gap-3"
-          >
-            <Link
-              href="/profile"
-              aria-label="프로필 페이지로 이동"
-              className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
-            >
-              <User size={20} strokeWidth={1.5} aria-hidden="true" />
-            </Link>
-            <Button
-              variant="ghost"
-              size="md"
-              disabled={isTestLogoutPending}
-              onClick={() => testLogout()}
-            >
-              {isTestLogoutPending ? '로그아웃 중...' : '테스트 계정 로그아웃'}
-            </Button>
-          </nav>
-        )}
+          {!user && (
+            <nav aria-label="로그인 메뉴" className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="md"
+                disabled={isTestLoginPending}
+                onClick={() => testLogin()}
+              >
+                {isTestLoginPending ? '로그인 중...' : '테스트 계정으로 로그인'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => {
+                  window.location.href = '/api/oauth/kakao/authorize';
+                }}
+              >
+                로그인
+              </Button>
+            </nav>
+          )}
 
-        {user && !user.isTestUser && (
-          <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
-            <Link
-              href="/profile"
-              aria-label="프로필 페이지로 이동"
-              className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+          {user && user.isTestUser && (
+            <nav
+              aria-label="테스트 계정 메뉴"
+              className="flex items-center gap-3"
             >
-              <User size={20} strokeWidth={1.5} aria-hidden="true" />
-            </Link>
-            <Button
-              variant="secondary"
-              size="md"
-              disabled={isLogoutPending}
-              onClick={() => logout()}
-            >
-              {isLogoutPending ? '로그아웃 중...' : '로그아웃'}
-            </Button>
-          </nav>
-        )}
+              <Link
+                href="/profile"
+                aria-label="프로필 페이지로 이동"
+                className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+              >
+                <User size={20} strokeWidth={1.5} aria-hidden="true" />
+              </Link>
+              <Button
+                variant="ghost"
+                size="md"
+                disabled={isTestLogoutPending}
+                onClick={() => testLogout()}
+              >
+                {isTestLogoutPending
+                  ? '로그아웃 중...'
+                  : '테스트 계정 로그아웃'}
+              </Button>
+            </nav>
+          )}
+
+          {user && !user.isTestUser && (
+            <nav aria-label="사용자 메뉴" className="flex items-center gap-3">
+              <Link
+                href="/profile"
+                aria-label="프로필 페이지로 이동"
+                className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+              >
+                <User size={20} strokeWidth={1.5} aria-hidden="true" />
+              </Link>
+              <Button
+                variant="secondary"
+                size="md"
+                disabled={isLogoutPending}
+                onClick={() => logout()}
+              >
+                {isLogoutPending ? '로그아웃 중...' : '로그아웃'}
+              </Button>
+            </nav>
+          )}
+        </div>
       </div>
     </header>
   );
