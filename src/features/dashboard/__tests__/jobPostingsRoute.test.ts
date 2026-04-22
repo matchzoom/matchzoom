@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GET } from '@/app/api/job-postings/route';
 
 vi.mock('next/headers', () => ({ cookies: vi.fn() }));
@@ -35,7 +35,7 @@ const JOB_XML_ONE_ITEM = `<?xml version="1.0" encoding="UTF-8"?>
         <jobNm>사무보조원</jobNm>
         <compAddr>경기도 수원시 팔달구</compAddr>
         <empType>정규직</empType>
-        <salary>월 2,000,000원</salary>
+        <salary>2,000,000</salary>
         <salaryType>월급</salaryType>
         <termDate>20260101~20260531</termDate>
         <reqCareer>신입</reqCareer>
@@ -69,9 +69,14 @@ const mockFetchWith = (xml: string) =>
 describe('GET /api/job-postings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.JOB_API_BASE_URL = 'https://api.example.com/jobs';
-    process.env.JOB_API_KEY = 'test-key';
+    vi.stubEnv('JOB_API_BASE_URL', 'https://api.example.com/jobs');
+    vi.stubEnv('JOB_API_KEY', 'test-key');
     mockFetchWith(JOB_XML_ONE_ITEM);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it('공고 목록을 반환한다', async () => {
@@ -88,6 +93,7 @@ describe('GET /api/job-postings', () => {
     expect(data[0]).toMatchObject({
       companyName: '테스트 회사',
       title: '사무보조원',
+      salary: '2,000,000원 (월급)',
     });
   });
 
@@ -149,8 +155,7 @@ describe('GET /api/job-postings', () => {
 
   it('환경변수 없으면 500을 반환한다', async () => {
     mockAuth('1');
-    delete process.env.JOB_API_BASE_URL;
-    delete process.env.JOB_API_KEY;
+    vi.unstubAllEnvs();
 
     const res = await GET(makeRequest());
     expect(res.status).toBe(500);
