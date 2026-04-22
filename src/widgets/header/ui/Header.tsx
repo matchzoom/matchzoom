@@ -49,15 +49,11 @@ export function Header() {
                 theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'
               }
               onClick={toggleTheme}
-              className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-[12px] ${theme === 'dark' ? 'bg-primary' : 'bg-gray-300'}`}
-              style={{ transition: 'background-color 150ms ease' }}
+              className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-[12px] transition-colors duration-[150ms] ${theme === 'dark' ? 'bg-primary' : 'bg-gray-300'}`}
             >
               <span
-                className="absolute top-[3px] flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white"
-                style={{
-                  left: theme === 'dark' ? '22px' : '3px',
-                  transition: 'left 150ms ease',
-                }}
+                className="absolute top-[3px] flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white transition-[left] duration-[150ms]"
+                style={{ left: theme === 'dark' ? '22px' : '3px' }}
               >
                 {theme === 'dark' ? (
                   <Moon
