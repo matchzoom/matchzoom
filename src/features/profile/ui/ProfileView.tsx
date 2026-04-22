@@ -13,8 +13,7 @@ import { ScrapedJobsTab } from './ScrapedJobsTab';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
-
-type ProfileTab = 'result' | 'scraps';
+import { PROFILE_TAB_ITEMS, type ProfileTab } from '../utils/profileTabs';
 
 export function ProfileView() {
   const router = useRouter();
@@ -78,26 +77,33 @@ export function ProfileView() {
             aria-label="프로필 메뉴"
             className="mb-10 flex border-b border-gray-200 md:hidden"
           >
-            {(['result', 'scraps'] as ProfileTab[]).map((tab) => (
+            {PROFILE_TAB_ITEMS.map(({ id, label }) => (
               <button
-                key={tab}
+                key={id}
                 type="button"
                 role="tab"
-                aria-selected={activeTab === tab}
-                onClick={() => setActiveTab(tab)}
+                id={`tab-${id}`}
+                aria-selected={activeTab === id}
+                aria-controls={`panel-${id}`}
+                onClick={() => setActiveTab(id)}
                 className={
                   'flex-1 cursor-pointer px-4 py-3 text-[0.9375rem] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] ' +
-                  (activeTab === tab
+                  (activeTab === id
                     ? 'border-b-2 border-primary font-bold text-primary'
                     : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900')
                 }
               >
-                {tab === 'result' ? '내 검사 결과' : '스크랩한 공고'}
+                {label}
               </button>
             ))}
           </div>
 
-          {activeTab === 'result' ? (
+          <div
+            role="tabpanel"
+            id="panel-result"
+            aria-labelledby="tab-result"
+            hidden={activeTab !== 'result'}
+          >
             <ProfileInfoTab
               userProfile={userProfile}
               lastSurveyDate={lastSurveyDate}
@@ -106,14 +112,20 @@ export function ProfileView() {
               matchedJobs={matchedJobs}
               onEdit={handleEdit}
             />
-          ) : (
+          </div>
+          <div
+            role="tabpanel"
+            id="panel-scraps"
+            aria-labelledby="tab-scraps"
+            hidden={activeTab !== 'scraps'}
+          >
             <ScrapedJobsTab
               jobs={scrapedJobs}
               onBookmarkToggle={(job) =>
                 handleBookmarkRemove(job.detailUrl ?? '')
               }
             />
-          )}
+          </div>
         </div>
       </div>
 
