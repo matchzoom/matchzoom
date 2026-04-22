@@ -66,13 +66,37 @@ export function ProfileView() {
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-5 lg:px-6">
+    <div className="mx-auto max-w-[1200px] px-4 pt-5 pb-10 md:px-5 md:py-10 lg:px-6">
       <div className="flex gap-8">
         <div className="hidden w-[220px] shrink-0 md:block">
           <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         <div className="min-w-0 flex-1">
+          <div
+            role="tablist"
+            aria-label="프로필 메뉴"
+            className="mb-10 flex border-b border-gray-200 md:hidden"
+          >
+            {(['result', 'scraps'] as ProfileTab[]).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                onClick={() => setActiveTab(tab)}
+                className={
+                  'flex-1 cursor-pointer px-4 py-3 text-[0.9375rem] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] ' +
+                  (activeTab === tab
+                    ? 'border-b-2 border-primary font-bold text-primary'
+                    : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900')
+                }
+              >
+                {tab === 'result' ? '내 검사 결과' : '스크랩한 공고'}
+              </button>
+            ))}
+          </div>
+
           {activeTab === 'result' ? (
             <ProfileInfoTab
               userProfile={userProfile}
