@@ -9,6 +9,8 @@ export function useTestLogout() {
     mutationFn: testLogout,
     onSuccess: () => {
       queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
+      localStorage.removeItem('matchzoom-job-sigungu-filter');
+      localStorage.removeItem('matchzoom-job-fitlevel-filter');
       window.location.href = '/';
     },
   });
