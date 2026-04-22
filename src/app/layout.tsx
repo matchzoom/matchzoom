@@ -57,9 +57,6 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col">
-        <a href="#main-content" className="skip-link">
-          본문 바로가기
-        </a>
         <QueryProvider>
           <NavigationTracker />
           <Header />
