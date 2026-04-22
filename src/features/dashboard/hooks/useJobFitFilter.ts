@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { FitLevel, JobPosting } from '@/shared/types/job';
+import { STORAGE_KEY_JOB_FITLEVEL_FILTER } from '@/shared/utils/storageKeys';
 
-const STORAGE_KEY = 'matchzoom-job-fitlevel-filter';
+const STORAGE_KEY = STORAGE_KEY_JOB_FITLEVEL_FILTER;
 
 const FIT_LEVEL_ORDER: FitLevel[] = ['잘 맞아요', '도전해볼 수 있어요'];
 
