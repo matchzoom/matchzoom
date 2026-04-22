@@ -49,8 +49,15 @@ describe('GET /api/bookmarks', () => {
 
     const data = await res.json();
     expect(data).toHaveLength(1);
-    expect(data[0].postingTitle).toBe('사무보조원 채용');
-    expect(data[0].postingUrl).toBe('https://example.com/job/1');
+    expect(data[0]).toEqual({
+      id: mockBookmarkRow.id,
+      postingTitle: mockBookmarkRow.posting_title,
+      postingUrl: mockBookmarkRow.posting_url,
+      companyName: mockBookmarkRow.company_name,
+      deadline: mockBookmarkRow.deadline,
+      fitLevel: mockBookmarkRow.fit_level,
+      createdAt: mockBookmarkRow.created_at,
+    });
   });
 
   it('북마크 없으면 빈 배열을 반환한다', async () => {
@@ -114,13 +121,20 @@ describe('POST /api/bookmarks', () => {
     const res = await POST(makePostRequest(validBody));
     expect(res.status).toBe(204);
 
-    expect(mockSupabaseFetch).toHaveBeenCalledWith(
-      '/rest/v1/bookmarks',
-      expect.objectContaining({
-        method: 'POST',
-        body: expect.stringContaining('"user_id":"1"'),
+    expect(mockSupabaseFetch).toHaveBeenCalledWith('/rest/v1/bookmarks', {
+      method: 'POST',
+      headers: {
+        Prefer: 'resolution=ignore-duplicates,return=representation',
+      },
+      body: JSON.stringify({
+        user_id: '1',
+        posting_title: validBody.postingTitle,
+        posting_url: validBody.postingUrl,
+        company_name: validBody.companyName,
+        deadline: validBody.deadline,
+        fit_level: validBody.fitLevel,
       }),
-    );
+    });
   });
 
   it('쿠키 없으면 401을 반환한다', async () => {
@@ -157,7 +171,9 @@ describe('DELETE /api/bookmarks', () => {
     expect(res.status).toBe(204);
 
     expect(mockSupabaseFetch).toHaveBeenCalledWith(
-      expect.stringContaining('user_id=eq.1'),
+      expect.stringContaining(
+        `user_id=eq.1&posting_url=eq.${encodeURIComponent('https://example.com/job/1')}`,
+      ),
       expect.objectContaining({ method: 'DELETE' }),
     );
   });
