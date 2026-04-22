@@ -19,7 +19,7 @@ export function Header() {
   const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
   const { mutate: testLogout, isPending: isTestLogoutPending } =
     useTestLogout();
-  const { theme, toggle: toggleTheme } = useDarkMode();
+  const { theme, toggle: toggleTheme, mounted: themeMounted } = useDarkMode();
 
   return (
     <header
@@ -38,9 +38,11 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2.5">
-            <span className="text-[0.75rem] font-semibold leading-none text-gray-500">
-              {theme === 'dark' ? '다크 모드' : '라이트 모드'}
-            </span>
+            {themeMounted && (
+              <span className="text-[0.75rem] font-semibold leading-none text-gray-500">
+                {theme === 'dark' ? '다크 모드' : '라이트 모드'}
+              </span>
+            )}
             <button
               type="button"
               role="switch"

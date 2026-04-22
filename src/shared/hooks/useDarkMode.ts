@@ -7,6 +7,7 @@ type Theme = 'dark' | 'light';
 export function useDarkMode() {
   // SSR/CSR 불일치 방지: 서버와 클라이언트 모두 'light'로 시작
   const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
   // 첫 렌더(하이드레이션)에서 DOM 덮어쓰기 방지용 플래그
   const hasMounted = useRef(false);
 
@@ -15,6 +16,7 @@ export function useDarkMode() {
     setTheme(
       document.documentElement.classList.contains('dark') ? 'dark' : 'light',
     );
+    setMounted(true);
   }, []);
 
   // 테마 변경 시 DOM 반영 + localStorage 저장 (첫 렌더는 skip — 인라인 스크립트가 이미 설정)
@@ -31,5 +33,5 @@ export function useDarkMode() {
 
   const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
-  return { theme, toggle };
+  return { theme, toggle, mounted };
 }
