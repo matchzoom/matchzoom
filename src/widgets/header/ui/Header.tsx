@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { User } from 'lucide-react';
 
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
@@ -10,6 +11,8 @@ import { useTestLogout } from '@/shared/hooks/useTestLogout';
 import { Button } from '@/shared/ui/Button';
 
 export function Header() {
+  const pathname = usePathname();
+  const isLanding = pathname === '/';
   const { data: user } = useCurrentUser();
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
   const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
@@ -17,7 +20,9 @@ export function Header() {
     useTestLogout();
 
   return (
-    <header className="border-b border-primary-border bg-hero-bg">
+    <header
+      className={`border-b ${isLanding ? 'border-primary-border bg-hero-bg' : 'border-gray-100'}`}
+    >
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
         <Link
           href="/"

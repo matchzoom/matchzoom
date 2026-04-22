@@ -1,14 +1,9 @@
-type ProfileTab = 'result' | 'scraps';
+import { PROFILE_TAB_ITEMS, type ProfileTab } from '../utils/profileTabs';
 
 type ProfileSidebarProps = {
   activeTab: ProfileTab;
   onTabChange: (tab: ProfileTab) => void;
 };
-
-const NAV_ITEMS: { tab: ProfileTab; label: string }[] = [
-  { tab: 'result', label: '내 검사 결과' },
-  { tab: 'scraps', label: '스크랩한 공고' },
-];
 
 export function ProfileSidebar({
   activeTab,
@@ -20,15 +15,15 @@ export function ProfileSidebar({
       className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
     >
       <ul role="list">
-        {NAV_ITEMS.map(({ tab, label }) => (
-          <li key={tab}>
+        {PROFILE_TAB_ITEMS.map(({ id, label }) => (
+          <li key={id}>
             <button
               type="button"
-              onClick={() => onTabChange(tab)}
-              aria-current={activeTab === tab ? 'page' : undefined}
+              onClick={() => onTabChange(id)}
+              aria-current={activeTab === id ? 'page' : undefined}
               className={
                 'transition-ui w-full cursor-pointer px-4 py-3 text-left text-[0.9375rem] ' +
-                (activeTab === tab
+                (activeTab === id
                   ? 'border-l-[3px] border-primary bg-primary-bg font-semibold text-primary'
                   : 'border-l-[3px] border-transparent font-normal text-gray-700 hover:bg-gray-100')
               }
