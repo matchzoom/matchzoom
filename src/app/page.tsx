@@ -36,9 +36,19 @@ export default function Home() {
     staleTime: 1000 * 60 * 5,
   });
 
-  if (userLoading || (!!user && profileLoading)) return null;
+  const isLoading = userLoading || (!!user && profileLoading);
 
-  if (user && profile) return <DashboardView />;
+  if (!isLoading && user && profile) return <DashboardView />;
 
-  return <LandingView isLoggedIn={!!user} />;
+  return (
+    <div
+      className={
+        isLoading
+          ? 'pointer-events-none [&_button]:opacity-0 [&_h1]:text-transparent [&_h3]:text-transparent [&_img]:opacity-0 [&_p]:text-transparent [&_span]:opacity-0 [&_.step-image-frame]:opacity-0'
+          : undefined
+      }
+    >
+      <LandingView isLoggedIn={!isLoading && !!user} />
+    </div>
+  );
 }

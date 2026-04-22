@@ -98,7 +98,7 @@ export function ServiceIntroSection() {
 
               <div className="hidden shrink-0 lg:block">
                 <div
-                  className={`h-[300px] w-[560px] overflow-hidden rounded-lg border border-gray-200 bg-white p-1.5 ${step.innerPad ?? ''}`}
+                  className={`step-image-frame h-[300px] w-[560px] overflow-hidden rounded-lg border border-gray-200 bg-white p-1.5 ${step.innerPad ?? ''}`}
                 >
                   <div className="relative h-full w-full overflow-hidden rounded">
                     {step.image ? (
