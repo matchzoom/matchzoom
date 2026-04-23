@@ -23,7 +23,7 @@ export function DashboardView() {
     selectedSigungu,
     filteredPostings: regionFiltered,
     handleSelectSigungu,
-  } = useJobRegionFilter(postings, profileProvinces);
+  } = useJobRegionFilter(postings ?? [], profileProvinces);
   const {
     availableFitLevels,
     selectedFitLevel,
