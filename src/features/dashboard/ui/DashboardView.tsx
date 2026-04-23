@@ -6,7 +6,6 @@ import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
 import { useJobFitFilter } from '../hooks/useJobFitFilter';
 import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
 import { JobListSection } from './JobListSection';
-import { DashboardSkeleton } from './DashboardSkeleton';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
@@ -38,8 +37,6 @@ export function DashboardView() {
     closeLoginModal,
   } = useBookmarkToggle();
 
-  if (isDashboardPending || isPostingsPending) return <DashboardSkeleton />;
-
   return (
     <div className="py-10 md:py-16">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-[60px] px-4 md:px-5 lg:px-6">
@@ -48,6 +45,7 @@ export function DashboardView() {
             검사 결과 요약
           </h2>
           <AIResultCard
+            isLoading={isDashboardPending}
             userName={userName}
             axes={personalityAxes}
             summary={personalitySummary}
@@ -60,6 +58,8 @@ export function DashboardView() {
             맞춤 채용공고
           </h2>
           <JobListSection
+            isLoading={isPostingsPending}
+            isLoadingUser={isDashboardPending}
             userName={userName}
             postings={filteredPostings}
             onBookmarkToggle={handleBookmarkToggle}
