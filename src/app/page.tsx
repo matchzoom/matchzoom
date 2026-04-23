@@ -7,6 +7,8 @@ import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getServerSession } from '@/shared/utils/serverSession';
 import { DashboardView } from '@/features/dashboard';
 import { LandingPage } from '@/features/landing';
+import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
+import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import { TEST_PROFILE, TEST_MATCH } from '@/shared/utils/testUser';
 import type { Profile } from '@/shared/types/profile';
 import type { MatchResult } from '@/shared/types/match';
@@ -31,8 +33,8 @@ export default async function Home() {
 
     if (profile) {
       const queryClient = new QueryClient();
-      queryClient.setQueryData(['profile'], profile);
-      queryClient.setQueryData(['match-result'], matchResult);
+      queryClient.setQueryData(PROFILE_QUERY_KEY, profile);
+      queryClient.setQueryData(MATCH_RESULT_QUERY_KEY, matchResult);
 
       return (
         <HydrationBoundary state={dehydrate(queryClient)}>

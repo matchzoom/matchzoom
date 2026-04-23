@@ -2,7 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '@/features/profile/api/profileApi';
+import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
 import { getMatchResult } from '@/features/match/api/matchApi';
+import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import {
   toPersonalityAxes,
   toMatchedJobs,
@@ -10,12 +12,12 @@ import {
 
 export function useDashboard() {
   const { data: profile } = useQuery({
-    queryKey: ['profile'],
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: getProfile,
   });
 
   const { data: matchResult } = useQuery({
-    queryKey: ['match-result'],
+    queryKey: MATCH_RESULT_QUERY_KEY,
     queryFn: getMatchResult,
   });
 

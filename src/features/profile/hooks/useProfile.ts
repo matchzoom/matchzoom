@@ -29,9 +29,11 @@ function toUserProfile(p: Profile): UserProfile {
   };
 }
 
+export const PROFILE_QUERY_KEY = ['profile'] as const;
+
 export function useProfile() {
   const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['profile'],
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: getProfile,
   });
 

@@ -17,7 +17,9 @@ import {
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
 import { generateMatch } from '@/features/match/api/matchApi';
+import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import { getProfile } from '@/features/profile/api/profileApi';
+import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
 import type { Profile } from '@/shared/types/profile';
 
 export type { SurveyFormValues };
@@ -96,7 +98,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   });
 
   const { data: existingProfile } = useQuery({
-    queryKey: ['profile'],
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: getProfile,
     enabled: mode === 'edit',
   });
@@ -185,7 +187,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       hope_activities: activities,
     });
 
-    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
     queryClient.removeQueries({ queryKey: ['job-postings'] });
     localStorage.removeItem('matchzoom-job-sigungu-filter');
     localStorage.removeItem('matchzoom-job-fitlevel-filter');
@@ -193,7 +195,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
 
     try {
       await generateMatch();
-      queryClient.invalidateQueries({ queryKey: ['match-result'] });
+      queryClient.invalidateQueries({ queryKey: MATCH_RESULT_QUERY_KEY });
       setIsComplete(true);
     } catch {
       setIsMatchError(true);
