@@ -6,17 +6,21 @@ import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
 import { useJobFitFilter } from '../hooks/useJobFitFilter';
 import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
 import { JobListSection } from './JobListSection';
+import { DashboardSkeleton } from './DashboardSkeleton';
 import { AIResultCard } from '@/shared/ui/AIResultCard';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 export function DashboardView() {
   const {
+    isPending,
     userName,
     personalityAxes,
     personalitySummary,
     matchedJobs,
     profileProvinces,
   } = useDashboard();
+
+  if (isPending) return <DashboardSkeleton />;
   const { data: postings } = useJobPostings();
   const {
     availableSigungu,
