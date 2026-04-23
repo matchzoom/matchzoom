@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import {
   dehydrate,
   HydrationBoundary,
@@ -6,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getServerSession } from '@/shared/utils/serverSession';
-import { DashboardView, DashboardSkeleton } from '@/features/dashboard';
+import { DashboardView } from '@/features/dashboard';
 import { LandingPage } from '@/features/landing';
 import { TEST_PROFILE, TEST_MATCH } from '@/shared/utils/testUser';
 import type { Profile } from '@/shared/types/profile';
@@ -37,9 +36,7 @@ export default async function Home() {
 
       return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <Suspense fallback={<DashboardSkeleton />}>
-            <DashboardView />
-          </Suspense>
+          <DashboardView />
         </HydrationBoundary>
       );
     }

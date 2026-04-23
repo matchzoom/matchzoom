@@ -1,6 +1,6 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '@/features/profile/api/profileApi';
 import { getMatchResult } from '@/features/match/api/matchApi';
 import {
@@ -9,12 +9,12 @@ import {
 } from '@/features/match/utils/convert';
 
 export function useDashboard() {
-  const { data: profile } = useSuspenseQuery({
+  const { data: profile } = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
   });
 
-  const { data: matchResult } = useSuspenseQuery({
+  const { data: matchResult } = useQuery({
     queryKey: ['match-result'],
     queryFn: getMatchResult,
   });
