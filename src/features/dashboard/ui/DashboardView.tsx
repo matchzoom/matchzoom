@@ -12,13 +12,12 @@ import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 export function DashboardView() {
   const {
     userName,
-    isLoading: isDashboardLoading,
     personalityAxes,
     personalitySummary,
     matchedJobs,
     profileProvinces,
   } = useDashboard();
-  const { data: postings = [], isPending: isJobsLoading } = useJobPostings();
+  const { data: postings } = useJobPostings();
   const {
     availableSigungu,
     selectedSigungu,
@@ -49,7 +48,6 @@ export function DashboardView() {
             axes={personalityAxes}
             summary={personalitySummary}
             jobs={matchedJobs}
-            isLoading={isDashboardLoading}
           />
         </section>
 
@@ -61,8 +59,6 @@ export function DashboardView() {
             userName={userName}
             postings={filteredPostings}
             onBookmarkToggle={handleBookmarkToggle}
-            isLoading={isJobsLoading}
-            isLoadingUser={isDashboardLoading}
             sigunguList={availableSigungu}
             selectedSigungu={selectedSigungu}
             onSelectSigungu={handleSelectSigungu}

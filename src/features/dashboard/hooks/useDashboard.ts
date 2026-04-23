@@ -1,21 +1,22 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { getProfile } from '@/features/profile/api/profileApi';
-import { useMatchResult } from '@/features/match/hooks/useMatchResult';
+import { getMatchResult } from '@/features/match/api/matchApi';
 import {
   toPersonalityAxes,
   toMatchedJobs,
 } from '@/features/match/utils/convert';
 
 export function useDashboard() {
-  const { data: profile, isLoading: isProfileLoading } = useQuery({
+  const { data: profile } = useSuspenseQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
   });
 
-  const { data: matchResult, isLoading: isMatchLoading } = useMatchResult({
-    enabled: !!profile,
+  const { data: matchResult } = useSuspenseQuery({
+    queryKey: ['match-result'],
+    queryFn: getMatchResult,
   });
 
   const profileProvinces = profile?.region_primary
@@ -24,7 +25,6 @@ export function useDashboard() {
 
   return {
     userName: profile?.name ?? '',
-    isLoading: isProfileLoading || isMatchLoading,
     personalityAxes: matchResult
       ? toPersonalityAxes(matchResult.radar_chart)
       : [],
