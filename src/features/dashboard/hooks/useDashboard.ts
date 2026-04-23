@@ -1,21 +1,23 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '@/features/profile/api/profileApi';
+import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
 import { getMatchResult } from '@/features/match/api/matchApi';
+import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import {
   toPersonalityAxes,
   toMatchedJobs,
 } from '@/features/match/utils/convert';
 
 export function useDashboard() {
-  const { data: profile } = useSuspenseQuery({
-    queryKey: ['profile'],
+  const { data: profile } = useQuery({
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: getProfile,
   });
 
-  const { data: matchResult } = useSuspenseQuery({
-    queryKey: ['match-result'],
+  const { data: matchResult } = useQuery({
+    queryKey: MATCH_RESULT_QUERY_KEY,
     queryFn: getMatchResult,
   });
 

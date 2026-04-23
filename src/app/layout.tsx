@@ -89,7 +89,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col" suppressHydrationWarning>
         <a href="#main-content" className="skip-link">
           본문 바로가기
         </a>
