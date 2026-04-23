@@ -12,16 +12,14 @@ import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 export function DashboardView() {
   const {
-    isPending,
+    isPending: isDashboardPending,
     userName,
     personalityAxes,
     personalitySummary,
     matchedJobs,
     profileProvinces,
   } = useDashboard();
-
-  if (isPending) return <DashboardSkeleton />;
-  const { data: postings } = useJobPostings();
+  const { data: postings, isPending: isPostingsPending } = useJobPostings();
   const {
     availableSigungu,
     selectedSigungu,
@@ -39,6 +37,8 @@ export function DashboardView() {
     loginModalOpen,
     closeLoginModal,
   } = useBookmarkToggle();
+
+  if (isDashboardPending || isPostingsPending) return <DashboardSkeleton />;
 
   return (
     <div className="py-10 md:py-16">
