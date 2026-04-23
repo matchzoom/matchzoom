@@ -1,4 +1,9 @@
 import type { Metadata } from 'next';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
@@ -7,6 +12,7 @@ import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getServerSession } from '@/shared/utils/serverSession';
 import type { CurrentUser } from '@/shared/types/user';
 import { TEST_USER } from '@/shared/utils/testUser';
+import { CURRENT_USER_QUERY_KEY } from '@/shared/hooks/useCurrentUser';
 import './globals.css';
 
 const siteUrl =
@@ -69,6 +75,10 @@ export default async function RootLayout({
 }) {
   const initialUser = await getInitialUser();
 
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(CURRENT_USER_QUERY_KEY, initialUser);
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -84,12 +94,14 @@ export default async function RootLayout({
           본문 바로가기
         </a>
         <QueryProvider>
-          <NavigationTracker />
-          <Header initialUser={initialUser} />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <HydrationBoundary state={dehydratedState}>
+            <NavigationTracker />
+            <Header initialUser={initialUser} />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </HydrationBoundary>
         </QueryProvider>
       </body>
     </html>
