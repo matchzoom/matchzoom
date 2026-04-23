@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
-import { verifySession } from '@/shared/utils/session';
-import { AUTH_COOKIE_KEYS } from '@/shared/utils/authCookies';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import { getServerSession } from '@/shared/utils/serverSession';
 import type { CurrentUser } from '@/shared/types/user';
-import { TEST_USER_ID, TEST_USER } from '@/shared/utils/testUser';
+import { TEST_USER } from '@/shared/utils/testUser';
 import './globals.css';
 
 const siteUrl =
@@ -49,14 +47,9 @@ export const metadata: Metadata = {
 
 async function getInitialUser(): Promise<CurrentUser | null> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(AUTH_COOKIE_KEYS.SESSION)?.value;
-    if (!token) return null;
-
-    const session = await verifySession(token);
-    if (!session?.userId) return null;
-
-    if (session.userId === TEST_USER_ID) return TEST_USER;
+    const session = await getServerSession();
+    if (!session) return null;
+    if (session.isTestUser) return TEST_USER;
 
     const rows = await supabaseFetch<
       Array<{ id: number; nickname: string; created_at: string }>
