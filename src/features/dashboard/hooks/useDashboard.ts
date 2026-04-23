@@ -11,12 +11,12 @@ import {
 } from '@/features/match/utils/convert';
 
 export function useDashboard() {
-  const { data: profile } = useQuery({
+  const { data: profile, isPending: isProfilePending } = useQuery({
     queryKey: PROFILE_QUERY_KEY,
     queryFn: getProfile,
   });
 
-  const { data: matchResult } = useQuery({
+  const { data: matchResult, isPending: isMatchPending } = useQuery({
     queryKey: MATCH_RESULT_QUERY_KEY,
     queryFn: getMatchResult,
   });
@@ -26,6 +26,7 @@ export function useDashboard() {
     : [];
 
   return {
+    isPending: isProfilePending || isMatchPending,
     userName: profile?.name ?? '',
     personalityAxes: matchResult
       ? toPersonalityAxes(matchResult.radar_chart)

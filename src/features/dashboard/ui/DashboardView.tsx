@@ -11,13 +11,14 @@ import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 export function DashboardView() {
   const {
+    isPending: isDashboardPending,
     userName,
     personalityAxes,
     personalitySummary,
     matchedJobs,
     profileProvinces,
   } = useDashboard();
-  const { data: postings } = useJobPostings();
+  const { data: postings, isPending: isPostingsPending } = useJobPostings();
   const {
     availableSigungu,
     selectedSigungu,
@@ -44,6 +45,7 @@ export function DashboardView() {
             검사 결과 요약
           </h2>
           <AIResultCard
+            isLoading={isDashboardPending}
             userName={userName}
             axes={personalityAxes}
             summary={personalitySummary}
@@ -56,6 +58,8 @@ export function DashboardView() {
             맞춤 채용공고
           </h2>
           <JobListSection
+            isLoading={isPostingsPending}
+            isLoadingUser={isDashboardPending}
             userName={userName}
             postings={filteredPostings}
             onBookmarkToggle={handleBookmarkToggle}
