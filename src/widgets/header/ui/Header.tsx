@@ -10,11 +10,18 @@ import { useTestLogin } from '@/shared/hooks/useTestLogin';
 import { useTestLogout } from '@/shared/hooks/useTestLogout';
 import { useDarkMode } from '@/shared/hooks/useDarkMode';
 import { Button } from '@/shared/ui/Button';
+import type { CurrentUser } from '@/shared/types/user';
 
-export function Header() {
+type HeaderProps = {
+  initialUser?: CurrentUser | null;
+};
+
+export function Header({ initialUser }: HeaderProps) {
   const pathname = usePathname();
   const isLanding = pathname === '/';
-  const { data: user } = useCurrentUser();
+  const { data: fetchedUser } = useCurrentUser();
+  // fetchedUser가 undefined(로딩 중)이면 서버에서 내려준 initialUser 사용
+  const user = fetchedUser ?? initialUser;
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
   const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
   const { mutate: testLogout, isPending: isTestLogoutPending } =

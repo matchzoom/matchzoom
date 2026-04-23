@@ -1,54 +1,32 @@
-'use client';
+import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/shared/utils/session';
+import { AUTH_COOKIE_KEYS } from '@/shared/utils/authCookies';
+import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import { DashboardView, DashboardSkeleton } from '@/features/dashboard';
+import { LandingPage } from '@/features/landing';
 
-import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
-import { getProfile } from '@/features/profile/api/profileApi';
-import { DashboardView } from '@/features/dashboard';
-import { HeroSection, ServiceIntroSection } from '@/features/landing';
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(AUTH_COOKIE_KEYS.SESSION)?.value;
+  const session = token ? await verifySession(token) : null;
 
-function LandingView({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const router = useRouter();
+  if (session?.userId) {
+    const rows = await supabaseFetch<{ id: number }[]>(
+      `/rest/v1/profiles?user_id=eq.${session.userId}&select=id&limit=1`,
+    );
+    const hasProfile = rows.length > 0;
 
-  const handleCtaClick = () => {
-    if (isLoggedIn) {
-      router.push('/survey');
-    } else {
-      window.location.href = '/api/oauth/kakao/authorize';
+    if (hasProfile) {
+      return (
+        <Suspense fallback={<DashboardSkeleton />}>
+          <DashboardView />
+        </Suspense>
+      );
     }
-  };
 
-  return (
-    <>
-      <HeroSection onCtaClick={handleCtaClick} />
-      <ServiceIntroSection />
-    </>
-  );
-}
+    return <LandingPage isLoggedIn={true} />;
+  }
 
-export default function Home() {
-  const { data: user, isLoading: userLoading } = useCurrentUser();
-
-  const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: getProfile,
-    enabled: !!user,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const isLoading = userLoading || (!!user && profileLoading);
-
-  if (!isLoading && user && profile) return <DashboardView />;
-
-  return (
-    <div
-      className={
-        isLoading
-          ? 'pointer-events-none [&_button]:opacity-0 [&_h1]:text-transparent [&_h3]:text-transparent [&_img]:opacity-0 [&_p]:text-transparent [&_span]:opacity-0 [&_.step-image-frame]:opacity-0'
-          : undefined
-      }
-    >
-      <LandingView isLoggedIn={!isLoading && !!user} />
-    </div>
-  );
+  return <LandingPage isLoggedIn={false} />;
 }

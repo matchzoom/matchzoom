@@ -1,8 +1,14 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
+import { verifySession } from '@/shared/utils/session';
+import { AUTH_COOKIE_KEYS } from '@/shared/utils/authCookies';
+import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import type { CurrentUser } from '@/shared/types/user';
+import { TEST_USER_ID, TEST_USER } from '@/shared/utils/testUser';
 import './globals.css';
 
 const siteUrl =
@@ -41,11 +47,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+async function getInitialUser(): Promise<CurrentUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE_KEYS.SESSION)?.value;
+    if (!token) return null;
+
+    const session = await verifySession(token);
+    if (!session?.userId) return null;
+
+    if (session.userId === TEST_USER_ID) return TEST_USER;
+
+    const rows = await supabaseFetch<
+      Array<{ id: number; nickname: string; created_at: string }>
+    >(
+      `/rest/v1/users?id=eq.${session.userId}&select=id,nickname,created_at&limit=1`,
+    );
+    return rows[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialUser = await getInitialUser();
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -62,7 +92,7 @@ export default function RootLayout({
         </a>
         <QueryProvider>
           <NavigationTracker />
-          <Header />
+          <Header initialUser={initialUser} />
           <main id="main-content" className="flex-1">
             {children}
           </main>
