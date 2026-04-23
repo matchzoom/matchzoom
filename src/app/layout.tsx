@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
-import { verifySession } from '@/shared/utils/session';
-import { AUTH_COOKIE_KEYS } from '@/shared/utils/authCookies';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import type { CurrentUser } from '@/shared/types/user';
-import { TEST_USER_ID, TEST_USER } from '@/shared/utils/testUser';
+import { TEST_USER } from '@/shared/utils/testUser';
+import { getServerSession } from '@/shared/utils/getServerSession';
+import { CURRENT_USER_QUERY_KEY } from '@/shared/hooks/useCurrentUser';
 import './globals.css';
 
 const siteUrl =
@@ -49,14 +53,9 @@ export const metadata: Metadata = {
 
 async function getInitialUser(): Promise<CurrentUser | null> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(AUTH_COOKIE_KEYS.SESSION)?.value;
-    if (!token) return null;
-
-    const session = await verifySession(token);
-    if (!session?.userId) return null;
-
-    if (session.userId === TEST_USER_ID) return TEST_USER;
+    const session = await getServerSession();
+    if (!session) return null;
+    if (session.isTestUser) return TEST_USER;
 
     const rows = await supabaseFetch<
       Array<{ id: number; nickname: string; created_at: string }>
@@ -76,6 +75,10 @@ export default async function RootLayout({
 }) {
   const initialUser = await getInitialUser();
 
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(CURRENT_USER_QUERY_KEY, initialUser);
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -91,12 +94,14 @@ export default async function RootLayout({
           본문 바로가기
         </a>
         <QueryProvider>
-          <NavigationTracker />
-          <Header initialUser={initialUser} />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <HydrationBoundary state={dehydratedState}>
+            <NavigationTracker />
+            <Header initialUser={initialUser} />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </HydrationBoundary>
         </QueryProvider>
       </body>
     </html>
