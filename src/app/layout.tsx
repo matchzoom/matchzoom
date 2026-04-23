@@ -9,9 +9,9 @@ import { NavigationTracker } from '@/shared/providers/NavigationTracker';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import { getServerSession } from '@/shared/utils/serverSession';
 import type { CurrentUser } from '@/shared/types/user';
 import { TEST_USER } from '@/shared/utils/testUser';
-import { getServerSession } from '@/shared/utils/getServerSession';
 import { CURRENT_USER_QUERY_KEY } from '@/shared/hooks/useCurrentUser';
 import './globals.css';
 

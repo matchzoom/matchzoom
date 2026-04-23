@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import { getServerSession } from '@/shared/utils/serverSession';
 import { DashboardView, DashboardSkeleton } from '@/features/dashboard';
 import { LandingPage } from '@/features/landing';
-import { getServerSession } from '@/shared/utils/getServerSession';
 
 export default async function Home() {
   const session = await getServerSession();
