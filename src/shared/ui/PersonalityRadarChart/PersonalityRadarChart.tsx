@@ -47,7 +47,7 @@ export function PersonalityRadarChart({ data }: PersonalityRadarChartProps) {
   return (
     <div className="w-full max-w-[320px]">
       <div
-        className="[&_*]:focus:outline-none"
+        className="h-[260px] [&_*]:focus:outline-none"
         role="img"
         aria-labelledby={listId}
       >
