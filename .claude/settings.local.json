@@ -6,7 +6,15 @@
       "Skill(keybindings-help)",
       "Skill(update-config)",
       "Bash(mkdir -p /Users/ahreum/Documents/myfolder/coding/마주봄/.claude/commands)",
-      "Bash(mkdir -p /Users/ahreum/Documents/myfolder/coding/마주봄/.claude/rules)"
+      "Bash(mkdir -p /Users/ahreum/Documents/myfolder/coding/마주봄/.claude/rules)",
+      "Bash(pnpm type-check *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)",
+      "Bash(git check-ignore *)",
+      "Bash(gh issue *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
