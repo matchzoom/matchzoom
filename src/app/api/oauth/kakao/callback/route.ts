@@ -56,9 +56,16 @@ export async function GET(request: NextRequest) {
     // Step 4: session JWT 서명
     const sessionJwt = await signSession(userId);
 
-    // Step 5: HttpOnly 쿠키 저장 후 / 로 redirect
-    // Set-Cookie: session=...; SameSite=Strict; HttpOnly; Secure
-    const response = NextResponse.redirect(new URL('/', request.url));
+    // Step 5: HttpOnly 쿠키 저장 후 / 로 이동
+    // NextResponse.redirect() 대신 200 HTML + JS redirect 사용:
+    // SameSite=Strict 쿠키는 카카오→콜백 크로스사이트 리다이렉트 체인에서
+    // 307 응답을 따라갈 때 전송되지 않는다. 200 응답으로 쿠키를 확정 저장한 뒤
+    // JS로 이동하면 브라우저가 이미 같은 사이트 컨텍스트에 있어 쿠키가 정상 전송된다.
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><script>window.location.replace('/');</script></body></html>`;
+    const response = new NextResponse(html, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
     setAuthCookies({
       response,
       sessionJwt,
