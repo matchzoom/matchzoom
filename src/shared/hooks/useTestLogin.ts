@@ -1,15 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { testLogin } from '@/shared/api/authApi';
-import { CURRENT_USER_QUERY_KEY } from './useCurrentUser';
-import { TEST_USER } from '@/shared/utils/testUser';
 
 export function useTestLogin() {
-  const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: testLogin,
     onSuccess: () => {
-      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, TEST_USER);
+      router.refresh();
     },
   });
 }
