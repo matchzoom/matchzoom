@@ -16,6 +16,7 @@ import {
   HOPE_ACTIVITIES_VALUES,
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
+import { JOB_POSTINGS_QUERY_KEY } from '@/features/dashboard/hooks/useJobPostings';
 import { generateMatch } from '@/features/match/api/matchApi';
 import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import { getProfile } from '@/features/profile/api/profileApi';
@@ -188,7 +189,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
     });
 
     queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-    queryClient.removeQueries({ queryKey: ['job-postings'] });
+    queryClient.removeQueries({ queryKey: JOB_POSTINGS_QUERY_KEY });
     localStorage.removeItem('matchzoom-job-sigungu-filter');
     localStorage.removeItem('matchzoom-job-fitlevel-filter');
     setIsMatching(true);
