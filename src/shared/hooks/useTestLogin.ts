@@ -8,7 +8,9 @@ export function useTestLogin() {
   return useMutation({
     mutationFn: testLogin,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY });
+      return queryClient.invalidateQueries({
+        queryKey: CURRENT_USER_QUERY_KEY,
+      });
     },
   });
 }
