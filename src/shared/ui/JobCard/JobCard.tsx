@@ -33,7 +33,7 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
   return (
     <article
       aria-label={job.title}
-      className="relative flex h-full w-full flex-col rounded-lg border border-gray-200 bg-white p-5 transition-ui hover:border-primary-border"
+      className="relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-5 transition-ui hover:border-primary-border"
     >
       {job.detailUrl && (
         <a
@@ -45,7 +45,7 @@ export function JobCard({ job, onBookmarkToggle }: JobCardProps) {
         />
       )}
       <header className="flex items-start justify-between gap-3 pb-3">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           {job.fitLevel && (
             <FitBadge level={job.fitLevel} className="self-start" />
           )}

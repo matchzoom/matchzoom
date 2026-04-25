@@ -26,7 +26,7 @@ export function Header({ initialUser }: HeaderProps) {
   const { mutate: testLogin, isPending: isTestLoginPending } = useTestLogin();
   const { mutate: testLogout, isPending: isTestLogoutPending } =
     useTestLogout();
-  const { theme, toggle: toggleTheme, mounted: themeMounted } = useDarkMode();
+  const { theme, toggle: toggleTheme, mounted } = useDarkMode();
 
   return (
     <header
@@ -44,12 +44,7 @@ export function Header({ initialUser }: HeaderProps) {
         </Link>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2.5">
-            {themeMounted && (
-              <span className="text-[0.75rem] font-semibold leading-none text-gray-500">
-                {theme === 'dark' ? '다크 모드' : '라이트 모드'}
-              </span>
-            )}
+          {mounted && (
             <button
               type="button"
               role="switch"
@@ -66,22 +61,22 @@ export function Header({ initialUser }: HeaderProps) {
               >
                 {theme === 'dark' ? (
                   <Moon
-                    size={10}
-                    strokeWidth={1.5}
+                    size={11}
+                    strokeWidth={2}
                     className="text-primary"
                     aria-hidden="true"
                   />
                 ) : (
                   <Sun
-                    size={10}
-                    strokeWidth={1.5}
-                    className="text-gray-400"
+                    size={11}
+                    strokeWidth={2}
+                    className="text-gray-600"
                     aria-hidden="true"
                   />
                 )}
               </span>
             </button>
-          </div>
+          )}
 
           {!user && (
             <nav aria-label="로그인 메뉴" className="flex items-center gap-2">
