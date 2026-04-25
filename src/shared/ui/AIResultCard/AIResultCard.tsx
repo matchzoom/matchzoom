@@ -1,9 +1,10 @@
 'use client';
 
-import type { MatchedJob, PersonalityAxis } from '@/shared/types/job';
-import { FitBadge } from '@/shared/ui/FitBadge';
+import type { PersonalityAxis } from '@/shared/types/job';
+import { MatchedJobsCard } from '@/shared/ui/MatchedJobsCard';
 import { PersonalityRadarChart } from '@/shared/ui/PersonalityRadarChart';
 import { Skeleton } from '@/shared/ui/Skeleton';
+import type { MatchedJob } from '@/shared/types/job';
 
 type AIResultCardProps = {
   userName: string;
@@ -39,50 +40,12 @@ export function AIResultCard({
         </div>
 
         {/* 우: 맞는 직종 TOP 3 */}
-        <div className="p-6">
-          <h3 className="mb-6 border-l-[3px] border-primary pl-[10px] text-[1rem] font-semibold leading-[1.5] text-gray-900">
-            {displayName}님에게 맞는 직종 TOP 3
-          </h3>
-          {isLoading ? (
-            <ol className="flex flex-col gap-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-4 rounded-md border border-gray-200 px-4 py-3"
-                >
-                  <Skeleton className="h-6 w-6 shrink-0 rounded-sm" />
-                  <Skeleton className="h-5 flex-1 rounded-sm" />
-                  <Skeleton className="h-5 w-20 rounded-sm" />
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
-              {jobs.map((job, index) => (
-                <li
-                  key={job.id}
-                  className="flex items-center gap-4 rounded-md border border-gray-200 bg-white px-4 py-3"
-                >
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-[0.75rem] font-semibold text-gray-500 tabular-nums"
-                    aria-label={`${index + 1}위`}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
-                    {job.name}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <FitBadge level={job.fitLevel} />
-                    <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
-                      {job.matchRate}%
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
+        <MatchedJobsCard
+          userName={userName}
+          jobs={jobs}
+          isLoading={isLoading}
+          className="rounded-none border-0 bg-transparent"
+        />
       </div>
 
       {/* 하단: AI 성향 요약 */}

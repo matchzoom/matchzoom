@@ -6,6 +6,7 @@ import {
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
+  PolarRadiusAxis,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
@@ -43,6 +44,7 @@ type PersonalityRadarChartProps = {
 
 export function PersonalityRadarChart({ data }: PersonalityRadarChartProps) {
   const listId = useId();
+  const maxValue = data[0]?.fullMark ?? 100;
 
   return (
     <div className="w-full max-w-[320px]">
@@ -57,6 +59,11 @@ export function PersonalityRadarChart({ data }: PersonalityRadarChartProps) {
             margin={{ top: 16, right: 24, bottom: 16, left: 24 }}
           >
             <PolarGrid stroke="var(--gray-200)" strokeWidth={1} />
+            <PolarRadiusAxis
+              domain={[0, maxValue]}
+              tick={false}
+              axisLine={false}
+            />
             <PolarAngleAxis
               dataKey="subject"
               tick={{

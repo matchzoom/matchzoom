@@ -81,7 +81,10 @@ export function JobListSection({
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {Array.from({ length: 6 }).map((_, i) => (
-            <li key={i} className="rounded-lg border border-gray-200 p-5">
+            <li
+              key={i}
+              className="min-w-0 rounded-lg border border-gray-200 p-5"
+            >
               <Skeleton className="mb-3 h-6 w-16 rounded-sm" />
               <Skeleton className="mb-2 h-5 w-3/4 rounded-sm" />
               <Skeleton className="mb-4 h-4 w-1/2 rounded-sm" />
@@ -104,7 +107,7 @@ export function JobListSection({
           aria-label="채용공고 목록"
         >
           {postings.map((job) => (
-            <li key={job.id}>
+            <li key={job.id} className="min-w-0">
               <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
             </li>
           ))}
