@@ -2,8 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getJobPostings } from '../api/jobPostingsApi';
+import { JOB_POSTINGS_QUERY_KEY } from '../utils/queryKeys';
 
-export const JOB_POSTINGS_QUERY_KEY = ['job-postings'] as const;
+export { JOB_POSTINGS_QUERY_KEY };
 
 export function useJobPostings() {
   return useQuery({

@@ -1,11 +1,11 @@
 import Image from 'next/image';
-import { Button } from '@/shared/ui/Button';
+import { CtaButton } from './CtaButton';
 
 type HeroSectionProps = {
-  onCtaClick: () => void;
+  isLoggedIn: boolean;
 };
 
-export function HeroSection({ onCtaClick }: HeroSectionProps) {
+export function HeroSection({ isLoggedIn }: HeroSectionProps) {
   return (
     <section
       aria-labelledby="hero-heading"
@@ -27,9 +27,10 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
               개인의 특성을 바탕으로 AI가 적합한 직종과 채용공고를 분석해드려요
             </p>
             <div className="flex flex-col items-start gap-3">
-              <Button size="lg" variant="primary" onClick={onCtaClick}>
-                내게 맞는 일 찾아보기
-              </Button>
+              <CtaButton
+                isLoggedIn={isLoggedIn}
+                label="내게 맞는 일 찾아보기"
+              />
               <p className="text-[0.8125rem] text-gray-500">
                 3분이면 충분해요 · 바로 결과 확인 가능
               </p>

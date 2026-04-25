@@ -1,64 +1,15 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
-import { supabaseFetch } from '@/shared/api/supabaseFetch';
+import { Suspense } from 'react';
 import { getServerSession } from '@/shared/utils/serverSession';
-import { DashboardView } from '@/features/dashboard';
-import {
-  dedupeItems,
-  parseJobItems,
-  rankPostings,
-  type ProfileRow,
-} from '@/features/dashboard/utils/jobPostings';
+import { AIResultCard } from '@/shared/ui/AIResultCard';
+import { JobListPrefetcher } from '@/features/dashboard/ui/JobListPrefetcher';
+import { JobListSkeleton } from '@/features/dashboard/ui/JobListSkeleton';
+import { getDashboardData } from '@/features/dashboard/api/dashboardServerApi';
 import { LandingPage } from '@/features/landing';
-import { JOB_POSTINGS_QUERY_KEY } from '@/features/dashboard/hooks/useJobPostings';
-import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
-import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import {
-  TEST_USER_ID,
-  TEST_PROFILE,
-  TEST_MATCH,
-} from '@/shared/utils/testUser';
-import type { Profile } from '@/shared/types/profile';
-import type { MatchResult } from '@/shared/types/match';
-import type { JobPosting } from '@/shared/types/job';
-
-async function getDashboardData(userId: string) {
-  const [profileRows, matchRows] = await Promise.all([
-    supabaseFetch<Profile[]>(`/rest/v1/profiles?user_id=eq.${userId}&select=*`),
-    supabaseFetch<MatchResult[]>(
-      `/rest/v1/match_results?user_id=eq.${userId}&select=*`,
-    ),
-  ]);
-  return { profile: profileRows[0] ?? null, matchResult: matchRows[0] ?? null };
-}
-
-async function getJobPostingsData(
-  userId: string,
-  profile: ProfileRow | undefined,
-): Promise<JobPosting[]> {
-  const baseUrl = process.env.JOB_API_BASE_URL;
-  const serviceKey = process.env.JOB_API_KEY;
-  if (!baseUrl || !serviceKey) return [];
-
-  const [bookmarkRows, jobXml] = await Promise.all([
-    userId === TEST_USER_ID
-      ? Promise.resolve([])
-      : supabaseFetch<{ posting_url: string }[]>(
-          `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
-        ),
-    fetch(
-      `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=100&pageNo=1`,
-      { next: { revalidate: 300 } },
-    ).then((r) => r.text()),
-  ]);
-
-  const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
-  const unique = dedupeItems(parseJobItems(jobXml));
-  return rankPostings(unique, profile, bookmarkedUrls);
-}
+  toPersonalityAxes,
+  toMatchedJobs,
+} from '@/features/match/utils/convert';
+import { TEST_PROFILE, TEST_MATCH } from '@/shared/utils/testUser';
 
 export default async function Home() {
   const session = await getServerSession();
@@ -69,24 +20,41 @@ export default async function Home() {
       : await getDashboardData(session.userId);
 
     if (profile) {
-      const profileRow: ProfileRow = {
-        mobility: profile.mobility,
-        hand_usage: profile.hand_usage,
-        stamina: profile.stamina,
-        communication: profile.communication,
-        region_primary: profile.region_primary,
-      };
-      const jobPostings = await getJobPostingsData(session.userId, profileRow);
-
-      const queryClient = new QueryClient();
-      queryClient.setQueryData(PROFILE_QUERY_KEY, profile);
-      queryClient.setQueryData(MATCH_RESULT_QUERY_KEY, matchResult);
-      queryClient.setQueryData(JOB_POSTINGS_QUERY_KEY, jobPostings);
+      const profileProvinces = profile.region_primary?.trim()
+        ? [profile.region_primary.trim().split(/\s+/)[0]]
+        : [];
 
       return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <DashboardView />
-        </HydrationBoundary>
+        <div className="py-10 md:py-16">
+          <div className="mx-auto flex max-w-[1200px] flex-col gap-[60px] px-4 md:px-5 lg:px-6">
+            <section aria-labelledby="result-summary-heading">
+              <h2 id="result-summary-heading" className="sr-only">
+                검사 결과 요약
+              </h2>
+              <AIResultCard
+                userName={profile.name}
+                axes={
+                  matchResult ? toPersonalityAxes(matchResult.radar_chart) : []
+                }
+                summary={matchResult?.summary_text ?? ''}
+                jobs={matchResult ? toMatchedJobs(matchResult.top3_jobs) : []}
+              />
+            </section>
+
+            <section aria-labelledby="job-postings-heading">
+              <h2 id="job-postings-heading" className="sr-only">
+                맞춤 채용공고
+              </h2>
+              <Suspense fallback={<JobListSkeleton />}>
+                <JobListPrefetcher
+                  userId={session.userId}
+                  profileProvinces={profileProvinces}
+                  userName={profile.name}
+                />
+              </Suspense>
+            </section>
+          </div>
+        </div>
       );
     }
 

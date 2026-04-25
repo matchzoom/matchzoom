@@ -1,14 +1,16 @@
-import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import {
   dedupeItems,
   parseJobItems,
   rankPostings,
   type ProfileRow,
-} from '@/features/dashboard/utils/jobPostings';
+} from '../utils/jobPostings';
 import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import type { JobPosting } from '@/shared/types/job';
 
-export const GET = createAuthorizedRoute(async ({ userId }) => {
+export async function getJobPostingsData(
+  userId: string,
+): Promise<JobPosting[]> {
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 
@@ -16,17 +18,19 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
     throw new Error('JOB_API_BASE_URL 또는 JOB_API_KEY 환경변수가 없습니다.');
   }
 
-  const testProfile: ProfileRow | undefined =
-    userId === TEST_USER_ID ? TEST_PROFILE : undefined;
+  const isTest = userId === TEST_USER_ID;
+  const testProfile = isTest
+    ? (TEST_PROFILE as unknown as ProfileRow)
+    : undefined;
 
   const [profileRows, bookmarkRows, jobXml] = await Promise.all([
     testProfile
-      ? Promise.resolve([testProfile])
+      ? Promise.resolve<ProfileRow[]>([testProfile])
       : supabaseFetch<ProfileRow[]>(
           `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
         ),
-    userId === TEST_USER_ID
-      ? Promise.resolve([])
+    isTest
+      ? Promise.resolve<{ posting_url: string }[]>([])
       : supabaseFetch<{ posting_url: string }[]>(
           `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
         ),
@@ -44,4 +48,4 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
   const unique = dedupeItems(parseJobItems(jobXml));
 
   return rankPostings(unique, profile, bookmarkedUrls);
-});
+}

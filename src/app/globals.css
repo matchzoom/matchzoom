@@ -1,7 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource/pretendard/400.css";
-@import "@fontsource/pretendard/600.css";
-@import "@fontsource/pretendard/700.css";
 
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 
@@ -87,6 +84,7 @@
   }
 }
 
+
 /* 다크 모드 */
 :root.dark {
   color-scheme: dark;
@@ -126,7 +124,7 @@
 
 @theme inline {
   /* Font */
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-sans: var(--font-pretendard), -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 
   /* Primary colors */
   --color-primary:           var(--primary);
@@ -195,7 +193,7 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  font-family: var(--font-pretendard), -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   font-size: 0.9375rem; /* 15px — body 기본 */
   font-weight: 400;
   line-height: 1.6;

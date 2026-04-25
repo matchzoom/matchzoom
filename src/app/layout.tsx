@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import localFont from 'next/font/local';
 import {
   dehydrate,
   HydrationBoundary,
@@ -14,6 +15,36 @@ import type { CurrentUser } from '@/shared/types/user';
 import { TEST_USER } from '@/shared/utils/testUser';
 import { CURRENT_USER_QUERY_KEY } from '@/shared/hooks/useCurrentUser';
 import './globals.css';
+
+const pretendard = localFont({
+  src: [
+    {
+      path: '../../public/fonts/pretendard-400.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/pretendard-600.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/pretendard-700.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-pretendard',
+  display: 'swap',
+  preload: true,
+  fallback: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'sans-serif',
+  ],
+});
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://matchzoom.vercel.app';
@@ -80,9 +111,9 @@ export default async function RootLayout({
   const dehydratedState = dehydrate(queryClient);
 
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" className={pretendard.variable} suppressHydrationWarning>
       <head>
-        {/* 테마 초기화: localStorage → 시스템 설정 순으로 결정. React 하이드레이션 전에 실행되어 FOUC 방지 */}
+        {/* 테마 초기화: localStorage 저장값 우선, 없으면 OS 설정 사용. React 하이드레이션 전에 실행되어 FOUC 방지 */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s||(d?'dark':'light');document.documentElement.classList.add(t)}catch(e){}})()`,
