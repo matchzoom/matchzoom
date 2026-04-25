@@ -1,7 +1,6 @@
 'use client';
 
 import type { MatchedJob, PersonalityAxis } from '@/shared/types/job';
-import { FitBadge } from '@/shared/ui/FitBadge';
 import { PersonalityRadarChart } from '@/shared/ui/PersonalityRadarChart';
 import { Skeleton } from '@/shared/ui/Skeleton';
 
@@ -44,41 +43,48 @@ export function AIResultCard({
             {displayName}님에게 맞는 직종 TOP 3
           </h3>
           {isLoading ? (
-            <ol className="flex flex-col gap-3">
+            <ol className="flex flex-col divide-y divide-gray-100">
               {Array.from({ length: 3 }).map((_, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-4 rounded-md border border-gray-200 px-4 py-3"
+                  className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0"
                 >
-                  <Skeleton className="h-6 w-6 shrink-0 rounded-sm" />
-                  <Skeleton className="h-5 flex-1 rounded-sm" />
-                  <Skeleton className="h-5 w-20 rounded-sm" />
+                  <div className="flex items-center justify-between gap-2">
+                    <Skeleton className="h-5 w-2/3 rounded-sm" />
+                    <Skeleton className="h-5 w-10 rounded-sm" />
+                  </div>
+                  <Skeleton className="h-1.5 w-full rounded-full" />
                 </li>
               ))}
             </ol>
           ) : (
-            <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
+            <ol
+              className="flex flex-col divide-y divide-gray-100"
+              aria-label="매칭 직종 목록"
+            >
               {jobs.map((job, index) => (
                 <li
                   key={job.id}
-                  className="flex items-center gap-4 rounded-md border border-gray-200 bg-white px-4 py-3"
+                  aria-label={`${index + 1}위: ${job.name}, 매칭률 ${job.matchRate}%`}
+                  className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0"
                 >
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-[0.75rem] font-semibold text-gray-500 tabular-nums"
-                    aria-label={`${index + 1}위`}
-                  >
-                    {index + 1}
-                  </span>
-                  <div className="flex w-full flex-col justify-between gap-1 sm:flex-row sm:gap-0">
-                    <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
                       {job.name}
                     </span>
-                    <div className="flex items-center gap-3">
-                      <FitBadge level={job.fitLevel} />
-                      <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
-                        {job.matchRate}%
-                      </span>
-                    </div>
+                    <span className="shrink-0 tabular-nums text-[0.9375rem] font-bold text-gray-900">
+                      {job.matchRate}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${job.matchRate}%` }}
+                      role="progressbar"
+                      aria-valuenow={job.matchRate}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    />
                   </div>
                 </li>
               ))}
