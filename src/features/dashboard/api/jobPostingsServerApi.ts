@@ -37,7 +37,10 @@ export async function getJobPostingsData(
     fetch(
       `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=100&pageNo=1`,
       { next: { revalidate: 300 } },
-    ).then((r) => r.text()),
+    ).then((r) => {
+      if (!r.ok) throw new Error(`Job API 오류: ${r.status}`);
+      return r.text();
+    }),
   ]);
 
   const profile = profileRows[0];

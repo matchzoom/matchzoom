@@ -20,7 +20,7 @@ export default async function Home() {
       : await getDashboardData(session.userId);
 
     if (profile) {
-      const profileProvinces = profile.region_primary
+      const profileProvinces = profile.region_primary?.trim()
         ? [profile.region_primary.trim().split(/\s+/)[0]]
         : [];
 
