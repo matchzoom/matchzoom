@@ -69,14 +69,16 @@ export function AIResultCard({
                   >
                     {index + 1}
                   </span>
-                  <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
-                    {job.name}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <FitBadge level={job.fitLevel} />
-                    <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
-                      {job.matchRate}%
+                  <div className="flex w-full flex-col justify-between gap-1 sm:flex-row sm:gap-0">
+                    <span className="flex-1 text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
+                      {job.name}
                     </span>
+                    <div className="flex items-center gap-3">
+                      <FitBadge level={job.fitLevel} />
+                      <span className="tabular-nums text-[0.875rem] font-semibold text-primary">
+                        {job.matchRate}%
+                      </span>
+                    </div>
                   </div>
                 </li>
               ))}
