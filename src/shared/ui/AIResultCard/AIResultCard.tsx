@@ -1,3 +1,5 @@
+'use client';
+
 import type { MatchedJob, PersonalityAxis } from '@/shared/types/job';
 import { FitBadge } from '@/shared/ui/FitBadge';
 import { PersonalityRadarChart } from '@/shared/ui/PersonalityRadarChart';
