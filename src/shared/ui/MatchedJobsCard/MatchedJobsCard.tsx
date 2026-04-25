@@ -33,10 +33,14 @@ export function MatchedJobsCard({
           {Array.from({ length: 3 }).map((_, i) => (
             <li
               key={i}
-              className="flex flex-col gap-2 rounded-md border border-gray-200 px-4 py-3"
+              className="flex items-center gap-4 rounded-md border border-gray-200 px-4 py-3"
             >
-              <Skeleton className="h-5 w-16 rounded-sm" />
-              <Skeleton className="h-9 w-full rounded-sm" />
+              <Skeleton className="h-6 w-6 shrink-0 rounded-sm" />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <Skeleton className="h-5 w-16 rounded-sm" />
+                <Skeleton className="h-5 w-3/4 rounded-sm" />
+              </div>
+              <Skeleton className="h-5 w-10 shrink-0 rounded-sm" />
             </li>
           ))}
         </ol>
@@ -45,28 +49,23 @@ export function MatchedJobsCard({
           {jobs.map((job, index) => (
             <li
               key={job.id}
-              aria-label={`${index + 1}위: ${job.name}, 매칭률 ${job.matchRate}%`}
-              className="flex flex-col gap-2 rounded-md border border-gray-200 bg-white px-4 py-3"
+              className="flex items-center gap-4 rounded-md border border-gray-200 bg-white px-4 py-3"
             >
-              <FitBadge level={job.fitLevel} />
-              <div className="relative h-9 w-full overflow-hidden rounded-sm bg-gray-100">
-                <div
-                  className="absolute inset-y-0 left-0 bg-primary/20"
-                  style={{ width: `${job.matchRate}%` }}
-                  role="progressbar"
-                  aria-valuenow={job.matchRate}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                />
-                <div className="absolute inset-0 flex items-center justify-between px-3">
-                  <span className="text-[0.875rem] font-semibold text-gray-900">
-                    {job.name}
-                  </span>
-                  <span className="tabular-nums text-[0.875rem] font-bold text-primary">
-                    {job.matchRate}%
-                  </span>
-                </div>
+              <span
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-gray-100 text-[0.75rem] font-semibold text-gray-500 tabular-nums"
+                aria-label={`${index + 1}위`}
+              >
+                {index + 1}
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <FitBadge level={job.fitLevel} className="self-start" />
+                <span className="text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
+                  {job.name}
+                </span>
               </div>
+              <span className="shrink-0 tabular-nums text-[0.875rem] font-semibold text-primary">
+                {job.matchRate}%
+              </span>
             </li>
           ))}
         </ol>
