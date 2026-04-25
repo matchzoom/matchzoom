@@ -57,13 +57,20 @@ export function MatchedJobsCard({
               >
                 {index + 1}
               </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <FitBadge level={job.fitLevel} className="self-start" />
-                <span className="text-[0.9375rem] font-semibold leading-[1.5] text-gray-900">
+              <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+                <FitBadge
+                  level={job.fitLevel}
+                  className="self-start sm:order-2 sm:shrink-0"
+                />
+                <span className="text-[0.9375rem] font-semibold leading-[1.5] text-gray-900 sm:order-1 sm:flex-1">
                   {job.name}
                 </span>
+                <span className="hidden shrink-0 tabular-nums text-[0.875rem] font-semibold text-primary sm:order-3 sm:block">
+                  {job.matchRate}%
+                </span>
               </div>
-              <span className="shrink-0 tabular-nums text-[0.875rem] font-semibold text-primary">
+              {/* % 모바일 전용 — li 우측 끝 */}
+              <span className="shrink-0 tabular-nums text-[0.875rem] font-semibold text-primary sm:hidden">
                 {job.matchRate}%
               </span>
             </li>
