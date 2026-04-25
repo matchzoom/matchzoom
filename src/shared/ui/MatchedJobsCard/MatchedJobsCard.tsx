@@ -1,7 +1,12 @@
-import type { MatchedJob } from '@/shared/types/job';
+import type { FitLevel, MatchedJob } from '@/shared/types/job';
 import { cn } from '@/shared/utils/cn';
-import { FitBadge } from '@/shared/ui/FitBadge';
 import { Skeleton } from '@/shared/ui/Skeleton';
+
+const fitBarStyle: Record<FitLevel, { fill: string; text: string }> = {
+  '잘 맞아요': { fill: 'bg-success-bg', text: 'text-success' },
+  '도전해볼 수 있어요': { fill: 'bg-warning-bg', text: 'text-warning' },
+  '힘들 수 있어요': { fill: 'bg-error-bg', text: 'text-error' },
+};
 
 type MatchedJobsCardProps = {
   userName: string;
@@ -29,46 +34,48 @@ export function MatchedJobsCard({
         {displayName}님에게 맞는 직종 TOP 3
       </h3>
       {isLoading ? (
-        <ol className="flex flex-col gap-3">
+        <ol className="flex flex-col gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <li
-              key={i}
-              className="flex flex-col gap-2 rounded-md border border-gray-200 px-4 py-3"
-            >
-              <Skeleton className="h-5 w-16 rounded-sm" />
+            <li key={i}>
               <Skeleton className="h-9 w-full rounded-sm" />
             </li>
           ))}
         </ol>
       ) : (
-        <ol className="flex flex-col gap-3" aria-label="매칭 직종 목록">
-          {jobs.map((job, index) => (
-            <li
-              key={job.id}
-              aria-label={`${index + 1}위: ${job.name}, 매칭률 ${job.matchRate}%`}
-              className="flex flex-col gap-2 rounded-md border border-gray-200 bg-white px-4 py-3"
-            >
-              <FitBadge level={job.fitLevel} />
-              <div className="relative h-9 w-full overflow-hidden rounded-sm bg-gray-100">
-                <div
-                  className="absolute inset-y-0 left-0 bg-primary/20"
-                  style={{ width: `${job.matchRate}%` }}
-                  role="progressbar"
-                  aria-valuenow={job.matchRate}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                />
-                <div className="absolute inset-0 flex items-center justify-between px-3">
-                  <span className="text-[0.875rem] font-semibold text-gray-900">
-                    {job.name}
-                  </span>
-                  <span className="tabular-nums text-[0.875rem] font-bold text-primary">
-                    {job.matchRate}%
-                  </span>
+        <ol className="flex flex-col gap-4" aria-label="매칭 직종 목록">
+          {jobs.map((job, index) => {
+            const { fill, text } = fitBarStyle[job.fitLevel];
+            return (
+              <li
+                key={job.id}
+                aria-label={`${index + 1}위: ${job.name}, 매칭률 ${job.matchRate}%`}
+              >
+                <div className="relative h-9 w-full overflow-hidden rounded-sm bg-gray-200">
+                  <div
+                    className={cn('absolute inset-y-0 left-0', fill)}
+                    style={{ width: `${job.matchRate}%` }}
+                    role="progressbar"
+                    aria-valuenow={job.matchRate}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-between px-3">
+                    <span className="text-[0.875rem] font-semibold text-gray-900">
+                      {job.name}
+                    </span>
+                    <span
+                      className={cn(
+                        'tabular-nums text-[0.875rem] font-bold',
+                        text,
+                      )}
+                    >
+                      {job.matchRate}%
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>
