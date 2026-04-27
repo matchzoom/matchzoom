@@ -6,11 +6,13 @@ import {
   type ProfileRow,
 } from '../utils/jobPostings';
 import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
-import type { JobPosting } from '@/shared/types/job';
+import type { PaginatedJobPostings } from '@/shared/types/job';
+
+const INITIAL_LIMIT = 12;
 
 export async function getJobPostingsData(
   userId: string,
-): Promise<JobPosting[]> {
+): Promise<PaginatedJobPostings> {
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 
@@ -45,7 +47,17 @@ export async function getJobPostingsData(
 
   const profile = profileRows[0];
   const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
-  const unique = dedupeItems(parseJobItems(jobXml));
+  const all = rankPostings(
+    dedupeItems(parseJobItems(jobXml)),
+    profile,
+    bookmarkedUrls,
+  );
 
-  return rankPostings(unique, profile, bookmarkedUrls);
+  const items = all.slice(0, INITIAL_LIMIT);
+  return {
+    items,
+    total: all.length,
+    offset: 0,
+    hasMore: INITIAL_LIMIT < all.length,
+  };
 }

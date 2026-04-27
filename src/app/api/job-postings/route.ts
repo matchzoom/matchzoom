@@ -8,7 +8,14 @@ import {
 } from '@/features/dashboard/utils/jobPostings';
 import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
 
-export const GET = createAuthorizedRoute(async ({ userId }) => {
+export const GET = createAuthorizedRoute(async ({ userId, request }) => {
+  const { searchParams } = new URL(request.url);
+  const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10));
+  const limit = Math.min(
+    50,
+    Math.max(1, parseInt(searchParams.get('limit') ?? '12', 10)),
+  );
+
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 
@@ -41,7 +48,17 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
 
   const profile = profileRows[0];
   const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
-  const unique = dedupeItems(parseJobItems(jobXml));
+  const all = rankPostings(
+    dedupeItems(parseJobItems(jobXml)),
+    profile,
+    bookmarkedUrls,
+  );
 
-  return rankPostings(unique, profile, bookmarkedUrls);
+  const items = all.slice(offset, offset + limit);
+  return {
+    items,
+    total: all.length,
+    offset,
+    hasMore: offset + items.length < all.length,
+  };
 });

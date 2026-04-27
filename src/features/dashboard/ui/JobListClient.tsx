@@ -1,9 +1,10 @@
 'use client';
 
-import { useJobPostings } from '../hooks/useJobPostings';
+import { useInfiniteJobPostings } from '../hooks/useInfiniteJobPostings';
 import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
 import { useJobFitFilter } from '../hooks/useJobFitFilter';
 import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
+import { useBreakpointLimit } from '../hooks/useBreakpointLimit';
 import { JobListSection } from './JobListSection';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
@@ -16,13 +17,18 @@ export function JobListClient({
   profileProvinces,
   userName,
 }: JobListClientProps) {
-  const { data: postings, isPending } = useJobPostings();
+  const columns = useBreakpointLimit();
+  const { data, isPending, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useInfiniteJobPostings();
+
+  const allPostings = data?.pages.flatMap((page) => page.items) ?? [];
+
   const {
     availableSigungu,
     selectedSigungu,
     filteredPostings: regionFiltered,
     handleSelectSigungu,
-  } = useJobRegionFilter(postings ?? [], profileProvinces);
+  } = useJobRegionFilter(allPostings, profileProvinces);
   const {
     availableFitLevels,
     selectedFitLevel,
@@ -48,6 +54,10 @@ export function JobListClient({
         fitLevelList={availableFitLevels}
         selectedFitLevel={selectedFitLevel}
         onSelectFitLevel={handleSelectFitLevel}
+        columns={columns}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
       />
       {loginModalOpen && (
         <ConfirmModal

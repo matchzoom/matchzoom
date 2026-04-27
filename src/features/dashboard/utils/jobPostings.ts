@@ -30,8 +30,6 @@ export type ProfileRow = {
   region_primary: string;
 };
 
-const LIMIT = 20;
-
 const ENV_KEYS: (keyof RawItem)[] = [
   'envBothHands',
   'envEyesight',
@@ -158,15 +156,14 @@ export function rankPostings(
   bookmarkedUrls: Set<string>,
 ): JobPosting[] {
   if (!profile) {
-    return items
-      .slice(0, LIMIT)
-      .map((item) => toPosting(item, undefined, undefined, bookmarkedUrls));
+    return items.map((item) =>
+      toPosting(item, undefined, undefined, bookmarkedUrls),
+    );
   }
 
   return items
     .filter((item) => matchesProfileRegion(item.regagnName, profile))
     .map((item) => ({ item, score: computeScore(item, profile) }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, LIMIT)
     .map(({ item, score }) => toPosting(item, profile, score, bookmarkedUrls));
 }

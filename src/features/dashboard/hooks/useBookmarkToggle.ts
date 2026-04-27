@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query';
 
-import type { JobPosting } from '@/shared/types/job';
+import type { JobPosting, PaginatedJobPostings } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
 import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
@@ -26,18 +30,28 @@ export function useBookmarkToggle() {
           ),
 
     onMutate: async (job) => {
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.jobPostings });
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.jobPostingsInfinite,
+      });
 
-      const previous = queryClient.getQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-      );
+      const previous = queryClient.getQueryData<
+        InfiniteData<PaginatedJobPostings>
+      >(QUERY_KEYS.jobPostingsInfinite);
 
-      queryClient.setQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-        (old = []) =>
-          old.map((p) =>
-            p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
-          ),
+      queryClient.setQueryData<InfiniteData<PaginatedJobPostings>>(
+        QUERY_KEYS.jobPostingsInfinite,
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.map((p) =>
+                p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
+              ),
+            })),
+          };
+        },
       );
 
       return { previous };
@@ -45,7 +59,7 @@ export function useBookmarkToggle() {
 
     onError: (_err, _job, ctx) => {
       if (ctx?.previous) {
-        queryClient.setQueryData(QUERY_KEYS.jobPostings, ctx.previous);
+        queryClient.setQueryData(QUERY_KEYS.jobPostingsInfinite, ctx.previous);
       }
     },
   });

@@ -2,8 +2,8 @@
 
 import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
-import { JobCard } from './JobCard';
 import { JobRegionFilter } from './JobRegionFilter';
+import { VirtualJobList } from './VirtualJobList';
 
 type JobListSectionProps = {
   userName: string;
@@ -17,6 +17,10 @@ type JobListSectionProps = {
   fitLevelList?: FitLevel[];
   selectedFitLevel?: FitLevel | null;
   onSelectFitLevel?: (fitLevel: FitLevel | null) => void;
+  columns?: number;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 };
 
 export function JobListSection({
@@ -31,6 +35,10 @@ export function JobListSection({
   fitLevelList = [],
   selectedFitLevel = null,
   onSelectFitLevel,
+  columns = 1,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  fetchNextPage = () => {},
 }: JobListSectionProps) {
   return (
     <section aria-labelledby="job-list-heading">
@@ -102,16 +110,14 @@ export function JobListSection({
           </p>
         </div>
       ) : (
-        <ul
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          aria-label="채용공고 목록"
-        >
-          {postings.map((job) => (
-            <li key={job.id} className="min-w-0">
-              <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
-            </li>
-          ))}
-        </ul>
+        <VirtualJobList
+          items={postings}
+          columns={columns}
+          onBookmarkToggle={onBookmarkToggle}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+        />
       )}
     </section>
   );

@@ -28,3 +28,10 @@ export type PersonalityAxis = {
   value: number;
   fullMark: number;
 };
+
+export type PaginatedJobPostings = {
+  items: JobPosting[];
+  total: number;
+  offset: number;
+  hasMore: boolean;
+};

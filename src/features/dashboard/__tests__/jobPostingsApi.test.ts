@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/shared/api/bffFetch', () => ({ bffFetch: vi.fn() }));
 
 import { bffFetch } from '@/shared/api/bffFetch';
-import { getJobPostings } from '../api/jobPostingsApi';
+import { getJobPostings, getJobPostingsPaginated } from '../api/jobPostingsApi';
 
 const mockBffFetch = vi.mocked(bffFetch);
 
@@ -54,5 +54,54 @@ describe('getJobPostings', () => {
     mockBffFetch.mockRejectedValue(new Error('네트워크 오류'));
 
     await expect(getJobPostings()).rejects.toThrow('네트워크 오류');
+  });
+});
+
+const mockPaginated = {
+  items: [mockPosting],
+  total: 10,
+  offset: 0,
+  hasMore: true,
+};
+
+describe('getJobPostingsPaginated', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('offset/limit을 쿼리 파라미터로 포함하여 호출한다', async () => {
+    mockBffFetch.mockResolvedValue(mockPaginated);
+
+    const result = await getJobPostingsPaginated(0, 12);
+
+    expect(mockBffFetch).toHaveBeenCalledWith(
+      '/job-postings?offset=0&limit=12',
+      {
+        method: 'GET',
+        signal: undefined,
+      },
+    );
+    expect(result).toEqual(mockPaginated);
+  });
+
+  it('AbortSignal을 전달한다', async () => {
+    mockBffFetch.mockResolvedValue(mockPaginated);
+    const controller = new AbortController();
+
+    await getJobPostingsPaginated(12, 3, controller.signal);
+
+    expect(mockBffFetch).toHaveBeenCalledWith(
+      '/job-postings?offset=12&limit=3',
+      {
+        method: 'GET',
+        signal: controller.signal,
+      },
+    );
+  });
+
+  it('에러를 그대로 전파한다', async () => {
+    mockBffFetch.mockRejectedValue(new Error('네트워크 오류'));
+
+    await expect(getJobPostingsPaginated(0, 12)).rejects.toThrow(
+      '네트워크 오류',
+    );
   });
 });
