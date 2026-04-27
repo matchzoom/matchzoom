@@ -174,6 +174,36 @@ export const useJobs = () => useQuery(...);
 export const useBookmarkToggle = () => useMutation(...);
 ```
 
+### 쿼리키 관리 (필수)
+
+모든 TanStack Query 쿼리키는 반드시 `shared/utils/queryKeys.ts`의 `QUERY_KEYS` 객체를 참조한다.
+
+- 문자열 리터럴 직접 사용 절대 금지
+- 훅 파일 내부에 쿼리키 상수 선언 금지
+- 새 쿼리키 추가 시 `QUERY_KEYS` 객체에만 등록
+
+```ts
+// 금지
+useQuery({ queryKey: ['profile'], ... });
+export const PROFILE_QUERY_KEY = ['profile'] as const;
+
+// 필수
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+useQuery({ queryKey: QUERY_KEYS.profile, ... });
+```
+
+**`shared/utils/queryKeys.ts` 현재 등록된 키:**
+
+```ts
+export const QUERY_KEYS = {
+  currentUser: ['currentUser'],
+  profile:     ['profile'],
+  matchResult: ['match-result'],
+  jobPostings: ['job-postings'],
+  bookmarks:   ['bookmarks'],
+} as const;
+```
+
 ---
 
 ## 8. API / Auth Rules (Canonical)

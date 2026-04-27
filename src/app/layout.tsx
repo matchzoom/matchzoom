@@ -13,7 +13,7 @@ import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getServerSession } from '@/shared/utils/serverSession';
 import type { CurrentUser } from '@/shared/types/user';
 import { TEST_USER } from '@/shared/utils/testUser';
-import { CURRENT_USER_QUERY_KEY } from '@/shared/hooks/useCurrentUser';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import './globals.css';
 
 const pretendard = localFont({
@@ -107,7 +107,7 @@ export default async function RootLayout({
   const initialUser = await getInitialUser();
 
   const queryClient = new QueryClient();
-  queryClient.setQueryData(CURRENT_USER_QUERY_KEY, initialUser);
+  queryClient.setQueryData(QUERY_KEYS.currentUser, initialUser);
   const dehydratedState = dehydrate(queryClient);
 
   return (

@@ -4,7 +4,7 @@ import {
   HydrationBoundary,
 } from '@tanstack/react-query';
 import { getJobPostingsData } from '../api/jobPostingsServerApi';
-import { JOB_POSTINGS_QUERY_KEY } from '../utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { JobListClient } from './JobListClient';
 
 type Props = {
@@ -20,7 +20,7 @@ export async function JobListPrefetcher({
 }: Props) {
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: JOB_POSTINGS_QUERY_KEY,
+    queryKey: QUERY_KEYS.jobPostings,
     queryFn: () => getJobPostingsData(userId),
   });
 

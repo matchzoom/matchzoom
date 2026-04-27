@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { JobPosting } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
-import { JOB_POSTINGS_QUERY_KEY } from './useJobPostings';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 
 export function useBookmarkToggle() {
@@ -26,14 +26,14 @@ export function useBookmarkToggle() {
           ),
 
     onMutate: async (job) => {
-      await queryClient.cancelQueries({ queryKey: JOB_POSTINGS_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.jobPostings });
 
       const previous = queryClient.getQueryData<JobPosting[]>(
-        JOB_POSTINGS_QUERY_KEY,
+        QUERY_KEYS.jobPostings,
       );
 
       queryClient.setQueryData<JobPosting[]>(
-        JOB_POSTINGS_QUERY_KEY,
+        QUERY_KEYS.jobPostings,
         (old = []) =>
           old.map((p) =>
             p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
@@ -45,7 +45,7 @@ export function useBookmarkToggle() {
 
     onError: (_err, _job, ctx) => {
       if (ctx?.previous) {
-        queryClient.setQueryData(JOB_POSTINGS_QUERY_KEY, ctx.previous);
+        queryClient.setQueryData(QUERY_KEYS.jobPostings, ctx.previous);
       }
     },
   });

@@ -9,6 +9,7 @@ import {
 } from '@/features/match/utils/convert';
 import type { Profile } from '@/shared/types/profile';
 import type { UserProfile } from '@/shared/types/userProfile';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 
 function toUserProfile(p: Profile): UserProfile {
   return {
@@ -29,11 +30,9 @@ function toUserProfile(p: Profile): UserProfile {
   };
 }
 
-export const PROFILE_QUERY_KEY = ['profile'] as const;
-
 export function useProfile() {
   const { data: profile, isLoading: isProfileLoading } = useQuery({
-    queryKey: PROFILE_QUERY_KEY,
+    queryKey: QUERY_KEYS.profile,
     queryFn: getProfile,
   });
 

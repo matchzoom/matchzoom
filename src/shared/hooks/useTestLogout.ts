@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { testLogout } from '@/shared/api/authApi';
-import { CURRENT_USER_QUERY_KEY } from './useCurrentUser';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import {
   STORAGE_KEY_JOB_SIGUNGU_FILTER,
   STORAGE_KEY_JOB_FITLEVEL_FILTER,
@@ -12,7 +12,7 @@ export function useTestLogout() {
   return useMutation({
     mutationFn: testLogout,
     onSuccess: () => {
-      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
+      queryClient.setQueryData(QUERY_KEYS.currentUser, null);
       localStorage.removeItem(STORAGE_KEY_JOB_SIGUNGU_FILTER);
       localStorage.removeItem(STORAGE_KEY_JOB_FITLEVEL_FILTER);
       window.location.href = '/';

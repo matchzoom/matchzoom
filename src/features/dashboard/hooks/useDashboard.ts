@@ -2,9 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getProfile } from '@/features/profile/api/profileApi';
-import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
 import { getMatchResult } from '@/features/match/api/matchApi';
-import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import {
   toPersonalityAxes,
   toMatchedJobs,
@@ -12,12 +11,12 @@ import {
 
 export function useDashboard() {
   const { data: profile, isPending: isProfilePending } = useQuery({
-    queryKey: PROFILE_QUERY_KEY,
+    queryKey: QUERY_KEYS.profile,
     queryFn: getProfile,
   });
 
   const { data: matchResult, isPending: isMatchPending } = useQuery({
-    queryKey: MATCH_RESULT_QUERY_KEY,
+    queryKey: QUERY_KEYS.matchResult,
     queryFn: getMatchResult,
   });
 

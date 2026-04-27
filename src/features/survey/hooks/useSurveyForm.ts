@@ -16,11 +16,9 @@ import {
   HOPE_ACTIVITIES_VALUES,
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
-import { JOB_POSTINGS_QUERY_KEY } from '@/features/dashboard/hooks/useJobPostings';
 import { generateMatch } from '@/features/match/api/matchApi';
-import { MATCH_RESULT_QUERY_KEY } from '@/features/match/hooks/useMatchResult';
 import { getProfile } from '@/features/profile/api/profileApi';
-import { PROFILE_QUERY_KEY } from '@/features/profile/hooks/useProfile';
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import type { Profile } from '@/shared/types/profile';
 
 export type { SurveyFormValues };
@@ -99,7 +97,7 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   });
 
   const { data: existingProfile } = useQuery({
-    queryKey: PROFILE_QUERY_KEY,
+    queryKey: QUERY_KEYS.profile,
     queryFn: getProfile,
     enabled: mode === 'edit',
   });
@@ -188,15 +186,15 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
       hope_activities: activities,
     });
 
-    queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-    queryClient.removeQueries({ queryKey: JOB_POSTINGS_QUERY_KEY });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.profile });
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.jobPostings });
     localStorage.removeItem('matchzoom-job-sigungu-filter');
     localStorage.removeItem('matchzoom-job-fitlevel-filter');
     setIsMatching(true);
 
     try {
       await generateMatch();
-      queryClient.invalidateQueries({ queryKey: MATCH_RESULT_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.matchResult });
       setIsComplete(true);
     } catch {
       setIsMatchError(true);
