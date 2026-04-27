@@ -2,13 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getJobPostings } from '../api/jobPostingsApi';
-import { JOB_POSTINGS_QUERY_KEY } from '../utils/queryKeys';
-
-export { JOB_POSTINGS_QUERY_KEY };
+import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 
 export function useJobPostings() {
   return useQuery({
-    queryKey: JOB_POSTINGS_QUERY_KEY,
+    queryKey: QUERY_KEYS.jobPostings,
     queryFn: ({ signal }) => getJobPostings(signal),
     staleTime: 5 * 60 * 1000,
   });
