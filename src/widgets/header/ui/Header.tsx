@@ -30,7 +30,7 @@ export function Header({ initialUser }: HeaderProps) {
 
   return (
     <header
-      className={`border-b ${isLanding ? 'border-primary-border bg-hero-bg' : 'border-gray-100'}`}
+      className={`sticky top-0 z-40 border-b ${isLanding ? 'border-primary-border bg-hero-bg' : 'border-gray-100 bg-[var(--color-bg)]'}`}
     >
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 md:h-[72px] md:px-5 lg:px-6">
         <Link

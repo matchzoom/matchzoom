@@ -1,4 +1,3 @@
-import { Info } from 'lucide-react';
 import type { FitLevel } from '@/shared/types/job';
 import { cn } from '@/shared/utils/cn';
 
@@ -29,16 +28,6 @@ export function JobRegionFilter({
 
   return (
     <>
-      <p className="mb-6 flex items-center gap-1 text-[0.875rem] text-gray-400">
-        <Info
-          size={14}
-          strokeWidth={1.5}
-          aria-hidden="true"
-          className="shrink-0"
-        />
-        주소는 본사 기준이에요. 실제 근무지는 공고에서 확인해주세요.
-      </p>
-
       {sigunguList.length > 0 && (
         <div
           role="group"
@@ -84,7 +73,7 @@ export function JobRegionFilter({
         <div
           role="group"
           aria-label="적합도 필터"
-          className="mb-8 flex flex-wrap gap-2"
+          className="flex flex-wrap gap-2"
         >
           {fitLevelList.map((fitLevel) => (
             <button

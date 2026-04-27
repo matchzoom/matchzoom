@@ -15,7 +15,7 @@ import { JobCard } from '@/shared/ui/JobCard';
 import { useBreakpointLimit } from '@/features/dashboard/hooks/useBreakpointLimit';
 
 const INITIAL_LIMIT = 12;
-const SUBSEQUENT_LIMIT = 20;
+const SUBSEQUENT_LIMIT = 12;
 
 async function fetchPerfPage(
   offset: number,
