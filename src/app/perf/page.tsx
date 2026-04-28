@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useLayoutEffect,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 import type { PaginatedJobPostings } from '@/shared/types/job';
@@ -43,7 +37,6 @@ export default function PerfPage() {
   const listAreaRef = useRef<HTMLDivElement>(null);
   const plainSentinelRef = useRef<HTMLDivElement>(null);
   const renderStartRef = useRef(0);
-  const rafRef = useRef<number>(0);
   const hasNextPageRef = useRef(false);
   const isFetchingRef = useRef(false);
   const fetchNextPageRef = useRef<() => void>(() => {});
@@ -85,15 +78,18 @@ export default function PerfPage() {
     fetchNextPageRef.current = fetchNextPage;
   }, [fetchNextPage]);
 
-  useLayoutEffect(() => {
-    const measure = () => {
-      const area = listAreaRef.current;
-      if (area) setDomCount(area.querySelectorAll('*').length);
-      rafRef.current = requestAnimationFrame(measure);
-    };
-    rafRef.current = requestAnimationFrame(measure);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  // DOM 노드 수는 실제 변경이 일어났을 때만 갱신.
+  // RAF로 매 프레임 측정·setState하면 측정 자체가 부하/리렌더를 유발해 측정값을 왜곡함.
+  useEffect(() => {
+    const area = listAreaRef.current;
+    if (!area) return;
+
+    const measure = () => setDomCount(area.querySelectorAll('*').length);
+    measure();
+    const observer = new MutationObserver(measure);
+    observer.observe(area, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [mode]);
 
   useEffect(() => {
     let obs: PerformanceObserver | null = null;
@@ -281,7 +277,6 @@ export default function PerfPage() {
           {mode === 'virtual' ? (
             <VirtualJobList
               items={allItems}
-              columns={columns}
               onBookmarkToggle={() => {}}
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}

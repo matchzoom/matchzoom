@@ -1,47 +1,33 @@
 'use client';
 
-import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
 import type { JobPosting } from '@/shared/types/job';
 import { JobCard } from '@/shared/ui/JobCard';
+import { useBreakpointLimit } from '../hooks/useBreakpointLimit';
 
-const ESTIMATED_ROW_HEIGHT = 260;
+const ESTIMATED_ROW_HEIGHT = 380;
 
-type VirtualJobListProps = {
+type Props = {
   items: JobPosting[];
-  columns: number;
   onBookmarkToggle: (job: JobPosting) => void;
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  fetchNextPage: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 };
 
 export function VirtualJobList({
   items,
-  columns,
   onBookmarkToggle,
-  hasNextPage,
-  isFetchingNextPage,
+  hasNextPage = false,
+  isFetchingNextPage = false,
   fetchNextPage,
-}: VirtualJobListProps) {
+}: Props) {
+  const columns = useBreakpointLimit();
   const listRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
-
-  const hasNextPageRef = useRef(hasNextPage);
-  const isFetchingRef = useRef(isFetchingNextPage);
-  const fetchNextPageRef = useRef(fetchNextPage);
-
-  useEffect(() => {
-    hasNextPageRef.current = hasNextPage;
-  }, [hasNextPage]);
-  useEffect(() => {
-    isFetchingRef.current = isFetchingNextPage;
-  }, [isFetchingNextPage]);
-  useEffect(() => {
-    fetchNextPageRef.current = fetchNextPage;
-  }, [fetchNextPage]);
 
   useLayoutEffect(() => {
     setScrollMargin(listRef.current?.offsetTop ?? 0);
@@ -57,26 +43,22 @@ export function VirtualJobList({
     overscan: 2,
   });
 
+  // isFetchingNextPage 변화에도 observer를 재생성해 fetch 완료 후 sentinel이
+  // 여전히 뷰포트에 있으면 자동 재발화시킨다
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    if (!sentinel || !fetchNextPage) return;
+    if (!hasNextPage || isFetchingNextPage) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (
-          entry.isIntersecting &&
-          hasNextPageRef.current &&
-          !isFetchingRef.current
-        ) {
-          fetchNextPageRef.current();
-        }
+        if (entry.isIntersecting) fetchNextPage();
       },
       { threshold: 0 },
     );
-
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, []);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const ariaSetSize = hasNextPage ? -1 : items.length;
 
@@ -118,6 +100,7 @@ export function VirtualJobList({
                     role="listitem"
                     aria-setsize={ariaSetSize}
                     aria-posinset={startIndex + colIndex + 1}
+                    className="min-w-0"
                   >
                     <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
                   </div>
@@ -129,6 +112,7 @@ export function VirtualJobList({
 
         <div
           ref={sentinelRef}
+          aria-hidden="true"
           style={{
             position: 'absolute',
             bottom: 200,
@@ -139,16 +123,13 @@ export function VirtualJobList({
       </div>
 
       {isFetchingNextPage && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 56,
-          }}
+        <p
+          role="status"
+          aria-live="polite"
+          className="py-6 text-center text-[0.875rem] text-gray-400"
         >
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
-        </div>
+          불러오는 중…
+        </p>
       )}
     </div>
   );

@@ -1,13 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { useInView } from 'react-intersection-observer';
-
 import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
-import { JobCard } from './JobCard';
 import { JobRegionFilter } from './JobRegionFilter';
+import { VirtualJobList } from './VirtualJobList';
 
 type JobListSectionProps = {
   userName: string;
@@ -26,24 +22,6 @@ type JobListSectionProps = {
   onLoadMore?: () => void;
 };
 
-function useItemsPerRow(): number {
-  const [itemsPerRow, setItemsPerRow] = useState(3);
-
-  useEffect(() => {
-    const compute = () => {
-      if (window.matchMedia('(min-width: 1024px)').matches) return 3;
-      if (window.matchMedia('(min-width: 640px)').matches) return 2;
-      return 1;
-    };
-    setItemsPerRow(compute());
-    const handler = () => setItemsPerRow(compute());
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-
-  return itemsPerRow;
-}
-
 export function JobListSection({
   userName,
   postings,
@@ -60,44 +38,6 @@ export function JobListSection({
   isFetchingNextPage = false,
   onLoadMore,
 }: JobListSectionProps) {
-  const itemsPerRow = useItemsPerRow();
-  const rowCount = Math.ceil(postings.length / itemsPerRow);
-
-  const parentRef = useRef<HTMLDivElement | null>(null);
-  const [parentOffset, setParentOffset] = useState(0);
-
-  const setParentRef = useCallback((node: HTMLDivElement | null) => {
-    parentRef.current = node;
-    if (node) setParentOffset(node.offsetTop);
-  }, []);
-
-  useEffect(() => {
-    const handler = () => {
-      if (parentRef.current) {
-        setParentOffset(parentRef.current.offsetTop);
-      }
-    };
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-
-  const virtualizer = useWindowVirtualizer({
-    count: rowCount,
-    estimateSize: () => 380,
-    overscan: 1,
-    scrollMargin: parentOffset,
-  });
-
-  const { ref: sentinelRef, inView } = useInView({
-    rootMargin: '200px',
-  });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage && onLoadMore) {
-      onLoadMore();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, onLoadMore]);
-
   const showSkeleton = isLoading || isLoadingUser;
   const showEmpty = !showSkeleton && postings.length === 0;
 
@@ -171,56 +111,13 @@ export function JobListSection({
           </p>
         </div>
       ) : (
-        <>
-          <div ref={setParentRef} aria-label="채용공고 목록">
-            <div
-              className="relative w-full"
-              style={{ height: `${virtualizer.getTotalSize()}px` }}
-            >
-              {virtualizer.getVirtualItems().map((vRow) => {
-                const start = vRow.index * itemsPerRow;
-                const rowItems = postings.slice(start, start + itemsPerRow);
-                return (
-                  <div
-                    key={vRow.key}
-                    data-index={vRow.index}
-                    ref={virtualizer.measureElement}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`,
-                    }}
-                  >
-                    <ul className="grid grid-cols-1 gap-6 pb-6 sm:grid-cols-2 lg:grid-cols-3">
-                      {rowItems.map((job) => (
-                        <li key={job.id} className="min-w-0">
-                          <JobCard
-                            job={job}
-                            onBookmarkToggle={onBookmarkToggle}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div ref={sentinelRef} aria-hidden="true" className="h-px" />
-
-          {isFetchingNextPage && (
-            <p
-              role="status"
-              aria-live="polite"
-              className="py-6 text-center text-[0.875rem] text-gray-400"
-            >
-              불러오는 중…
-            </p>
-          )}
-        </>
+        <VirtualJobList
+          items={postings}
+          onBookmarkToggle={onBookmarkToggle}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={onLoadMore}
+        />
       )}
     </section>
   );
