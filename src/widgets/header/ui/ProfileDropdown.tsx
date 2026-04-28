@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User } from 'lucide-react';
 
+import { Button } from '@/shared/ui/Button';
 import { cn } from '@/shared/utils/cn';
 
 type ProfileDropdownProps = {
@@ -42,16 +43,17 @@ export function ProfileDropdown({
 
   return (
     <div ref={containerRef} className="relative">
-      <button
-        type="button"
+      <Button
+        size="icon"
+        variant="ghost"
         aria-label="사용자 메뉴 열기"
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-[6px] border border-gray-200 text-gray-700 hover:bg-gray-100"
+        className="h-10 w-10 border border-gray-200"
       >
         <User size={20} strokeWidth={1.5} aria-hidden="true" />
-      </button>
+      </Button>
 
       {open && (
         <div

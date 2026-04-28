@@ -33,14 +33,14 @@ export function MobileLoginDrawer({
     >
       {/* 상단 닫기 버튼 */}
       <div className="flex h-14 shrink-0 items-center px-2">
-        <button
-          type="button"
+        <Button
+          size="icon"
+          variant="ghost"
           aria-label="메뉴 닫기"
           onClick={onClose}
-          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm text-gray-700 hover:bg-gray-100"
         >
           <X size={24} strokeWidth={1.5} aria-hidden="true" />
-        </button>
+        </Button>
       </div>
 
       {/* 중앙 로고 */}

@@ -132,16 +132,16 @@ export function Header({ initialUser }: HeaderProps) {
                 isTestUser={!!user.isTestUser}
               />
             ) : (
-              <button
-                type="button"
+              <Button
+                size="icon"
+                variant="ghost"
                 aria-label="메뉴 열기"
                 aria-expanded={loginDrawerOpen}
                 aria-controls="mobile-login-menu"
                 onClick={() => setLoginDrawerOpen(true)}
-                className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm text-gray-700 hover:bg-gray-100"
               >
                 <Menu size={24} strokeWidth={1.5} aria-hidden="true" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
