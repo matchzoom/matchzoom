@@ -11,8 +11,8 @@ import type { PaginatedJobPostings } from '@/shared/types/job';
 
 export const GET = createAuthorizedRoute(async ({ userId, request }) => {
   const { searchParams } = new URL(request.url);
-  const offset = Number(searchParams.get('offset') ?? '0');
-  const limit = Number(searchParams.get('limit') ?? '12');
+  const offset = parseInt(searchParams.get('offset') ?? '0', 10) || 0;
+  const limit = parseInt(searchParams.get('limit') ?? '12', 10) || 12;
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 

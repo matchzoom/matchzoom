@@ -5,7 +5,7 @@ import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { getPaginatedJobPostings } from '../api/jobPostingsApi';
 
 const INITIAL_LIMIT = 12;
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 3;
 
 export function useInfiniteJobPostings() {
   return useInfiniteQuery({

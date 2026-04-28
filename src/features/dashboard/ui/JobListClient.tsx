@@ -57,6 +57,7 @@ export function JobListClient({
         fetchNextPage={fetchNextPage}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
+        virtual
       />
       {loginModalOpen && (
         <ConfirmModal

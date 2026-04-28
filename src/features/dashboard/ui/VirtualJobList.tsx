@@ -27,7 +27,7 @@ export function VirtualJobList({
 
   return (
     <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
-      <ul
+      <div
         role="list"
         aria-label="채용공고 목록"
         style={{
@@ -43,10 +43,11 @@ export function VirtualJobList({
           const rowItems = postings.slice(startIndex, startIndex + columns);
 
           return (
-            <li
+            <div
               key={virtualRow.key}
               data-index={virtualRow.index}
               ref={virtualizer.measureElement}
+              role="presentation"
               className="mb-6 grid gap-6"
               style={{
                 gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
@@ -62,10 +63,10 @@ export function VirtualJobList({
                   <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
                 </div>
               ))}
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 }
