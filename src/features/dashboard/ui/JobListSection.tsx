@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { JobCard } from './JobCard';
+import { VirtualJobList } from './VirtualJobList';
 import { JobRegionFilter } from './JobRegionFilter';
 
 type JobListSectionProps = {
@@ -17,6 +19,10 @@ type JobListSectionProps = {
   fitLevelList?: FitLevel[];
   selectedFitLevel?: FitLevel | null;
   onSelectFitLevel?: (fitLevel: FitLevel | null) => void;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  virtual?: boolean;
 };
 
 export function JobListSection({
@@ -31,7 +37,33 @@ export function JobListSection({
   fitLevelList = [],
   selectedFitLevel = null,
   onSelectFitLevel,
+  fetchNextPage,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  virtual = false,
 }: JobListSectionProps) {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingNextPageRef = useRef(isFetchingNextPage);
+  useEffect(() => {
+    isFetchingNextPageRef.current = isFetchingNextPage;
+  });
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasNextPage || !fetchNextPage) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPageRef.current)
+          fetchNextPage();
+      },
+      { threshold: 0 },
+    );
+
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
   return (
     <section aria-labelledby="job-list-heading">
       <h2
@@ -101,6 +133,11 @@ export function JobListSection({
             프로필에서 희망 지역을 변경하거나 나중에 다시 확인해보세요
           </p>
         </div>
+      ) : virtual ? (
+        <VirtualJobList
+          postings={postings}
+          onBookmarkToggle={onBookmarkToggle}
+        />
       ) : (
         <ul
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
@@ -112,6 +149,15 @@ export function JobListSection({
             </li>
           ))}
         </ul>
+      )}
+
+      {hasNextPage && (
+        <div ref={sentinelRef} className="h-1" aria-hidden="true" />
+      )}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-8" aria-busy="true">
+          <div className="h-6 w-6 animate-spin rounded-full border-4 border-gray-200 border-t-primary" />
+        </div>
       )}
     </section>
   );

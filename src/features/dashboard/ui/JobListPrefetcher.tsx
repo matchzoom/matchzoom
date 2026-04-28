@@ -19,9 +19,12 @@ export async function JobListPrefetcher({
   userName,
 }: Props) {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchInfiniteQuery({
     queryKey: QUERY_KEYS.jobPostings,
-    queryFn: () => getJobPostingsData(userId),
+    queryFn: () => getJobPostingsData(userId, 0, 12),
+    initialPageParam: 0,
+    getNextPageParam: (last: Awaited<ReturnType<typeof getJobPostingsData>>) =>
+      last.nextOffset,
   });
 
   return (

@@ -23,6 +23,12 @@ export type JobPosting = {
   bookmarked: boolean;
 };
 
+export type PaginatedJobPostings = {
+  items: JobPosting[];
+  nextOffset: number | null;
+  total: number;
+};
+
 export type PersonalityAxis = {
   subject: string;
   value: number;

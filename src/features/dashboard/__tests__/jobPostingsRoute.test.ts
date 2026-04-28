@@ -57,13 +57,16 @@ const mockProfileRow = {
   region_primary: '경기도 수원시',
 };
 
-const makeRequest = () =>
-  new Request('http://localhost/api/job-postings', { method: 'GET' });
+const makeRequest = (offset = 0, limit = 12) =>
+  new Request(
+    `http://localhost/api/job-postings?offset=${offset}&limit=${limit}`,
+    { method: 'GET' },
+  );
 
 const mockFetchWith = (xml: string) =>
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue({ text: () => Promise.resolve(xml) }),
+    vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve(xml) }),
   );
 
 describe('GET /api/job-postings', () => {
@@ -79,7 +82,7 @@ describe('GET /api/job-postings', () => {
     vi.unstubAllGlobals();
   });
 
-  it('공고 목록을 반환한다', async () => {
+  it('공고 목록을 PaginatedJobPostings 구조로 반환한다', async () => {
     mockAuth('1');
     mockSupabaseFetch
       .mockResolvedValueOnce([mockProfileRow])
@@ -89,12 +92,40 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
-    expect(data[0]).toMatchObject({
+    expect(Array.isArray(data.items)).toBe(true);
+    expect(typeof data.total).toBe('number');
+    expect(data.items[0]).toMatchObject({
       companyName: '테스트 회사',
       title: '사무보조원',
       salary: '2,000,000원 (월급)',
     });
+  });
+
+  it('offset/limit에 따라 슬라이스를 반환한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest(0, 12));
+    expect(res.status).toBe(200);
+
+    const data = await res.json();
+    expect(data.items.length).toBeLessThanOrEqual(12);
+    expect(data).toHaveProperty('nextOffset');
+    expect(data).toHaveProperty('total');
+  });
+
+  it('전체 아이템이 limit보다 적으면 nextOffset이 null이다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest(0, 12));
+    const data = await res.json();
+    // XML에 아이템이 1개이므로 12개 limit에 다 들어감 → nextOffset null
+    expect(data.nextOffset).toBeNull();
   });
 
   it('프로필 없으면 필터링 없이 목록을 반환한다', async () => {
@@ -105,7 +136,7 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
+    expect(Array.isArray(data.items)).toBe(true);
   });
 
   it('북마크된 공고는 bookmarked: true로 반환한다', async () => {
@@ -120,11 +151,13 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    const bookmarked = data.find((p: { bookmarked: boolean }) => p.bookmarked);
+    const bookmarked = data.items.find(
+      (p: { bookmarked: boolean }) => p.bookmarked,
+    );
     expect(bookmarked).toBeDefined();
   });
 
-  it('공고가 없으면 빈 배열을 반환한다', async () => {
+  it('공고가 없으면 빈 items 배열을 반환한다', async () => {
     mockFetchWith(JOB_XML_EMPTY);
     mockAuth('1');
     mockSupabaseFetch
@@ -135,7 +168,9 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(data).toEqual([]);
+    expect(data.items).toEqual([]);
+    expect(data.total).toBe(0);
+    expect(data.nextOffset).toBeNull();
   });
 
   it('쿠키 없으면 401을 반환한다', async () => {

@@ -7,8 +7,12 @@ import {
   type ProfileRow,
 } from '@/features/dashboard/utils/jobPostings';
 import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import type { PaginatedJobPostings } from '@/shared/types/job';
 
-export const GET = createAuthorizedRoute(async ({ userId }) => {
+export const GET = createAuthorizedRoute(async ({ userId, request }) => {
+  const { searchParams } = new URL(request.url);
+  const offset = Number(searchParams.get('offset') ?? '0');
+  const limit = Number(searchParams.get('limit') ?? '12');
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 
@@ -42,6 +46,14 @@ export const GET = createAuthorizedRoute(async ({ userId }) => {
   const profile = profileRows[0];
   const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
   const unique = dedupeItems(parseJobItems(jobXml));
+  const ranked = rankPostings(unique, profile, bookmarkedUrls);
 
-  return rankPostings(unique, profile, bookmarkedUrls);
+  const items = ranked.slice(offset, offset + limit);
+  const nextOffset = offset + limit < ranked.length ? offset + limit : null;
+
+  return {
+    items,
+    nextOffset,
+    total: ranked.length,
+  } satisfies PaginatedJobPostings;
 });
