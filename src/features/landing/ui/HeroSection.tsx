@@ -9,7 +9,7 @@ export function HeroSection({ isLoggedIn }: HeroSectionProps) {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="bg-hero-bg py-16 md:py-20 lg:py-0"
+      className="bg-hero-bg -mt-14 pb-16 pt-28 md:-mt-[72px] md:pb-20 md:pt-32 lg:pb-0 lg:pt-[72px]"
     >
       <div className="mx-auto max-w-[1200px] px-4 md:px-5 lg:px-6">
         <div className="flex items-center justify-between gap-10">
