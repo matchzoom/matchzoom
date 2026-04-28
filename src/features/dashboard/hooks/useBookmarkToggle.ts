@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { JobPosting } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 
 export function useBookmarkToggle() {

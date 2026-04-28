@@ -1,74 +1,54 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-import { useProfile } from '../hooks/useProfile';
-import { useScrapedJobs } from '../hooks/useScrapedJobs';
-import { useBookmarkRemove } from '../hooks/useBookmarkRemove';
+import type { UserProfile } from '@/shared/types/userProfile';
+import type {
+  MatchedJob,
+  PersonalityAxis,
+  JobPosting,
+} from '@/shared/types/job';
+import type { Bookmark } from '@/shared/types/bookmark';
 import { ProfileSidebar } from './ProfileSidebar';
 import { ProfileInfoTab } from './ProfileInfoTab';
-import { ProfileEmptyView } from './ProfileEmptyView';
 import { ScrapedJobsTab } from './ScrapedJobsTab';
-import { Skeleton } from '@/shared/ui/Skeleton';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
-import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { PROFILE_TAB_ITEMS, type ProfileTab } from '../utils/profileTabs';
 
-export function ProfileView() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<ProfileTab>('result');
-  const [editLoginModalOpen, setEditLoginModalOpen] = useState(false);
-  const { data: user } = useCurrentUser();
+type ProfileViewProps = {
+  userProfile: UserProfile;
+  lastSurveyDate: string;
+  personalityAxes: PersonalityAxis[];
+  personalitySummary: string;
+  matchedJobs: MatchedJob[];
+  scrapedJobs: Bookmark[];
+  activeTab: ProfileTab;
+  onTabChange: (tab: ProfileTab) => void;
+  editLoginModalOpen: boolean;
+  onEditLoginModalClose: () => void;
+  loginModalOpen: boolean;
+  onLoginModalClose: () => void;
+  onEdit: () => void;
+  onBookmarkToggle: (job: JobPosting) => void;
+};
 
-  const {
-    userProfile,
-    isLoading,
-    lastSurveyDate,
-    personalityAxes,
-    personalitySummary,
-    matchedJobs,
-  } = useProfile();
-  const { data: scrapedJobs = [] } = useScrapedJobs();
-  const {
-    remove: handleBookmarkRemove,
-    loginModalOpen,
-    closeLoginModal,
-  } = useBookmarkRemove();
-
-  if (isLoading) {
-    return (
-      <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-5 lg:px-6">
-        <div className="flex gap-8">
-          <div className="hidden w-[220px] shrink-0 md:block">
-            <Skeleton className="h-[100px] rounded-lg" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <Skeleton className="mb-4 h-8 w-[200px]" />
-            <Skeleton className="h-[300px] rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userProfile) {
-    return <ProfileEmptyView />;
-  }
-
-  function handleEdit() {
-    if (user?.isTestUser) {
-      setEditLoginModalOpen(true);
-      return;
-    }
-    router.push('/survey?mode=edit');
-  }
-
+export function ProfileView({
+  userProfile,
+  lastSurveyDate,
+  personalityAxes,
+  personalitySummary,
+  matchedJobs,
+  scrapedJobs,
+  activeTab,
+  onTabChange,
+  editLoginModalOpen,
+  onEditLoginModalClose,
+  loginModalOpen,
+  onLoginModalClose,
+  onEdit,
+  onBookmarkToggle,
+}: ProfileViewProps) {
   return (
     <div className="mx-auto max-w-[1200px] px-4 pt-5 pb-10 md:px-5 md:py-10 lg:px-6">
       <div className="flex gap-8">
         <div className="hidden w-[220px] shrink-0 md:block">
-          <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <ProfileSidebar activeTab={activeTab} onTabChange={onTabChange} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -85,7 +65,7 @@ export function ProfileView() {
                 id={`tab-${id}`}
                 aria-selected={activeTab === id}
                 aria-controls={`panel-${id}`}
-                onClick={() => setActiveTab(id)}
+                onClick={() => onTabChange(id)}
                 className={
                   'flex-1 cursor-pointer px-4 py-3 text-[0.9375rem] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-[-2px] ' +
                   (activeTab === id
@@ -110,7 +90,7 @@ export function ProfileView() {
               personalityAxes={personalityAxes}
               personalitySummary={personalitySummary}
               matchedJobs={matchedJobs}
-              onEdit={handleEdit}
+              onEdit={onEdit}
             />
           </div>
           <div
@@ -121,9 +101,7 @@ export function ProfileView() {
           >
             <ScrapedJobsTab
               jobs={scrapedJobs}
-              onBookmarkToggle={(job) =>
-                handleBookmarkRemove(job.detailUrl ?? '')
-              }
+              onBookmarkToggle={onBookmarkToggle}
             />
           </div>
         </div>
@@ -138,7 +116,7 @@ export function ProfileView() {
           onConfirm={() => {
             window.location.href = '/api/oauth/kakao/authorize';
           }}
-          onClose={closeLoginModal}
+          onClose={onLoginModalClose}
         />
       )}
 
@@ -151,7 +129,7 @@ export function ProfileView() {
           onConfirm={() => {
             window.location.href = '/api/oauth/kakao/authorize';
           }}
-          onClose={() => setEditLoginModalOpen(false)}
+          onClose={onEditLoginModalClose}
         />
       )}
     </div>

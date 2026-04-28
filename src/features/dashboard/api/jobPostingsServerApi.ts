@@ -5,7 +5,7 @@ import {
   rankPostings,
   type ProfileRow,
 } from '../utils/jobPostings';
-import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_PROFILE } from '@/shared/constants/testUser';
 import type { JobPosting } from '@/shared/types/job';
 
 export async function getJobPostingsData(

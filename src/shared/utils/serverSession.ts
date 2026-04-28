@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { verifySession } from './session';
 import { AUTH_COOKIE_KEYS } from './authCookies';
-import { TEST_USER_ID } from './testUser';
+import { TEST_USER_ID } from '@/shared/constants/testUser';
 
 export type ServerSession = {
   userId: string;
