@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, MessageCircle, Menu } from 'lucide-react';
+import { MessageCircle, Menu } from 'lucide-react';
 
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { ROUTES } from '@/shared/constants/routes';
@@ -11,11 +11,11 @@ import { useLogout } from '@/shared/hooks/useLogout';
 import { useTestLogin } from '@/shared/hooks/useTestLogin';
 import { useTestLogout } from '@/shared/hooks/useTestLogout';
 import { useDarkMode } from '@/shared/hooks/useDarkMode';
-import { Button, buttonVariants } from '@/shared/ui/Button';
-import { cn } from '@/shared/utils/cn';
+import { Button } from '@/shared/ui/Button';
 import type { CurrentUser } from '@/shared/types/user';
 import { DarkModeToggle } from './DarkModeToggle';
-import { MobileMenuDrawer } from './MobileMenuDrawer';
+import { MobileLoginDrawer } from './MobileLoginDrawer';
+import { ProfileDropdown } from './ProfileDropdown';
 
 type HeaderProps = {
   initialUser?: CurrentUser | null;
@@ -23,11 +23,10 @@ type HeaderProps = {
 
 export function Header({ initialUser }: HeaderProps) {
   const pathname = usePathname();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const { data: fetchedUser } = useCurrentUser();
-  // fetchedUser가 undefined(로딩 중)이면 서버에서 내려준 initialUser 사용
   const user = fetchedUser ?? initialUser;
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export function Header({ initialUser }: HeaderProps) {
   }, []);
 
   useEffect(() => {
-    setDrawerOpen(false);
+    setLoginDrawerOpen(false);
   }, [pathname]);
 
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
@@ -53,7 +52,7 @@ export function Header({ initialUser }: HeaderProps) {
 
   const handleGuestLogin = () => {
     testLogin();
-    setDrawerOpen(false);
+    setLoginDrawerOpen(false);
   };
 
   const handleLogout = () => {
@@ -114,60 +113,46 @@ export function Header({ initialUser }: HeaderProps) {
             )}
 
             {user && (
-              <nav aria-label="사용자 메뉴" className="flex items-center gap-2">
-                <Link
-                  href="/profile"
-                  aria-label="프로필 페이지로 이동"
-                  className={cn(
-                    buttonVariants({ variant: 'outline', size: 'md' }),
-                  )}
-                >
-                  <User size={20} strokeWidth={1.5} aria-hidden="true" />
-                  프로필
-                </Link>
-                <Button
-                  variant="outline"
-                  size="md"
-                  disabled={isLogoutPendingCombined}
-                  onClick={handleLogout}
-                >
-                  {isLogoutPendingCombined
-                    ? '로그아웃 중...'
-                    : user.isTestUser
-                      ? '게스트 계정 로그아웃'
-                      : '로그아웃'}
-                </Button>
-              </nav>
+              <ProfileDropdown
+                isLogoutPending={isLogoutPendingCombined}
+                onLogout={handleLogout}
+                isTestUser={!!user.isTestUser}
+              />
             )}
           </div>
 
-          {/* 모바일 우측 영역: 항상 다크모드 토글 + 햄버거 */}
+          {/* 모바일 우측 영역 */}
           <div className="flex items-center gap-2 md:hidden">
             {mounted && <DarkModeToggle theme={theme} onToggle={toggleTheme} />}
-            <button
-              type="button"
-              aria-label="메뉴 열기"
-              aria-expanded={drawerOpen}
-              aria-controls="mobile-menu"
-              onClick={() => setDrawerOpen(true)}
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm text-gray-700 hover:bg-gray-100"
-            >
-              <Menu size={24} strokeWidth={1.5} aria-hidden="true" />
-            </button>
+
+            {user ? (
+              <ProfileDropdown
+                isLogoutPending={isLogoutPendingCombined}
+                onLogout={handleLogout}
+                isTestUser={!!user.isTestUser}
+              />
+            ) : (
+              <button
+                type="button"
+                aria-label="메뉴 열기"
+                aria-expanded={loginDrawerOpen}
+                aria-controls="mobile-login-menu"
+                onClick={() => setLoginDrawerOpen(true)}
+                className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm text-gray-700 hover:bg-gray-100"
+              >
+                <Menu size={24} strokeWidth={1.5} aria-hidden="true" />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      {/* 모바일 메뉴 드로어 */}
-      {drawerOpen && (
-        <MobileMenuDrawer
-          user={user}
-          onClose={() => setDrawerOpen(false)}
-          onGuestLogin={handleGuestLogin}
+      {loginDrawerOpen && !user && (
+        <MobileLoginDrawer
+          onClose={() => setLoginDrawerOpen(false)}
+          onTestLogin={handleGuestLogin}
           onKakaoLogin={handleKakaoLogin}
-          isGuestLoginPending={isTestLoginPending}
-          onLogout={handleLogout}
-          isLogoutPending={isLogoutPendingCombined}
+          isTestLoginPending={isTestLoginPending}
         />
       )}
     </>
