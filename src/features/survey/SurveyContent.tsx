@@ -1,22 +1,16 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import { SurveyForm } from './ui/SurveyForm';
 import { useSurveyForm } from './hooks/useSurveyForm';
 import { usePreventNavigation } from './hooks/usePreventNavigation';
-import { getProfile } from '@/shared/api/profileApi';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys';
+import { useProfile } from '@/shared/hooks/useProfile';
 
 export function SurveyContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') === 'edit' ? 'edit' : 'create';
 
-  const { data: existingProfile } = useQuery({
-    queryKey: QUERY_KEYS.profile,
-    queryFn: getProfile,
-    enabled: mode === 'edit',
-  });
+  const { profile: existingProfile } = useProfile({ enabled: mode === 'edit' });
 
   const form = useSurveyForm(mode, existingProfile ?? undefined);
   const { isBlocking, onStay, onLeave } = usePreventNavigation(form.isDirty);

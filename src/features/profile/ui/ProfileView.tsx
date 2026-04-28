@@ -10,6 +10,7 @@ import { ProfileInfoTab } from './ProfileInfoTab';
 import { ScrapedJobsTab } from './ScrapedJobsTab';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { PROFILE_TAB_ITEMS, type ProfileTab } from '../utils/profileTabs';
+import { ROUTES } from '@/shared/constants/routes';
 
 type ProfileViewProps = {
   userProfile: UserProfile;
@@ -114,7 +115,7 @@ export function ProfileView({
           confirmLabel="로그인하기"
           cancelLabel="닫기"
           onConfirm={() => {
-            window.location.href = '/api/oauth/kakao/authorize';
+            window.location.href = ROUTES.KAKAO_AUTHORIZE;
           }}
           onClose={onLoginModalClose}
         />
@@ -127,7 +128,7 @@ export function ProfileView({
           confirmLabel="로그인하기"
           cancelLabel="닫기"
           onConfirm={() => {
-            window.location.href = '/api/oauth/kakao/authorize';
+            window.location.href = ROUTES.KAKAO_AUTHORIZE;
           }}
           onClose={onEditLoginModalClose}
         />

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 
-import { buttonVariants } from '@/shared/ui/Button/Button';
+import { buttonVariants } from '@/shared/ui/Button';
 import { cn } from '@/shared/utils/cn';
+import { ROUTES } from '@/shared/constants/routes';
 
 type CtaButtonProps = {
   isLoggedIn: boolean;
@@ -10,7 +11,7 @@ type CtaButtonProps = {
 };
 
 export function CtaButton({ isLoggedIn, label, size = 'lg' }: CtaButtonProps) {
-  const href = isLoggedIn ? '/survey' : '/api/oauth/kakao/authorize';
+  const href = isLoggedIn ? '/survey' : ROUTES.KAKAO_AUTHORIZE;
   return (
     <Link
       href={href}

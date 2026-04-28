@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { getProfile } from '@/shared/api/profileApi';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import type { Profile } from '@/shared/types/profile';
@@ -25,10 +25,13 @@ function toUserProfile(p: Profile): UserProfile {
   };
 }
 
-export function useProfile() {
+type Options = Omit<UseQueryOptions<Profile | null>, 'queryKey' | 'queryFn'>;
+
+export function useProfile(options?: Options) {
   const { data: profile, isLoading } = useQuery({
     queryKey: QUERY_KEYS.profile,
     queryFn: getProfile,
+    ...options,
   });
 
   return {
