@@ -42,6 +42,11 @@
   --border:  #E5E7EB;
   --text:    #111827;
 
+  /* Kakao brand */
+  --kakao:       #FEE500;
+  --kakao-hover: #F0D800;
+  --kakao-text:  #191919;
+
   /* Hero */
   --hero-bg: #E8F0FE;
 
@@ -147,6 +152,11 @@
   --color-gray-50:  var(--gray-50);
   --color-white:        var(--white);
   --color-static-white: var(--static-white);
+
+  /* Kakao brand */
+  --color-kakao:       var(--kakao);
+  --color-kakao-hover: var(--kakao-hover);
+  --color-kakao-text:  var(--kakao-text);
 
   /* Semantic colors */
   --color-success:    var(--success);

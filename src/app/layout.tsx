@@ -128,7 +128,7 @@ export default async function RootLayout({
           <HydrationBoundary state={dehydratedState}>
             <NavigationTracker />
             <Header initialUser={initialUser} />
-            <main id="main-content" className="flex-1">
+            <main id="main-content" className="flex-1 pt-14 md:pt-[72px]">
               {children}
             </main>
             <Footer />

@@ -18,14 +18,20 @@ const buttonVariants = cva(
         ghost:
           'border border-transparent bg-transparent text-gray-700 ' +
           'hover:bg-gray-100',
+        outline:
+          'border border-gray-300 bg-white text-gray-700 ' +
+          'hover:bg-gray-100',
         destructive:
           'border border-transparent bg-error text-static-white ' +
           'hover:bg-error-hover',
+        kakao:
+          'border border-transparent bg-[var(--kakao)] text-[var(--kakao-text)] ' +
+          'hover:bg-[var(--kakao-hover)]',
       },
       size: {
         lg: 'h-12 px-5',
-        md: 'h-10 px-4',
-        sm: 'h-8 px-3',
+        md: 'h-[46px] px-4',
+        sm: 'h-[42px] px-3',
         icon: 'h-11 w-11',
       },
     },

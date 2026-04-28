@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useProfile } from '@/shared/hooks/useProfile';
 import { useMatchResult } from '@/shared/hooks/useMatchResult';
@@ -14,9 +14,16 @@ import { ProfileEmptyView } from '@/features/profile/ui/ProfileEmptyView';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { type ProfileTab } from '@/features/profile/utils/profileTabs';
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<ProfileTab>('result');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const activeTab: ProfileTab = tabParam === 'scraps' ? 'scraps' : 'result';
+
+  const handleTabChange = (tab: ProfileTab) => {
+    router.replace(`/profile?tab=${tab}`);
+  };
+
   const [editLoginModalOpen, setEditLoginModalOpen] = useState(false);
 
   const { data: user } = useCurrentUser();
@@ -62,7 +69,7 @@ export default function ProfilePage() {
 
   if (!userProfile) {
     return (
-      <ProfileEmptyView activeTab={activeTab} onTabChange={setActiveTab} />
+      <ProfileEmptyView activeTab={activeTab} onTabChange={handleTabChange} />
     );
   }
 
@@ -77,7 +84,7 @@ export default function ProfilePage() {
       matchedJobs={matchResult ? toMatchedJobs(matchResult.top3_jobs) : []}
       scrapedJobs={scrapedJobs}
       activeTab={activeTab}
-      onTabChange={setActiveTab}
+      onTabChange={handleTabChange}
       editLoginModalOpen={editLoginModalOpen}
       onEditLoginModalClose={() => setEditLoginModalOpen(false)}
       loginModalOpen={loginModalOpen}
@@ -85,5 +92,13 @@ export default function ProfilePage() {
       onEdit={handleEdit}
       onBookmarkToggle={(job) => handleBookmarkRemove(job.detailUrl ?? '')}
     />
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfilePageContent />
+    </Suspense>
   );
 }

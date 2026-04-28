@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { X } from 'lucide-react';
 
+import { Button } from '@/shared/ui/Button';
 import { useModalAccessibility } from '@/shared/hooks/useModalAccessibility';
 
 type PolicyContent = {
@@ -109,14 +110,15 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
               시행일: {content.effectiveDate}
             </p>
           </div>
-          <button
-            type="button"
+          <Button
+            size="icon"
+            variant="ghost"
             onClick={onClose}
             aria-label="모달 닫기"
-            className="transition-ui flex h-9 w-9 cursor-pointer items-center justify-center rounded-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            className="h-9 w-9 text-gray-500 hover:text-gray-700"
           >
             <X size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
 
         <div className="overflow-y-auto px-6 py-5">
