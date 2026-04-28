@@ -1,21 +1,23 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 
 import { ProfileSidebar } from './ProfileSidebar';
+import type { ProfileTab } from '../utils/profileTabs';
 
-type ProfileTab = 'result' | 'scraps';
+type ProfileEmptyViewProps = {
+  activeTab: ProfileTab;
+  onTabChange: (tab: ProfileTab) => void;
+};
 
-export function ProfileEmptyView() {
-  const [activeTab, setActiveTab] = useState<ProfileTab>('result');
-
+export function ProfileEmptyView({
+  activeTab,
+  onTabChange,
+}: ProfileEmptyViewProps) {
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-5 lg:px-6">
       <div className="flex gap-8">
         {/* 데스크탑 사이드바 */}
         <div className="hidden w-[220px] shrink-0 md:block">
-          <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <ProfileSidebar activeTab={activeTab} onTabChange={onTabChange} />
         </div>
 
         {/* 콘텐츠 영역 */}

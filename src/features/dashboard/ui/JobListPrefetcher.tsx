@@ -4,8 +4,8 @@ import {
   HydrationBoundary,
 } from '@tanstack/react-query';
 import { getJobPostingsData } from '../api/jobPostingsServerApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
-import { JobListClient } from './JobListClient';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
+import { JobListClient } from '../JobListClient';
 
 type Props = {
   userId: string;

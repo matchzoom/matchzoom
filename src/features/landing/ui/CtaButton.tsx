@@ -1,37 +1,23 @@
-'use client';
+import Link from 'next/link';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/shared/ui/Button';
-import type { ButtonHTMLAttributes } from 'react';
+import { buttonVariants } from '@/shared/ui/Button';
+import { cn } from '@/shared/utils/cn';
+import { ROUTES } from '@/shared/constants/routes';
 
-type CtaButtonProps = Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'onClick'
-> & {
+type CtaButtonProps = {
   isLoggedIn: boolean;
   label: string;
   size?: 'sm' | 'md' | 'lg';
 };
 
-export function CtaButton({
-  isLoggedIn,
-  label,
-  size = 'lg',
-  ...props
-}: CtaButtonProps) {
-  const router = useRouter();
-
-  const handleClick = () => {
-    if (isLoggedIn) {
-      router.push('/survey');
-    } else {
-      window.location.href = '/api/oauth/kakao/authorize';
-    }
-  };
-
+export function CtaButton({ isLoggedIn, label, size = 'lg' }: CtaButtonProps) {
+  const href = isLoggedIn ? '/survey' : ROUTES.KAKAO_AUTHORIZE;
   return (
-    <Button size={size} variant="primary" onClick={handleClick} {...props}>
+    <Link
+      href={href}
+      className={cn(buttonVariants({ variant: 'primary', size }))}
+    >
       {label}
-    </Button>
+    </Link>
   );
 }

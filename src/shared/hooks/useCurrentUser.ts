@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCurrentUser } from '@/shared/api/userApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 
 /**
  * 로그인한 유저 정보를 가져오는 React Query 훅.

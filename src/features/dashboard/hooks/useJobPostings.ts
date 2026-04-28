@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getJobPostings } from '../api/jobPostingsApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 
 export function useJobPostings() {
   return useQuery({

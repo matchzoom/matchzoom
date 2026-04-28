@@ -1,7 +1,7 @@
 import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { CreateProfileBodySchema, type Profile } from '@/shared/types/profile';
-import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_PROFILE } from '@/shared/constants/testUser';
 
 export const GET = createAuthorizedRoute(async ({ userId }) => {
   if (userId === TEST_USER_ID) return TEST_PROFILE;

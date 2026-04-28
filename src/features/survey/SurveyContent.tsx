@@ -1,14 +1,18 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { SurveyForm } from './SurveyForm';
-import { useSurveyForm } from '../hooks/useSurveyForm';
-import { usePreventNavigation } from '../hooks/usePreventNavigation';
+import { SurveyForm } from './ui/SurveyForm';
+import { useSurveyForm } from './hooks/useSurveyForm';
+import { usePreventNavigation } from './hooks/usePreventNavigation';
+import { useProfile } from '@/shared/hooks/useProfile';
 
 export function SurveyContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') === 'edit' ? 'edit' : 'create';
-  const form = useSurveyForm(mode);
+
+  const { profile: existingProfile } = useProfile({ enabled: mode === 'edit' });
+
+  const form = useSurveyForm(mode, existingProfile ?? undefined);
   const { isBlocking, onStay, onLeave } = usePreventNavigation(form.isDirty);
 
   return (
