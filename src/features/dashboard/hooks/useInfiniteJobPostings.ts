@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getJobPostingsPaginated } from '../api/jobPostingsApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 
 const INITIAL_LIMIT = 12;
 const SUBSEQUENT_LIMIT = 3;
