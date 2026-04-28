@@ -3,12 +3,13 @@
 import { useMemo } from 'react';
 
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
-import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
-import { useJobFilterOptions } from '../hooks/useJobFilterOptions';
-import { useJobFitFilter } from '../hooks/useJobFitFilter';
-import { useJobPostings } from '../hooks/useJobPostings';
-import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
-import { JobListSection } from './JobListSection';
+import { ROUTES } from '@/shared/constants/routes';
+import { useBookmarkToggle } from './hooks/useBookmarkToggle';
+import { useJobFilterOptions } from './hooks/useJobFilterOptions';
+import { useJobFitFilter } from './hooks/useJobFitFilter';
+import { useJobPostings } from './hooks/useJobPostings';
+import { useJobRegionFilter } from './hooks/useJobRegionFilter';
+import { JobListSection } from './ui/JobListSection';
 
 type JobListClientProps = {
   userName: string;
@@ -65,7 +66,7 @@ export function JobListClient({ userName }: JobListClientProps) {
           confirmLabel="로그인하기"
           cancelLabel="닫기"
           onConfirm={() => {
-            window.location.href = '/api/oauth/kakao/authorize';
+            window.location.href = ROUTES.KAKAO_AUTHORIZE;
           }}
           onClose={closeLoginModal}
         />

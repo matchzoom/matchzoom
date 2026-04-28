@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { STORAGE_KEY_JOB_SIGUNGU_FILTER } from '@/shared/utils/storageKeys';
+import { STORAGE_KEY_JOB_SIGUNGU_FILTER } from '@/shared/constants/storageKeys';
 
 const STORAGE_KEY = STORAGE_KEY_JOB_SIGUNGU_FILTER;
 

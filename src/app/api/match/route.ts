@@ -4,7 +4,7 @@ import { openAiFetch } from '@/shared/api/openAiFetch';
 import { AiMatchResponseSchema, type MatchResult } from '@/shared/types/match';
 import type { Profile } from '@/shared/types/profile';
 import { matchStrategy } from '@/features/match/strategies';
-import { TEST_USER_ID, TEST_MATCH } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_MATCH } from '@/shared/constants/testUser';
 
 export const GET = createAuthorizedRoute(async ({ userId }) => {
   if (userId === TEST_USER_ID) return TEST_MATCH;

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { SurveyContent } from '@/features/survey/ui/SurveyContent';
+import { SurveyContent } from '@/features/survey/SurveyContent';
 
 export default function SurveyPage() {
   return (

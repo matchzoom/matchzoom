@@ -1,7 +1,7 @@
 import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import type { User, CurrentUser } from '@/shared/types/user';
-import { TEST_USER_ID, TEST_USER } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_USER } from '@/shared/constants/testUser';
 
 // GET /api/users/me
 // 로그인한 유저 정보 반환 (kakao_id 제외)

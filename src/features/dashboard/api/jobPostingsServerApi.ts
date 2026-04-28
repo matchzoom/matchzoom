@@ -11,7 +11,7 @@ import {
   type ProfileRow,
   type RawItem,
 } from '../utils/jobPostings';
-import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_PROFILE } from '@/shared/constants/testUser';
 import type {
   JobPosting,
   JobPostingsFilterOptions,

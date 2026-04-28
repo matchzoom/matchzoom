@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { SIDO_LIST } from '../utils/regions';
 import {
   surveySchema,
@@ -16,9 +16,8 @@ import {
   HOPE_ACTIVITIES_VALUES,
 } from '../utils/options';
 import { submitSurvey } from '../api/surveyApi';
-import { generateMatch } from '@/features/match/api/matchApi';
-import { getProfile } from '@/features/profile/api/profileApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { generateMatch } from '@/shared/api/matchApi';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import type { Profile } from '@/shared/types/profile';
 
 export type { SurveyFormValues };
@@ -75,7 +74,10 @@ const INITIAL: SurveyFormValues = {
   hope_activities_other: '',
 };
 
-export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
+export function useSurveyForm(
+  mode: 'create' | 'edit' = 'create',
+  existingProfile?: Profile,
+) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2>(1);
@@ -94,12 +96,6 @@ export function useSurveyForm(mode: 'create' | 'edit' = 'create') {
   } = useForm<SurveyFormValues>({
     resolver: zodResolver(surveySchema),
     defaultValues: INITIAL,
-  });
-
-  const { data: existingProfile } = useQuery({
-    queryKey: QUERY_KEYS.profile,
-    queryFn: getProfile,
-    enabled: mode === 'edit',
   });
 
   useEffect(() => {

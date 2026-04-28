@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { logout } from '@/shared/api/authApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import {
   STORAGE_KEY_JOB_SIGUNGU_FILTER,
   STORAGE_KEY_JOB_FITLEVEL_FILTER,
-} from '@/shared/utils/storageKeys';
+} from '@/shared/constants/storageKeys';
 
 export function useLogout() {
   const queryClient = useQueryClient();

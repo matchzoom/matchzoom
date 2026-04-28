@@ -9,7 +9,7 @@ import {
 
 import type { JobPosting, JobPostingsPage } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 
 type CachedJobList = InfiniteData<JobPostingsPage> | undefined;

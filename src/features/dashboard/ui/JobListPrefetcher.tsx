@@ -9,8 +9,8 @@ import {
   getJobPostingsPage,
 } from '../api/jobPostingsServerApi';
 import { JOB_POSTINGS_PAGE_SIZE_FIRST } from '../hooks/useJobPostings';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
-import { JobListClient } from './JobListClient';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
+import { JobListClient } from '../JobListClient';
 
 type Props = {
   userId: string;

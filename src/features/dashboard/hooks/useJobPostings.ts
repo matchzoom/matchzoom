@@ -6,7 +6,7 @@ import { getJobPostingsPage } from '../api/jobPostingsApi';
 import {
   QUERY_KEYS,
   type JobPostingsListFilters,
-} from '@/shared/utils/queryKeys';
+} from '@/shared/constants/queryKeys';
 
 export const JOB_POSTINGS_PAGE_SIZE_FIRST = 12;
 export const JOB_POSTINGS_PAGE_SIZE_NEXT = 3;

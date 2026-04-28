@@ -12,8 +12,8 @@ import { Footer } from '@/widgets/footer';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getServerSession } from '@/shared/utils/serverSession';
 import type { CurrentUser } from '@/shared/types/user';
-import { TEST_USER } from '@/shared/utils/testUser';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { TEST_USER } from '@/shared/constants/testUser';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import './globals.css';
 
 const pretendard = localFont({

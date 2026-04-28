@@ -5,11 +5,8 @@ import { JobListPrefetcher } from '@/features/dashboard/ui/JobListPrefetcher';
 import { JobListSkeleton } from '@/features/dashboard/ui/JobListSkeleton';
 import { getDashboardData } from '@/features/dashboard/api/dashboardServerApi';
 import { LandingPage } from '@/features/landing';
-import {
-  toPersonalityAxes,
-  toMatchedJobs,
-} from '@/features/match/utils/convert';
-import { TEST_PROFILE, TEST_MATCH } from '@/shared/utils/testUser';
+import { toPersonalityAxes, toMatchedJobs } from '@/shared/utils/matchConvert';
+import { TEST_PROFILE, TEST_MATCH } from '@/shared/constants/testUser';
 
 export default async function Home() {
   const session = await getServerSession();

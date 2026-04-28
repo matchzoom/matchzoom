@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import type { FitLevel } from '@/shared/types/job';
-import { STORAGE_KEY_JOB_FITLEVEL_FILTER } from '@/shared/utils/storageKeys';
+import { STORAGE_KEY_JOB_FITLEVEL_FILTER } from '@/shared/constants/storageKeys';
 
 const STORAGE_KEY = STORAGE_KEY_JOB_FITLEVEL_FILTER;
 
