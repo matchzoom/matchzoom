@@ -19,6 +19,7 @@ export default [
       'src/global.d.ts',
       'node_modules/**',
       'dist/**',
+      'scripts/**',
       '*.config.js',
       '*.config.ts',
       'commitlint.config.js',

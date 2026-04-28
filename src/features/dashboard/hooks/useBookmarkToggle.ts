@@ -1,12 +1,31 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query';
 
-import type { JobPosting } from '@/shared/types/job';
+import type { JobPosting, JobPostingsPage } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
 import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+
+type CachedJobList = InfiniteData<JobPostingsPage> | undefined;
+
+function flipBookmark(data: CachedJobList, jobId: number): CachedJobList {
+  if (!data) return data;
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.map((p) =>
+        p.id === jobId ? { ...p, bookmarked: !p.bookmarked } : p,
+      ),
+    })),
+  };
+}
 
 export function useBookmarkToggle() {
   const queryClient = useQueryClient();
@@ -26,26 +45,26 @@ export function useBookmarkToggle() {
           ),
 
     onMutate: async (job) => {
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.jobPostings });
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.jobPostings.all,
+      });
 
-      const previous = queryClient.getQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-      );
+      const previous = queryClient.getQueriesData<
+        InfiniteData<JobPostingsPage>
+      >({ queryKey: QUERY_KEYS.jobPostings.all });
 
-      queryClient.setQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-        (old = []) =>
-          old.map((p) =>
-            p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
-          ),
+      queryClient.setQueriesData<InfiniteData<JobPostingsPage>>(
+        { queryKey: QUERY_KEYS.jobPostings.all },
+        (old) => flipBookmark(old, job.id),
       );
 
       return { previous };
     },
 
     onError: (_err, _job, ctx) => {
-      if (ctx?.previous) {
-        queryClient.setQueryData(QUERY_KEYS.jobPostings, ctx.previous);
+      if (!ctx?.previous) return;
+      for (const [key, data] of ctx.previous) {
+        queryClient.setQueryData(key, data);
       }
     },
   });
