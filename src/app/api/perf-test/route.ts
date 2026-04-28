@@ -17,8 +17,8 @@ export type PerfTestItem = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const offset = Number(searchParams.get('offset') ?? '0');
-  const limit = Number(searchParams.get('limit') ?? '12');
+  const offset = parseInt(searchParams.get('offset') ?? '0', 10) || 0;
+  const limit = parseInt(searchParams.get('limit') ?? '12', 10) || 12;
 
   const start = performance.now();
   // limit+1개 요청해서 다음 페이지 존재 여부 판단 (별도 count 쿼리 불필요)
