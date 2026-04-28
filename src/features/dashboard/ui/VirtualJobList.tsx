@@ -48,7 +48,7 @@ export function VirtualJobList({
               data-index={virtualRow.index}
               ref={virtualizer.measureElement}
               role="presentation"
-              className="mb-6 grid gap-6"
+              className="pb-6 grid gap-6"
               style={{
                 gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               }}
