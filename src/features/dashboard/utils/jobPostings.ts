@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 
-import type { FitLevel, JobPosting } from '@/shared/types/job';
+import type { FilterOptions, FitLevel, JobPosting } from '@/shared/types/job';
 
 export type RawItem = {
   busplaName?: string;
@@ -29,8 +29,6 @@ export type ProfileRow = {
   communication: string;
   region_primary: string;
 };
-
-const LIMIT = 20;
 
 const ENV_KEYS: (keyof RawItem)[] = [
   'envBothHands',
@@ -68,6 +66,11 @@ export function parseJobItems(xml: string): RawItem[] {
   const parsed = parser.parse(xml);
   const raw: RawItem | RawItem[] = parsed?.response?.body?.items?.item ?? [];
   return Array.isArray(raw) ? raw : [raw];
+}
+
+export function parseTotalCount(xml: string): number {
+  const parsed = parser.parse(xml);
+  return Number(parsed?.response?.body?.totalCount ?? 0);
 }
 
 export function dedupeItems(items: RawItem[]): RawItem[] {
@@ -158,15 +161,64 @@ export function rankPostings(
   bookmarkedUrls: Set<string>,
 ): JobPosting[] {
   if (!profile) {
-    return items
-      .slice(0, LIMIT)
-      .map((item) => toPosting(item, undefined, undefined, bookmarkedUrls));
+    return items.map((item) =>
+      toPosting(item, undefined, undefined, bookmarkedUrls),
+    );
   }
 
   return items
     .filter((item) => matchesProfileRegion(item.regagnName, profile))
     .map((item) => ({ item, score: computeScore(item, profile) }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, LIMIT)
     .map(({ item, score }) => toPosting(item, profile, score, bookmarkedUrls));
+}
+
+const FIT_LEVEL_ORDER: FitLevel[] = ['잘 맞아요', '도전해볼 수 있어요'];
+
+function extractSigungu(location: string): string | null {
+  const parts = location.trim().split(/\s+/);
+  return parts[1] ?? null;
+}
+
+export function applyFilters(
+  items: JobPosting[],
+  sigungu: string | null,
+  fitLevel: FitLevel | null,
+): JobPosting[] {
+  let result = items;
+  if (sigungu) {
+    result = result.filter((p) => extractSigungu(p.location) === sigungu);
+  }
+  if (fitLevel) {
+    result = result.filter((p) => p.fitLevel === fitLevel);
+  }
+  return result;
+}
+
+export function extractFilterOptions(
+  allItems: JobPosting[],
+  sigungu: string | null,
+  province: string | null,
+): FilterOptions {
+  const sigunguSet = new Set<string>();
+  for (const posting of allItems) {
+    if (province && !posting.location.startsWith(province)) continue;
+    const sg = extractSigungu(posting.location);
+    if (sg) sigunguSet.add(sg);
+  }
+  const sigunguList = Array.from(sigunguSet).sort((a, b) =>
+    a.localeCompare(b, 'ko'),
+  );
+
+  const sigunguFiltered = sigungu
+    ? allItems.filter((p) => extractSigungu(p.location) === sigungu)
+    : allItems;
+
+  const fitLevelSet = new Set<FitLevel>();
+  for (const posting of sigunguFiltered) {
+    if (posting.fitLevel) fitLevelSet.add(posting.fitLevel);
+  }
+  const fitLevelList = FIT_LEVEL_ORDER.filter((f) => fitLevelSet.has(f));
+
+  return { sigunguList, fitLevelList };
 }

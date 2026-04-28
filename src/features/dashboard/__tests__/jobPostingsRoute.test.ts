@@ -24,10 +24,12 @@ const mockAuth = (userId: string | null) => {
   }
 };
 
-// fast-xml-parser가 숫자 필드를 number로 파싱하므로 XML은 하드코딩 문자열로 고정
 const JOB_XML_ONE_ITEM = `<?xml version="1.0" encoding="UTF-8"?>
 <response>
   <body>
+    <totalCount>1</totalCount>
+    <numOfRows>100</numOfRows>
+    <pageNo>1</pageNo>
     <items>
       <item>
         <rno>1</rno>
@@ -47,7 +49,44 @@ const JOB_XML_ONE_ITEM = `<?xml version="1.0" encoding="UTF-8"?>
 </response>`;
 
 const JOB_XML_EMPTY = `<?xml version="1.0" encoding="UTF-8"?>
-<response><body><items></items></body></response>`;
+<response><body><totalCount>0</totalCount><items></items></body></response>`;
+
+const JOB_XML_MIXED_REGIONS = `<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <body>
+    <totalCount>2</totalCount>
+    <numOfRows>100</numOfRows>
+    <pageNo>1</pageNo>
+    <items>
+      <item>
+        <rno>1</rno>
+        <busplaName>경기 회사</busplaName>
+        <jobNm>사무보조원</jobNm>
+        <compAddr>경기도 수원시 팔달구</compAddr>
+        <empType>정규직</empType>
+        <salary>2,000,000</salary>
+        <salaryType>월급</salaryType>
+        <termDate>20260101~20260531</termDate>
+        <reqCareer>신입</reqCareer>
+        <reqEduc>고졸</reqEduc>
+        <regagnName>한국장애인고용공단 경기지사</regagnName>
+      </item>
+      <item>
+        <rno>2</rno>
+        <busplaName>서울 회사</busplaName>
+        <jobNm>사무보조원</jobNm>
+        <compAddr>서울특별시 강남구</compAddr>
+        <empType>정규직</empType>
+        <salary>2,000,000</salary>
+        <salaryType>월급</salaryType>
+        <termDate>20260101~20260531</termDate>
+        <reqCareer>신입</reqCareer>
+        <reqEduc>고졸</reqEduc>
+        <regagnName>한국장애인고용공단 경기지사</regagnName>
+      </item>
+    </items>
+  </body>
+</response>`;
 
 const mockProfileRow = {
   mobility: '도보 이동 가능',
@@ -57,13 +96,13 @@ const mockProfileRow = {
   region_primary: '경기도 수원시',
 };
 
-const makeRequest = () =>
-  new Request('http://localhost/api/job-postings', { method: 'GET' });
+const makeRequest = (search = '') =>
+  new Request(`http://localhost/api/job-postings${search}`, { method: 'GET' });
 
 const mockFetchWith = (xml: string) =>
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue({ text: () => Promise.resolve(xml) }),
+    vi.fn().mockResolvedValue({ ok: true, text: () => Promise.resolve(xml) }),
   );
 
 describe('GET /api/job-postings', () => {
@@ -79,7 +118,7 @@ describe('GET /api/job-postings', () => {
     vi.unstubAllGlobals();
   });
 
-  it('공고 목록을 반환한다', async () => {
+  it('페이지네이션 응답 형태로 공고를 반환한다', async () => {
     mockAuth('1');
     mockSupabaseFetch
       .mockResolvedValueOnce([mockProfileRow])
@@ -89,12 +128,64 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
-    expect(data[0]).toMatchObject({
+    expect(data).toHaveProperty('items');
+    expect(data).toHaveProperty('hasMore');
+    expect(data).toHaveProperty('offset');
+    expect(data).toHaveProperty('filterOptions');
+    expect(Array.isArray(data.items)).toBe(true);
+    expect(data.items[0]).toMatchObject({
       companyName: '테스트 회사',
       title: '사무보조원',
       salary: '2,000,000원 (월급)',
     });
+    expect(data.offset).toBe(0);
+  });
+
+  it('filterOptions에 시군구·적합도 목록이 포함된다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest());
+    const data = await res.json();
+    expect(data.filterOptions.sigunguList).toContain('수원시');
+    expect(Array.isArray(data.filterOptions.fitLevelList)).toBe(true);
+  });
+
+  it('sigunguList는 유저 프로필의 province로 시작하는 공고만 포함한다', async () => {
+    mockFetchWith(JOB_XML_MIXED_REGIONS);
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest());
+    const data = await res.json();
+    expect(data.filterOptions.sigunguList).toContain('수원시');
+    expect(data.filterOptions.sigunguList).not.toContain('강남구');
+  });
+
+  it('limit 파라미터를 적용한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?offset=0&limit=12'));
+    const data = await res.json();
+    expect(data.items.length).toBeLessThanOrEqual(12);
+  });
+
+  it('sigungu 필터를 적용한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?sigungu=다른시'));
+    const data = await res.json();
+    expect(data.items).toEqual([]);
   });
 
   it('프로필 없으면 필터링 없이 목록을 반환한다', async () => {
@@ -105,11 +196,11 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
+    expect(Array.isArray(data.items)).toBe(true);
   });
 
   it('북마크된 공고는 bookmarked: true로 반환한다', async () => {
-    const detailUrl = `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent('테스트 회사')}`;
+    const detailUrl = `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent('테스트 회사')}#s27xov`;
 
     mockAuth('1');
     mockSupabaseFetch
@@ -120,11 +211,13 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    const bookmarked = data.find((p: { bookmarked: boolean }) => p.bookmarked);
+    const bookmarked = data.items.find(
+      (p: { bookmarked: boolean }) => p.bookmarked,
+    );
     expect(bookmarked).toBeDefined();
   });
 
-  it('공고가 없으면 빈 배열을 반환한다', async () => {
+  it('공고가 없으면 items가 빈 배열이다', async () => {
     mockFetchWith(JOB_XML_EMPTY);
     mockAuth('1');
     mockSupabaseFetch
@@ -135,7 +228,8 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(data).toEqual([]);
+    expect(data.items).toEqual([]);
+    expect(data.hasMore).toBe(false);
   });
 
   it('쿠키 없으면 401을 반환한다', async () => {

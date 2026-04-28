@@ -17,6 +17,9 @@ type JobListSectionProps = {
   fitLevelList?: FitLevel[];
   selectedFitLevel?: FitLevel | null;
   onSelectFitLevel?: (fitLevel: FitLevel | null) => void;
+  sentinelRef?: (node: HTMLElement | null) => void;
+  hasMore?: boolean;
+  isFetchingNextPage?: boolean;
 };
 
 export function JobListSection({
@@ -31,6 +34,9 @@ export function JobListSection({
   fitLevelList = [],
   selectedFitLevel = null,
   onSelectFitLevel,
+  sentinelRef,
+  hasMore = false,
+  isFetchingNextPage = false,
 }: JobListSectionProps) {
   return (
     <section aria-labelledby="job-list-heading">
@@ -64,14 +70,16 @@ export function JobListSection({
           </div>
         </div>
       ) : onSelectSigungu && onSelectFitLevel ? (
-        <JobRegionFilter
-          sigunguList={sigunguList}
-          selectedSigungu={selectedSigungu}
-          onSelectSigungu={onSelectSigungu}
-          fitLevelList={fitLevelList}
-          selectedFitLevel={selectedFitLevel}
-          onSelectFitLevel={onSelectFitLevel}
-        />
+        <div className="sticky top-0 z-20 bg-[var(--color-bg)]">
+          <JobRegionFilter
+            sigunguList={sigunguList}
+            selectedSigungu={selectedSigungu}
+            onSelectSigungu={onSelectSigungu}
+            fitLevelList={fitLevelList}
+            selectedFitLevel={selectedFitLevel}
+            onSelectFitLevel={onSelectFitLevel}
+          />
+        </div>
       ) : null}
 
       {isLoading || isLoadingUser ? (
@@ -102,16 +110,26 @@ export function JobListSection({
           </p>
         </div>
       ) : (
-        <ul
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          aria-label="채용공고 목록"
-        >
-          {postings.map((job) => (
-            <li key={job.id} className="min-w-0">
-              <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            aria-label="채용공고 목록"
+          >
+            {postings.map((job) => (
+              <li key={job.id} className="min-w-0">
+                <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
+              </li>
+            ))}
+          </ul>
+          {hasMore && sentinelRef && (
+            <div ref={sentinelRef} aria-hidden="true" className="h-1 w-full" />
+          )}
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-4">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
+            </div>
+          )}
+        </>
       )}
     </section>
   );

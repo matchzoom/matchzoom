@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 import type { FitLevel } from '@/shared/types/job';
 import { cn } from '@/shared/utils/cn';
 
@@ -43,7 +43,7 @@ export function JobRegionFilter({
         <div
           role="group"
           aria-label="시/군/구 필터"
-          className="mb-2 flex flex-wrap gap-2"
+          className="mb-2 flex flex-wrap items-center gap-2"
         >
           <button
             type="button"
@@ -59,24 +59,41 @@ export function JobRegionFilter({
             전체
           </button>
 
-          <div aria-hidden="true" className="w-px self-stretch bg-gray-300" />
+          <div
+            aria-hidden="true"
+            className="h-6 w-px self-stretch bg-gray-300"
+          />
 
-          {sigunguList.map((sigungu) => (
-            <button
-              key={sigungu}
-              type="button"
-              aria-pressed={selectedSigungu === sigungu}
-              onClick={() => onSelectSigungu(sigungu)}
+          <div className="relative">
+            <select
+              aria-label="시/군/구 선택"
+              value={selectedSigungu ?? ''}
+              onChange={(e) => onSelectSigungu(e.target.value || null)}
               className={cn(
-                'h-8 cursor-pointer rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
-                selectedSigungu === sigungu
+                'h-8 cursor-pointer appearance-none rounded-sm border pl-3 pr-8 text-[0.8125rem] font-semibold transition-colors',
+                'focus:border-primary focus-visible:[outline-offset:0]',
+                selectedSigungu !== null
                   ? 'border-primary bg-primary-tag text-primary'
                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
               )}
             >
-              {sigungu}
-            </button>
-          ))}
+              <option value="">지역 선택</option>
+              {sigunguList.map((sigungu) => (
+                <option key={sigungu} value={sigungu}>
+                  {sigungu}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={16}
+              strokeWidth={1.5}
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute right-2 top-1/2 -translate-y-1/2',
+                selectedSigungu !== null ? 'text-primary' : 'text-gray-500',
+              )}
+            />
+          </div>
         </div>
       )}
 

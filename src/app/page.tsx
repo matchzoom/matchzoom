@@ -20,10 +20,6 @@ export default async function Home() {
       : await getDashboardData(session.userId);
 
     if (profile) {
-      const profileProvinces = profile.region_primary?.trim()
-        ? [profile.region_primary.trim().split(/\s+/)[0]]
-        : [];
-
       return (
         <div className="py-10 md:py-16">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-[60px] px-4 md:px-5 lg:px-6">
@@ -48,7 +44,6 @@ export default async function Home() {
               <Suspense fallback={<JobListSkeleton />}>
                 <JobListPrefetcher
                   userId={session.userId}
-                  profileProvinces={profileProvinces}
                   userName={profile.name}
                 />
               </Suspense>

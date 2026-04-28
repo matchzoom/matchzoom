@@ -20,10 +20,6 @@ export function useDashboard() {
     queryFn: getMatchResult,
   });
 
-  const profileProvinces = profile?.region_primary
-    ? [profile.region_primary.trim().split(/\s+/)[0]]
-    : [];
-
   return {
     isPending: isProfilePending || isMatchPending,
     userName: profile?.name ?? '',
@@ -32,6 +28,5 @@ export function useDashboard() {
       : [],
     personalitySummary: matchResult?.summary_text ?? '',
     matchedJobs: matchResult ? toMatchedJobs(matchResult.top3_jobs) : [],
-    profileProvinces,
   };
 }

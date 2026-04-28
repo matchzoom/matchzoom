@@ -28,3 +28,15 @@ export type PersonalityAxis = {
   value: number;
   fullMark: number;
 };
+
+export type FilterOptions = {
+  sigunguList: string[];
+  fitLevelList: FitLevel[];
+};
+
+export type PaginatedJobPostings = {
+  items: JobPosting[];
+  hasMore: boolean;
+  offset: number;
+  filterOptions: FilterOptions;
+};

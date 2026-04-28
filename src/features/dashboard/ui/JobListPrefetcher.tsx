@@ -9,24 +9,23 @@ import { JobListClient } from './JobListClient';
 
 type Props = {
   userId: string;
-  profileProvinces: string[];
   userName: string;
 };
 
-export async function JobListPrefetcher({
-  userId,
-  profileProvinces,
-  userName,
-}: Props) {
+export async function JobListPrefetcher({ userId, userName }: Props) {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: QUERY_KEYS.jobPostings,
-    queryFn: () => getJobPostingsData(userId),
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: [
+      ...QUERY_KEYS.jobPostingsInfinite,
+      { sigungu: null, fitLevel: null },
+    ],
+    queryFn: () => getJobPostingsData(userId, { offset: 0, limit: 12 }),
+    initialPageParam: 0,
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <JobListClient profileProvinces={profileProvinces} userName={userName} />
+      <JobListClient userName={userName} />
     </HydrationBoundary>
   );
 }

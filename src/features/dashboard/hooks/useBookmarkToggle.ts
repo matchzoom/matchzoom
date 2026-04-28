@@ -1,12 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query';
 
-import type { JobPosting } from '@/shared/types/job';
+import type { JobPosting, PaginatedJobPostings } from '@/shared/types/job';
 import { addBookmark, removeBookmark } from '../api/bookmarkApi';
 import { QUERY_KEYS } from '@/shared/utils/queryKeys';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+
+type InfiniteJobData = InfiniteData<PaginatedJobPostings>;
 
 export function useBookmarkToggle() {
   const queryClient = useQueryClient();
@@ -26,27 +32,34 @@ export function useBookmarkToggle() {
           ),
 
     onMutate: async (job) => {
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.jobPostings });
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.jobPostingsInfinite,
+      });
 
-      const previous = queryClient.getQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-      );
+      const queries = queryClient.getQueriesData<InfiniteJobData>({
+        queryKey: QUERY_KEYS.jobPostingsInfinite,
+      });
 
-      queryClient.setQueryData<JobPosting[]>(
-        QUERY_KEYS.jobPostings,
-        (old = []) =>
-          old.map((p) =>
-            p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
-          ),
-      );
+      queries.forEach(([queryKey, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<InfiniteJobData>(queryKey, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map((p) =>
+              p.id === job.id ? { ...p, bookmarked: !p.bookmarked } : p,
+            ),
+          })),
+        });
+      });
 
-      return { previous };
+      return { previous: queries };
     },
 
     onError: (_err, _job, ctx) => {
-      if (ctx?.previous) {
-        queryClient.setQueryData(QUERY_KEYS.jobPostings, ctx.previous);
-      }
+      ctx?.previous?.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
     },
   });
 
