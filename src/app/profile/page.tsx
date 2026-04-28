@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useProfile } from '@/shared/hooks/useProfile';
@@ -14,7 +14,7 @@ import { ProfileEmptyView } from '@/features/profile/ui/ProfileEmptyView';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { type ProfileTab } from '@/features/profile/utils/profileTabs';
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
@@ -92,5 +92,13 @@ export default function ProfilePage() {
       onEdit={handleEdit}
       onBookmarkToggle={(job) => handleBookmarkRemove(job.detailUrl ?? '')}
     />
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfilePageContent />
+    </Suspense>
   );
 }
