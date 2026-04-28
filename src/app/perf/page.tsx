@@ -468,7 +468,7 @@ function ModeButton({
         'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
         active
           ? 'bg-primary text-white'
-          : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
+          : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
       ].join(' ')}
     >
       {children}
@@ -491,7 +491,7 @@ function Metric({
     <div className="flex items-baseline gap-1" title={note}>
       <span className="text-[0.6875rem] text-gray-400">{label}</span>
       <span
-        className={`text-xs font-semibold ${highlight ? 'text-red-500' : 'text-gray-800'}`}
+        className={`text-xs font-semibold ${highlight ? 'text-red-500' : 'text-gray-900'}`}
       >
         {value}
       </span>
