@@ -1,7 +1,7 @@
 import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { isApiError } from '@/shared/utils/errorGuards';
-import { TEST_USER_ID } from '@/shared/utils/testUser';
+import { TEST_USER_ID } from '@/shared/constants/testUser';
 
 type BookmarkRow = {
   id: number;

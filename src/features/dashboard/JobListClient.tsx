@@ -1,12 +1,13 @@
 'use client';
 
-import { useInfiniteJobPostings } from '../hooks/useInfiniteJobPostings';
-import { useJobRegionFilter } from '../hooks/useJobRegionFilter';
-import { useJobFitFilter } from '../hooks/useJobFitFilter';
-import { useBookmarkToggle } from '../hooks/useBookmarkToggle';
-import { useBreakpointLimit } from '../hooks/useBreakpointLimit';
-import { JobListSection } from './JobListSection';
+import { useInfiniteJobPostings } from './hooks/useInfiniteJobPostings';
+import { useJobRegionFilter } from './hooks/useJobRegionFilter';
+import { useJobFitFilter } from './hooks/useJobFitFilter';
+import { useBookmarkToggle } from './hooks/useBookmarkToggle';
+import { useBreakpointLimit } from './hooks/useBreakpointLimit';
+import { JobListSection } from './ui/JobListSection';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
+import { ROUTES } from '@/shared/constants/routes';
 
 type JobListClientProps = {
   profileProvinces: string[];
@@ -66,7 +67,7 @@ export function JobListClient({
           confirmLabel="로그인하기"
           cancelLabel="닫기"
           onConfirm={() => {
-            window.location.href = '/api/oauth/kakao/authorize';
+            window.location.href = ROUTES.KAKAO_AUTHORIZE;
           }}
           onClose={closeLoginModal}
         />

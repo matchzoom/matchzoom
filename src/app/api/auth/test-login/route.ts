@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { signSession } from '@/shared/utils/session';
-import { TEST_USER_ID } from '@/shared/utils/testUser';
+import { TEST_USER_ID } from '@/shared/constants/testUser';
 
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 

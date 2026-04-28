@@ -1,1 +1,1 @@
-export { JobListClient } from './ui/JobListClient';
+export { JobListClient } from './JobListClient';

@@ -6,7 +6,7 @@ import {
   rankPostings,
   type ProfileRow,
 } from '@/features/dashboard/utils/jobPostings';
-import { TEST_USER_ID, TEST_PROFILE } from '@/shared/utils/testUser';
+import { TEST_USER_ID, TEST_PROFILE } from '@/shared/constants/testUser';
 
 export const GET = createAuthorizedRoute(async ({ userId, request }) => {
   const { searchParams } = new URL(request.url);

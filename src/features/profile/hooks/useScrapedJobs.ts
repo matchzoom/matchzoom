@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { getBookmarks } from '../api/bookmarksApi';
-import { QUERY_KEYS } from '@/shared/utils/queryKeys';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 
 export function useScrapedJobs() {
   return useQuery({

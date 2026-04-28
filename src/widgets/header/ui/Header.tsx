@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { User, Sun, Moon } from 'lucide-react';
 
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+import { ROUTES } from '@/shared/constants/routes';
 import { useLogout } from '@/shared/hooks/useLogout';
 import { useTestLogin } from '@/shared/hooks/useTestLogin';
 import { useTestLogout } from '@/shared/hooks/useTestLogout';
@@ -92,7 +93,7 @@ export function Header({ initialUser }: HeaderProps) {
                 variant="secondary"
                 size="md"
                 onClick={() => {
-                  window.location.href = '/api/oauth/kakao/authorize';
+                  window.location.href = ROUTES.KAKAO_AUTHORIZE;
                 }}
               >
                 로그인

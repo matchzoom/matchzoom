@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { JobPosting } from '@/shared/types/job';
-import { STORAGE_KEY_JOB_SIGUNGU_FILTER } from '@/shared/utils/storageKeys';
+import { STORAGE_KEY_JOB_SIGUNGU_FILTER } from '@/shared/constants/storageKeys';
 
 const STORAGE_KEY = STORAGE_KEY_JOB_SIGUNGU_FILTER;
 

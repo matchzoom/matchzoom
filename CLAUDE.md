@@ -54,12 +54,13 @@ src/
 ├── widgets/   ← 독립 UI 블록 (GNB, Footer, 카드 목록 등)
 ├── features/  ← 사용자 시나리오 단위 기능
 └── shared/    ← 전 레이어에서 공유하는 코드
-    ├── ui/        ← 재사용 UI 컴포넌트 (Button, Modal 등)
-    ├── api/       ← raw fetch 함수만
-    ├── hooks/     ← TanStack Query 래퍼 훅
-    ├── utils/     ← 순수 함수, 포매터, 상수
-    ├── libs/      ← 서드파티 라이브러리 설정·래퍼
-    └── types/     ← Zod 스키마 + 추론된 TS 타입
+    ├── ui/           ← 재사용 UI 컴포넌트 (Button, Modal 등)
+    ├── api/          ← raw fetch 함수만
+    ├── hooks/        ← TanStack Query 래퍼 훅
+    ├── utils/        ← 순수 함수, 포매터
+    ├── constants/    ← 앱 전역 상수 (쿼리키, 스토리지키, 목 데이터 등)
+    ├── libs/         ← 서드파티 라이브러리 설정·래퍼
+    └── types/        ← Zod 스키마 + 추론된 TS 타입
 ```
 
 **단방향 규칙 (ESLint로 자동 검증):**
@@ -92,8 +93,15 @@ src/
 
 ### `shared/utils/`
 
-- 순수 함수, 포매터, 상수
+- 순수 함수, 포매터만
+- 상수 금지 — 상수는 `constants/`에 위치
 - Zod 스키마 금지 (types/에 위치)
+- React 의존 금지
+
+### `shared/constants/`
+
+- 앱 전역 상수만 (객체·문자열·배열 리터럴)
+- 함수 금지 — 함수가 필요하면 `utils/`에 위치
 - React 의존 금지
 
 ### `features/[x]/`
