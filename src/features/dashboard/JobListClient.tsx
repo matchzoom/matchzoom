@@ -6,9 +6,8 @@ import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { ROUTES } from '@/shared/constants/routes';
 import { useBookmarkToggle } from './hooks/useBookmarkToggle';
 import { useJobFilterOptions } from './hooks/useJobFilterOptions';
-import { useJobFitFilter } from './hooks/useJobFitFilter';
+import { useJobFilter } from './hooks/useJobFilter';
 import { useJobPostings } from './hooks/useJobPostings';
-import { useJobRegionFilter } from './hooks/useJobRegionFilter';
 import { JobListSection } from './ui/JobListSection';
 
 type JobListClientProps = {
@@ -20,16 +19,11 @@ export function JobListClient({ userName }: JobListClientProps) {
   const sigunguList = filterOptions?.sigunguList ?? [];
   const fitLevelList = filterOptions?.fitLevels ?? [];
 
-  const { selectedSigungu, handleSelectSigungu } =
-    useJobRegionFilter(sigunguList);
-  const { selectedFitLevel, handleSelectFitLevel } =
-    useJobFitFilter(fitLevelList);
+  const { sigungu, fitLevel, handleSelectSigungu, handleSelectFitLevel } =
+    useJobFilter();
 
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useJobPostings({
-      sigungu: selectedSigungu,
-      fitLevel: selectedFitLevel,
-    });
+    useJobPostings({ sigungu, fitLevel });
 
   const postings = useMemo(
     () => data?.pages.flatMap((page) => page.items) ?? [],
@@ -50,10 +44,10 @@ export function JobListClient({ userName }: JobListClientProps) {
         postings={postings}
         onBookmarkToggle={handleBookmarkToggle}
         sigunguList={sigunguList}
-        selectedSigungu={selectedSigungu}
+        selectedSigungu={sigungu}
         onSelectSigungu={handleSelectSigungu}
         fitLevelList={fitLevelList}
-        selectedFitLevel={selectedFitLevel}
+        selectedFitLevel={fitLevel}
         onSelectFitLevel={handleSelectFitLevel}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}

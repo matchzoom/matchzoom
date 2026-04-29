@@ -100,11 +100,11 @@ function matchesProfileRegion(
   regagnName: string | undefined,
   profile: ProfileRow,
 ): boolean {
-  if (!regagnName) return false;
+  if (!regagnName) return true;
   const city = agencyCity(regagnName);
-  if (!city) return false;
+  if (!city) return true;
   const primaryCity = profile.region_primary.split(' ')[0];
-  return primaryCity.startsWith(city);
+  return primaryCity.startsWith(city) || city.startsWith(primaryCity);
 }
 
 function computeScore(item: RawItem, profile: ProfileRow): number {

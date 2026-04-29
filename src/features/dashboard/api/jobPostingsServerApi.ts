@@ -58,7 +58,9 @@ export async function fetchAllExternalPages(): Promise<RawItem[]> {
 }
 
 const getCachedRawItems = unstable_cache(
-  async () => dedupeItems(await fetchAllExternalPages()),
+  async () => {
+    return dedupeItems(await fetchAllExternalPages());
+  },
   ['job-postings-raw'],
   { revalidate: 300 },
 );
