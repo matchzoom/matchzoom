@@ -7,9 +7,7 @@ import {
   QUERY_KEYS,
   type JobPostingsListFilters,
 } from '@/shared/constants/queryKeys';
-
-export const JOB_POSTINGS_PAGE_SIZE_FIRST = 12;
-export const JOB_POSTINGS_PAGE_SIZE_NEXT = 3;
+import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 
 export function useJobPostings(filters: JobPostingsListFilters) {
   return useInfiniteQuery({
@@ -18,10 +16,7 @@ export function useJobPostings(filters: JobPostingsListFilters) {
       getJobPostingsPage(
         {
           cursor: pageParam,
-          limit:
-            pageParam === 0
-              ? JOB_POSTINGS_PAGE_SIZE_FIRST
-              : JOB_POSTINGS_PAGE_SIZE_NEXT,
+          limit: JOB_POSTINGS_PAGE_SIZE,
           sigungu: filters.sigungu,
           fitLevel: filters.fitLevel,
         },

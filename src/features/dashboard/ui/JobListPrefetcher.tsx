@@ -8,7 +8,7 @@ import {
   getJobPostingsFilterOptions,
   getJobPostingsPage,
 } from '../api/jobPostingsServerApi';
-import { JOB_POSTINGS_PAGE_SIZE_FIRST } from '../hooks/useJobPostings';
+import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import { JobListClient } from '../JobListClient';
 import type { FitLevel } from '@/shared/types/job';
@@ -35,7 +35,7 @@ export async function JobListPrefetcher({
       queryFn: () =>
         getJobPostingsPage(userId, {
           cursor: 0,
-          limit: JOB_POSTINGS_PAGE_SIZE_FIRST,
+          limit: JOB_POSTINGS_PAGE_SIZE,
           sigungu,
           fitLevel,
         }),
