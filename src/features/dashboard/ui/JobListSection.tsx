@@ -2,8 +2,8 @@
 
 import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
-import { JobCard } from './JobCard';
 import { JobRegionFilter } from './JobRegionFilter';
+import { VirtualJobList } from './VirtualJobList';
 
 type JobListSectionProps = {
   userName: string;
@@ -17,6 +17,9 @@ type JobListSectionProps = {
   fitLevelList?: FitLevel[];
   selectedFitLevel?: FitLevel | null;
   onSelectFitLevel?: (fitLevel: FitLevel | null) => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
 };
 
 export function JobListSection({
@@ -31,7 +34,13 @@ export function JobListSection({
   fitLevelList = [],
   selectedFitLevel = null,
   onSelectFitLevel,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  onLoadMore,
 }: JobListSectionProps) {
+  const showSkeleton = isLoading || isLoadingUser;
+  const showEmpty = !showSkeleton && postings.length === 0;
+
   return (
     <section aria-labelledby="job-list-heading">
       <h2
@@ -41,7 +50,7 @@ export function JobListSection({
         {isLoadingUser ? '사용자' : userName}님에게 맞는 채용공고
       </h2>
 
-      {isLoading || isLoadingUser ? (
+      {showSkeleton ? (
         <div className="mb-8">
           <div className="mb-2 flex flex-wrap gap-2">
             <Skeleton className="h-8 w-10 rounded-sm" />
@@ -74,7 +83,7 @@ export function JobListSection({
         />
       ) : null}
 
-      {isLoading || isLoadingUser ? (
+      {showSkeleton ? (
         <ul
           aria-busy="true"
           aria-label="채용공고 로딩 중"
@@ -92,7 +101,7 @@ export function JobListSection({
             </li>
           ))}
         </ul>
-      ) : postings.length === 0 ? (
+      ) : showEmpty ? (
         <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 py-16 text-center">
           <p className="text-[0.9375rem] font-semibold text-gray-700">
             희망 지역의 채용공고가 없어요
@@ -102,16 +111,13 @@ export function JobListSection({
           </p>
         </div>
       ) : (
-        <ul
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          aria-label="채용공고 목록"
-        >
-          {postings.map((job) => (
-            <li key={job.id} className="min-w-0">
-              <JobCard job={job} onBookmarkToggle={onBookmarkToggle} />
-            </li>
-          ))}
-        </ul>
+        <VirtualJobList
+          items={postings}
+          onBookmarkToggle={onBookmarkToggle}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={onLoadMore}
+        />
       )}
     </section>
   );

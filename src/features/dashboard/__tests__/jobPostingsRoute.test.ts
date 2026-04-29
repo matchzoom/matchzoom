@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { GET } from '@/app/api/job-postings/route';
 
+vi.mock('next/cache', () => ({
+  unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
+}));
 vi.mock('next/headers', () => ({ cookies: vi.fn() }));
 vi.mock('@/shared/api/supabaseFetch', () => ({ supabaseFetch: vi.fn() }));
 vi.mock('@/shared/utils/authCookies', () => ({ getAuthCookie: vi.fn() }));
 vi.mock('@/shared/utils/session', () => ({ verifySession: vi.fn() }));
 
+import { GET } from '@/app/api/job-postings/route';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { getAuthCookie } from '@/shared/utils/authCookies';
 import { verifySession } from '@/shared/utils/session';
@@ -24,18 +27,50 @@ const mockAuth = (userId: string | null) => {
   }
 };
 
-// fast-xml-parser가 숫자 필드를 number로 파싱하므로 XML은 하드코딩 문자열로 고정
-const JOB_XML_ONE_ITEM = `<?xml version="1.0" encoding="UTF-8"?>
+// 회사A: score 3 (잘 맞아요), 수원시
+// 회사B: score 2 (도전해볼 수 있어요), 성남시
+// 회사C: score 0 (도전해볼 수 있어요), 수원시
+const JOB_XML_MULTI = `<?xml version="1.0" encoding="UTF-8"?>
 <response>
   <body>
+    <totalCount>3</totalCount>
     <items>
       <item>
         <rno>1</rno>
-        <busplaName>테스트 회사</busplaName>
+        <busplaName>회사A</busplaName>
         <jobNm>사무보조원</jobNm>
         <compAddr>경기도 수원시 팔달구</compAddr>
         <empType>정규직</empType>
         <salary>2,000,000</salary>
+        <salaryType>월급</salaryType>
+        <termDate>20260101~20260531</termDate>
+        <reqCareer>신입</reqCareer>
+        <reqEduc>고졸</reqEduc>
+        <regagnName>한국장애인고용공단 경기지사</regagnName>
+        <envStndWalk>장시간 서서 일하기 어려움</envStndWalk>
+        <envLstnTalk>의사소통 어려움</envLstnTalk>
+      </item>
+      <item>
+        <rno>2</rno>
+        <busplaName>회사B</busplaName>
+        <jobNm>경비원</jobNm>
+        <compAddr>경기도 성남시 분당구</compAddr>
+        <empType>계약직</empType>
+        <salary>1,800,000</salary>
+        <salaryType>월급</salaryType>
+        <termDate>20260101~20260630</termDate>
+        <reqCareer>경력</reqCareer>
+        <reqEduc>고졸</reqEduc>
+        <regagnName>한국장애인고용공단 경기지사</regagnName>
+        <envStndWalk>장시간 서서 일하기 어려움</envStndWalk>
+      </item>
+      <item>
+        <rno>3</rno>
+        <busplaName>회사C</busplaName>
+        <jobNm>청소원</jobNm>
+        <compAddr>경기도 수원시 영통구</compAddr>
+        <empType>정규직</empType>
+        <salary>2,200,000</salary>
         <salaryType>월급</salaryType>
         <termDate>20260101~20260531</termDate>
         <reqCareer>신입</reqCareer>
@@ -47,7 +82,7 @@ const JOB_XML_ONE_ITEM = `<?xml version="1.0" encoding="UTF-8"?>
 </response>`;
 
 const JOB_XML_EMPTY = `<?xml version="1.0" encoding="UTF-8"?>
-<response><body><items></items></body></response>`;
+<response><body><totalCount>0</totalCount><items></items></body></response>`;
 
 const mockProfileRow = {
   mobility: '도보 이동 가능',
@@ -57,13 +92,16 @@ const mockProfileRow = {
   region_primary: '경기도 수원시',
 };
 
-const makeRequest = () =>
-  new Request('http://localhost/api/job-postings', { method: 'GET' });
+const makeRequest = (qs = '') =>
+  new Request(`http://localhost/api/job-postings${qs}`, { method: 'GET' });
 
 const mockFetchWith = (xml: string) =>
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue({ text: () => Promise.resolve(xml) }),
+    vi.fn().mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(xml),
+    }),
   );
 
 describe('GET /api/job-postings', () => {
@@ -71,7 +109,7 @@ describe('GET /api/job-postings', () => {
     vi.clearAllMocks();
     vi.stubEnv('JOB_API_BASE_URL', 'https://api.example.com/jobs');
     vi.stubEnv('JOB_API_KEY', 'test-key');
-    mockFetchWith(JOB_XML_ONE_ITEM);
+    mockFetchWith(JOB_XML_MULTI);
   });
 
   afterEach(() => {
@@ -79,7 +117,7 @@ describe('GET /api/job-postings', () => {
     vi.unstubAllGlobals();
   });
 
-  it('공고 목록을 반환한다', async () => {
+  it('기본 파라미터로 페이지(items + nextCursor)를 반환한다', async () => {
     mockAuth('1');
     mockSupabaseFetch
       .mockResolvedValueOnce([mockProfileRow])
@@ -89,42 +127,118 @@ describe('GET /api/job-postings', () => {
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
-    expect(data[0]).toMatchObject({
-      companyName: '테스트 회사',
-      title: '사무보조원',
-      salary: '2,000,000원 (월급)',
-    });
+    expect(data).toHaveProperty('items');
+    expect(data).toHaveProperty('nextCursor');
+    expect(Array.isArray(data.items)).toBe(true);
+    // 3개 모두 limit=12 안에 들어가므로 마지막 페이지
+    expect(data.items).toHaveLength(3);
+    expect(data.nextCursor).toBeNull();
+    // 점수 정렬: A → B → C
+    expect(data.items[0].companyName).toBe('회사A');
+    expect(data.items[0].fitLevel).toBe('잘 맞아요');
   });
 
-  it('프로필 없으면 필터링 없이 목록을 반환한다', async () => {
+  it('cursor + limit으로 슬라이스하고 nextCursor를 반환한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?cursor=0&limit=2'));
+    const data = await res.json();
+    expect(data.items).toHaveLength(2);
+    expect(data.items[0].companyName).toBe('회사A');
+    expect(data.items[1].companyName).toBe('회사B');
+    expect(data.nextCursor).toBe(2);
+  });
+
+  it('마지막 페이지에서 nextCursor는 null이다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?cursor=2&limit=2'));
+    const data = await res.json();
+    expect(data.items).toHaveLength(1);
+    expect(data.items[0].companyName).toBe('회사C');
+    expect(data.nextCursor).toBeNull();
+  });
+
+  it('sigungu 필터: 시군구 일치 항목만 반환한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?sigungu=수원시'));
+    const data = await res.json();
+    expect(data.items).toHaveLength(2);
+    expect(
+      data.items.map((p: { companyName: string }) => p.companyName),
+    ).toEqual(['회사A', '회사C']);
+  });
+
+  it('fitLevel 필터: 적합도 일치 항목만 반환한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(
+      makeRequest('?fitLevel=' + encodeURIComponent('잘 맞아요')),
+    );
+    const data = await res.json();
+    expect(data.items).toHaveLength(1);
+    expect(data.items[0].companyName).toBe('회사A');
+  });
+
+  it('정의되지 않은 fitLevel 값은 무시한다', async () => {
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest('?fitLevel=invalid'));
+    const data = await res.json();
+    expect(data.items).toHaveLength(3);
+  });
+
+  it('프로필 없으면 지역 필터링 없이 모든 항목을 반환한다', async () => {
     mockAuth('1');
     mockSupabaseFetch.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     const res = await GET(makeRequest());
-    expect(res.status).toBe(200);
-
     const data = await res.json();
-    expect(Array.isArray(data)).toBe(true);
+    expect(data.items).toHaveLength(3);
   });
 
   it('북마크된 공고는 bookmarked: true로 반환한다', async () => {
-    const detailUrl = `https://www.work24.go.kr/wk/a/b/1700/themeEmpInfoSrchList.do?thmaHrplCd=F00036&resultCnt=10&searchMode=Y&currentPageNo=1&pageIndex=1&sortField=DATE&sortOrderBy=DESC&srcKeyword=${encodeURIComponent('테스트 회사')}`;
+    // 첫 호출에서 회사A의 detailUrl을 받아 두 번째 호출에서 북마크 처리
+    mockAuth('1');
+    mockSupabaseFetch
+      .mockResolvedValueOnce([mockProfileRow])
+      .mockResolvedValueOnce([]);
+    const firstRes = await GET(makeRequest());
+    const firstData = await firstRes.json();
+    const targetUrl = firstData.items.find(
+      (p: { companyName: string }) => p.companyName === '회사A',
+    ).detailUrl;
 
     mockAuth('1');
     mockSupabaseFetch
       .mockResolvedValueOnce([mockProfileRow])
-      .mockResolvedValueOnce([{ posting_url: detailUrl }]);
+      .mockResolvedValueOnce([{ posting_url: targetUrl }]);
 
     const res = await GET(makeRequest());
-    expect(res.status).toBe(200);
-
     const data = await res.json();
-    const bookmarked = data.find((p: { bookmarked: boolean }) => p.bookmarked);
-    expect(bookmarked).toBeDefined();
+    const bookmarked = data.items.find(
+      (p: { bookmarked: boolean; companyName: string }) => p.bookmarked,
+    );
+    expect(bookmarked?.companyName).toBe('회사A');
   });
 
-  it('공고가 없으면 빈 배열을 반환한다', async () => {
+  it('공고가 없으면 빈 페이지를 반환한다', async () => {
     mockFetchWith(JOB_XML_EMPTY);
     mockAuth('1');
     mockSupabaseFetch
@@ -132,15 +246,13 @@ describe('GET /api/job-postings', () => {
       .mockResolvedValueOnce([]);
 
     const res = await GET(makeRequest());
-    expect(res.status).toBe(200);
-
     const data = await res.json();
-    expect(data).toEqual([]);
+    expect(data.items).toEqual([]);
+    expect(data.nextCursor).toBeNull();
   });
 
   it('쿠키 없으면 401을 반환한다', async () => {
     mockAuth(null);
-
     const res = await GET(makeRequest());
     expect(res.status).toBe(401);
   });

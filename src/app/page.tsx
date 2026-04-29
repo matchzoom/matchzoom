@@ -7,8 +7,29 @@ import { getDashboardData } from '@/features/dashboard/api/dashboardServerApi';
 import { LandingPage } from '@/features/landing';
 import { toPersonalityAxes, toMatchedJobs } from '@/shared/utils/matchConvert';
 import { TEST_PROFILE, TEST_MATCH } from '@/shared/constants/testUser';
+import type { FitLevel } from '@/shared/types/job';
 
-export default async function Home() {
+const VALID_FIT_LEVELS: readonly FitLevel[] = [
+  '잘 맞아요',
+  '도전해볼 수 있어요',
+  '힘들 수 있어요',
+];
+
+function parseFitLevel(value: string | undefined): FitLevel | null {
+  if (value && (VALID_FIT_LEVELS as string[]).includes(value))
+    return value as FitLevel;
+  return null;
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sigungu?: string; fitLevel?: string }>;
+}) {
+  const params = await searchParams;
+  const sigungu = params.sigungu ?? null;
+  const fitLevel = parseFitLevel(params.fitLevel);
+
   const session = await getServerSession();
 
   if (session) {
@@ -17,10 +38,6 @@ export default async function Home() {
       : await getDashboardData(session.userId);
 
     if (profile) {
-      const profileProvinces = profile.region_primary?.trim()
-        ? [profile.region_primary.trim().split(/\s+/)[0]]
-        : [];
-
       return (
         <div className="py-10 md:py-16">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-[60px] px-4 md:px-5 lg:px-6">
@@ -45,8 +62,9 @@ export default async function Home() {
               <Suspense fallback={<JobListSkeleton />}>
                 <JobListPrefetcher
                   userId={session.userId}
-                  profileProvinces={profileProvinces}
                   userName={profile.name}
+                  sigungu={sigungu}
+                  fitLevel={fitLevel}
                 />
               </Suspense>
             </section>

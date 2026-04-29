@@ -183,7 +183,7 @@ export function useSurveyForm(
     });
 
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.profile });
-    queryClient.removeQueries({ queryKey: QUERY_KEYS.jobPostings });
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.jobPostings.all });
     localStorage.removeItem('matchzoom-job-sigungu-filter');
     localStorage.removeItem('matchzoom-job-fitlevel-filter');
     setIsMatching(true);

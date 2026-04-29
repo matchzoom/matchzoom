@@ -1,35 +1,35 @@
 'use client';
 
-import { useJobPostings } from './hooks/useJobPostings';
-import { useJobRegionFilter } from './hooks/useJobRegionFilter';
-import { useJobFitFilter } from './hooks/useJobFitFilter';
-import { useBookmarkToggle } from './hooks/useBookmarkToggle';
-import { JobListSection } from './ui/JobListSection';
+import { useMemo } from 'react';
+
 import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 import { ROUTES } from '@/shared/constants/routes';
+import { useBookmarkToggle } from './hooks/useBookmarkToggle';
+import { useJobFilterOptions } from './hooks/useJobFilterOptions';
+import { useJobFilter } from './hooks/useJobFilter';
+import { useJobPostings } from './hooks/useJobPostings';
+import { JobListSection } from './ui/JobListSection';
 
 type JobListClientProps = {
-  profileProvinces: string[];
   userName: string;
 };
 
-export function JobListClient({
-  profileProvinces,
-  userName,
-}: JobListClientProps) {
-  const { data: postings, isPending } = useJobPostings();
-  const {
-    availableSigungu,
-    selectedSigungu,
-    filteredPostings: regionFiltered,
-    handleSelectSigungu,
-  } = useJobRegionFilter(postings ?? [], profileProvinces);
-  const {
-    availableFitLevels,
-    selectedFitLevel,
-    filteredPostings,
-    handleSelectFitLevel,
-  } = useJobFitFilter(regionFiltered);
+export function JobListClient({ userName }: JobListClientProps) {
+  const { data: filterOptions } = useJobFilterOptions();
+  const sigunguList = filterOptions?.sigunguList ?? [];
+  const fitLevelList = filterOptions?.fitLevels ?? [];
+
+  const { sigungu, fitLevel, handleSelectSigungu, handleSelectFitLevel } =
+    useJobFilter();
+
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useJobPostings({ sigungu, fitLevel });
+
+  const postings = useMemo(
+    () => data?.pages.flatMap((page) => page.items) ?? [],
+    [data],
+  );
+
   const {
     toggle: handleBookmarkToggle,
     loginModalOpen,
@@ -41,14 +41,17 @@ export function JobListClient({
       <JobListSection
         isLoading={isPending}
         userName={userName}
-        postings={filteredPostings}
+        postings={postings}
         onBookmarkToggle={handleBookmarkToggle}
-        sigunguList={availableSigungu}
-        selectedSigungu={selectedSigungu}
+        sigunguList={sigunguList}
+        selectedSigungu={sigungu}
         onSelectSigungu={handleSelectSigungu}
-        fitLevelList={availableFitLevels}
-        selectedFitLevel={selectedFitLevel}
+        fitLevelList={fitLevelList}
+        selectedFitLevel={fitLevel}
         onSelectFitLevel={handleSelectFitLevel}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={fetchNextPage}
       />
       {loginModalOpen && (
         <ConfirmModal

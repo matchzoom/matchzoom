@@ -3,30 +3,53 @@ import {
   dehydrate,
   HydrationBoundary,
 } from '@tanstack/react-query';
-import { getJobPostingsData } from '../api/jobPostingsServerApi';
+
+import {
+  getJobPostingsFilterOptions,
+  getJobPostingsPage,
+} from '../api/jobPostingsServerApi';
+import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import { JobListClient } from '../JobListClient';
+import type { FitLevel } from '@/shared/types/job';
 
 type Props = {
   userId: string;
-  profileProvinces: string[];
   userName: string;
+  sigungu?: string | null;
+  fitLevel?: FitLevel | null;
 };
 
 export async function JobListPrefetcher({
   userId,
-  profileProvinces,
   userName,
+  sigungu = null,
+  fitLevel = null,
 }: Props) {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: QUERY_KEYS.jobPostings,
-    queryFn: () => getJobPostingsData(userId),
-  });
+  const filters = { sigungu, fitLevel };
+
+  await Promise.all([
+    queryClient.prefetchInfiniteQuery({
+      queryKey: QUERY_KEYS.jobPostings.list(filters),
+      queryFn: () =>
+        getJobPostingsPage(userId, {
+          cursor: 0,
+          limit: JOB_POSTINGS_PAGE_SIZE,
+          sigungu,
+          fitLevel,
+        }),
+      initialPageParam: 0,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: QUERY_KEYS.jobPostings.filterOptions,
+      queryFn: () => getJobPostingsFilterOptions(userId),
+    }),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <JobListClient profileProvinces={profileProvinces} userName={userName} />
+      <JobListClient userName={userName} />
     </HydrationBoundary>
   );
 }

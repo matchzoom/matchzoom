@@ -1,16 +1,27 @@
+import { unstable_cache } from 'next/cache';
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import {
+  applyFilters,
   dedupeItems,
+  getFilterOptions,
   parseJobItems,
+  parseTotalCount,
   rankPostings,
+  type JobPostingsFilters,
   type ProfileRow,
+  type RawItem,
 } from '../utils/jobPostings';
 import { TEST_USER_ID, TEST_PROFILE } from '@/shared/constants/testUser';
-import type { JobPosting } from '@/shared/types/job';
+import type {
+  JobPosting,
+  JobPostingsFilterOptions,
+  JobPostingsPage,
+} from '@/shared/types/job';
 
-export async function getJobPostingsData(
-  userId: string,
-): Promise<JobPosting[]> {
+const EXTERNAL_PAGE_SIZE = 100;
+const MAX_EXTERNAL_PAGES = 10;
+
+async function fetchExternalPage(pageNo: number): Promise<string> {
   const baseUrl = process.env.JOB_API_BASE_URL;
   const serviceKey = process.env.JOB_API_KEY;
 
@@ -18,14 +29,49 @@ export async function getJobPostingsData(
     throw new Error('JOB_API_BASE_URL 또는 JOB_API_KEY 환경변수가 없습니다.');
   }
 
-  const isTest = userId === TEST_USER_ID;
-  const testProfile = isTest
-    ? (TEST_PROFILE as unknown as ProfileRow)
-    : undefined;
+  const res = await fetch(
+    `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=${EXTERNAL_PAGE_SIZE}&pageNo=${pageNo}`,
+    { next: { revalidate: 300 } },
+  );
+  if (!res.ok) throw new Error(`Job API 오류: ${res.status}`);
+  return res.text();
+}
 
-  const [profileRows, bookmarkRows, jobXml] = await Promise.all([
-    testProfile
-      ? Promise.resolve<ProfileRow[]>([testProfile])
+export async function fetchAllExternalPages(): Promise<RawItem[]> {
+  const firstXml = await fetchExternalPage(1);
+  const totalCount = parseTotalCount(firstXml);
+  const totalPages = Math.min(
+    Math.ceil(totalCount / EXTERNAL_PAGE_SIZE),
+    MAX_EXTERNAL_PAGES,
+  );
+
+  const restXmls =
+    totalPages <= 1
+      ? []
+      : await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, i) =>
+            fetchExternalPage(i + 2),
+          ),
+        );
+
+  return [firstXml, ...restXmls].flatMap(parseJobItems);
+}
+
+const getCachedRawItems = unstable_cache(
+  async () => {
+    return dedupeItems(await fetchAllExternalPages());
+  },
+  ['job-postings-raw'],
+  { revalidate: 300 },
+);
+
+export async function getRankedPostings(userId: string): Promise<JobPosting[]> {
+  const isTest = userId === TEST_USER_ID;
+
+  const [items, profileRows, bookmarkRows] = await Promise.all([
+    getCachedRawItems(),
+    isTest
+      ? Promise.resolve<ProfileRow[]>([TEST_PROFILE as unknown as ProfileRow])
       : supabaseFetch<ProfileRow[]>(
           `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
         ),
@@ -34,18 +80,32 @@ export async function getJobPostingsData(
       : supabaseFetch<{ posting_url: string }[]>(
           `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
         ),
-    fetch(
-      `${baseUrl}?serviceKey=${encodeURIComponent(serviceKey)}&numOfRows=100&pageNo=1`,
-      { next: { revalidate: 300 } },
-    ).then((r) => {
-      if (!r.ok) throw new Error(`Job API 오류: ${r.status}`);
-      return r.text();
-    }),
   ]);
 
   const profile = profileRows[0];
   const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
-  const unique = dedupeItems(parseJobItems(jobXml));
+  return rankPostings(items, profile, bookmarkedUrls);
+}
 
-  return rankPostings(unique, profile, bookmarkedUrls);
+export async function getJobPostingsPage(
+  userId: string,
+  params: { cursor: number; limit: number } & JobPostingsFilters,
+): Promise<JobPostingsPage> {
+  const ranked = await getRankedPostings(userId);
+  const filtered = applyFilters(ranked, {
+    sigungu: params.sigungu,
+    fitLevel: params.fitLevel,
+  });
+  const end = params.cursor + params.limit;
+  return {
+    items: filtered.slice(params.cursor, end),
+    nextCursor: end < filtered.length ? end : null,
+  };
+}
+
+export async function getJobPostingsFilterOptions(
+  userId: string,
+): Promise<JobPostingsFilterOptions> {
+  const ranked = await getRankedPostings(userId);
+  return getFilterOptions(ranked);
 }
