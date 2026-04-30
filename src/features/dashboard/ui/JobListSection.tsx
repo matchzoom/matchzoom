@@ -117,8 +117,8 @@ export function JobListSection({
         <div
           className={
             isFiltering
-              ? 'pointer-events-none opacity-50 transition-opacity'
-              : undefined
+              ? 'pointer-events-none opacity-50 transition-opacity duration-200'
+              : 'transition-opacity duration-200'
           }
           aria-busy={isFiltering}
         >
