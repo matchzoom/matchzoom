@@ -11,23 +11,15 @@ import {
 import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys';
 import { JobListClient } from '../JobListClient';
-import type { FitLevel } from '@/shared/types/job';
 
 type Props = {
   userId: string;
   userName: string;
-  sigungu?: string | null;
-  fitLevel?: FitLevel | null;
 };
 
-export async function JobListPrefetcher({
-  userId,
-  userName,
-  sigungu = null,
-  fitLevel = null,
-}: Props) {
+export async function JobListPrefetcher({ userId, userName }: Props) {
   const queryClient = new QueryClient();
-  const filters = { sigungu, fitLevel };
+  const filters = { sigungu: null, fitLevel: null };
 
   await Promise.all([
     queryClient.prefetchInfiniteQuery({
@@ -36,8 +28,8 @@ export async function JobListPrefetcher({
         getJobPostingsPage(userId, {
           cursor: 0,
           limit: JOB_POSTINGS_PAGE_SIZE,
-          sigungu,
-          fitLevel,
+          sigungu: null,
+          fitLevel: null,
         }),
       initialPageParam: 0,
     }),
