@@ -7,19 +7,7 @@ import { getDashboardData } from '@/features/dashboard/api/dashboardServerApi';
 import { LandingPage } from '@/features/landing';
 import { toPersonalityAxes, toMatchedJobs } from '@/shared/utils/matchConvert';
 import { TEST_PROFILE, TEST_MATCH } from '@/shared/constants/testUser';
-import type { FitLevel } from '@/shared/types/job';
-
-const VALID_FIT_LEVELS: readonly FitLevel[] = [
-  '잘 맞아요',
-  '도전해볼 수 있어요',
-  '힘들 수 있어요',
-];
-
-function parseFitLevel(value: string | undefined): FitLevel | null {
-  if (value && (VALID_FIT_LEVELS as string[]).includes(value))
-    return value as FitLevel;
-  return null;
-}
+import { parseFitLevel } from '@/features/dashboard/utils/parseFitLevel';
 
 export default async function Home({
   searchParams,

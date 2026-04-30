@@ -1,4 +1,5 @@
 import { Skeleton } from '@/shared/ui/Skeleton';
+import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 
 export function JobListSkeleton() {
   return (
@@ -13,7 +14,7 @@ export function JobListSkeleton() {
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         aria-label="채용공고 로딩 중"
       >
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: JOB_POSTINGS_PAGE_SIZE }).map((_, i) => (
           <li key={i} className="rounded-lg border border-gray-200 p-5">
             <Skeleton className="mb-3 h-6 w-16 rounded-sm" />
             <Skeleton className="mb-2 h-5 w-3/4 rounded-sm" />

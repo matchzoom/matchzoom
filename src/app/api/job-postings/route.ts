@@ -1,17 +1,6 @@
 import { createAuthorizedRoute } from '@/shared/api/createAuthorizedRoute';
 import { getJobPostingsPage } from '@/features/dashboard/api/jobPostingsServerApi';
-import type { FitLevel } from '@/shared/types/job';
-
-function parseFitLevel(v: string | null): FitLevel | null {
-  if (
-    v === '잘 맞아요' ||
-    v === '도전해볼 수 있어요' ||
-    v === '힘들 수 있어요'
-  ) {
-    return v;
-  }
-  return null;
-}
+import { parseFitLevel } from '@/features/dashboard/utils/parseFitLevel';
 
 export const GET = createAuthorizedRoute(async ({ userId, request }) => {
   const { searchParams } = new URL(request.url);

@@ -3,18 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import type { FitLevel } from '@/shared/types/job';
-
-const VALID_FIT_LEVELS: readonly FitLevel[] = [
-  '잘 맞아요',
-  '도전해볼 수 있어요',
-  '힘들 수 있어요',
-];
-
-function parseFitLevel(value: string | null): FitLevel | null {
-  if (value && (VALID_FIT_LEVELS as string[]).includes(value))
-    return value as FitLevel;
-  return null;
-}
+import { parseFitLevel } from '../utils/parseFitLevel';
 
 export function useJobFilter() {
   const router = useRouter();
@@ -38,7 +27,7 @@ export function useJobFilter() {
       }
 
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname);
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
     [router, pathname, searchParams],
   );

@@ -4,6 +4,7 @@ import type { FitLevel, JobPosting } from '@/shared/types/job';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { JobRegionFilter } from './JobRegionFilter';
 import { VirtualJobList } from './VirtualJobList';
+import { JOB_POSTINGS_PAGE_SIZE } from '../constants/jobPostingsConfig';
 
 type JobListSectionProps = {
   userName: string;
@@ -89,7 +90,7 @@ export function JobListSection({
           aria-label="채용공고 로딩 중"
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: JOB_POSTINGS_PAGE_SIZE }).map((_, i) => (
             <li
               key={i}
               className="min-w-0 rounded-lg border border-gray-200 p-5"
