@@ -12,6 +12,7 @@ type JobListSectionProps = {
   onBookmarkToggle: (job: JobPosting) => void;
   isLoading?: boolean;
   isLoadingUser?: boolean;
+  isFiltering?: boolean;
   sigunguList?: string[];
   selectedSigungu?: string | null;
   onSelectSigungu?: (sigungu: string | null) => void;
@@ -29,6 +30,7 @@ export function JobListSection({
   onBookmarkToggle,
   isLoading = false,
   isLoadingUser = false,
+  isFiltering = false,
   sigunguList = [],
   selectedSigungu = null,
   onSelectSigungu,
@@ -112,13 +114,22 @@ export function JobListSection({
           </p>
         </div>
       ) : (
-        <VirtualJobList
-          items={postings}
-          onBookmarkToggle={onBookmarkToggle}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={onLoadMore}
-        />
+        <div
+          className={
+            isFiltering
+              ? 'pointer-events-none opacity-50 transition-opacity'
+              : undefined
+          }
+          aria-busy={isFiltering}
+        >
+          <VirtualJobList
+            items={postings}
+            onBookmarkToggle={onBookmarkToggle}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={onLoadMore}
+          />
+        </div>
       )}
     </section>
   );

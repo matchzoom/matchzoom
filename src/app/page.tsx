@@ -7,17 +7,7 @@ import { getDashboardData } from '@/features/dashboard/api/dashboardServerApi';
 import { LandingPage } from '@/features/landing';
 import { toPersonalityAxes, toMatchedJobs } from '@/shared/utils/matchConvert';
 import { TEST_PROFILE, TEST_MATCH } from '@/shared/constants/testUser';
-import { parseFitLevel } from '@/features/dashboard/utils/parseFitLevel';
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ sigungu?: string; fitLevel?: string }>;
-}) {
-  const params = await searchParams;
-  const sigungu = params.sigungu ?? null;
-  const fitLevel = parseFitLevel(params.fitLevel);
-
+export default async function Home() {
   const session = await getServerSession();
 
   if (session) {
@@ -51,8 +41,6 @@ export default async function Home({
                 <JobListPrefetcher
                   userId={session.userId}
                   userName={profile.name}
-                  sigungu={sigungu}
-                  fitLevel={fitLevel}
                 />
               </Suspense>
             </section>

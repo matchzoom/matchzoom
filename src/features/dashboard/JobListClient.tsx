@@ -22,8 +22,14 @@ export function JobListClient({ userName }: JobListClientProps) {
   const { sigungu, fitLevel, handleSelectSigungu, handleSelectFitLevel } =
     useJobFilter();
 
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useJobPostings({ sigungu, fitLevel });
+  const {
+    data,
+    isPending,
+    isPlaceholderData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useJobPostings({ sigungu, fitLevel });
 
   const postings = useMemo(
     () => data?.pages.flatMap((page) => page.items) ?? [],
@@ -40,6 +46,7 @@ export function JobListClient({ userName }: JobListClientProps) {
     <>
       <JobListSection
         isLoading={isPending}
+        isFiltering={isPlaceholderData}
         userName={userName}
         postings={postings}
         onBookmarkToggle={handleBookmarkToggle}
