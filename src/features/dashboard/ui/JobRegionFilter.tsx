@@ -86,22 +86,6 @@ export function JobRegionFilter({
           aria-label="적합도 필터"
           className="mb-8 flex flex-wrap gap-2"
         >
-          <button
-            type="button"
-            aria-pressed={selectedFitLevel === null}
-            onClick={() => onSelectFitLevel(null)}
-            className={cn(
-              'h-8 cursor-pointer rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
-              selectedFitLevel === null
-                ? 'border-primary bg-primary-tag text-primary'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
-            )}
-          >
-            전체
-          </button>
-
-          <div aria-hidden="true" className="w-px self-stretch bg-gray-300" />
-
           {fitLevelList.map((fitLevel) => (
             <button
               key={fitLevel}

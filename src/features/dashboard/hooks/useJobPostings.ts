@@ -1,6 +1,6 @@
 'use client';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { getJobPostingsPage } from '../api/jobPostingsApi';
 import {
@@ -25,5 +25,6 @@ export function useJobPostings(filters: JobPostingsListFilters) {
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
