@@ -17,10 +17,12 @@ const buttonVariants = cva(
           'disabled:border-gray-200 disabled:bg-white disabled:text-gray-400',
         ghost:
           'border border-transparent bg-transparent text-gray-700 ' +
-          'hover:bg-gray-100',
+          'enabled:hover:bg-gray-100 ' +
+          'disabled:opacity-50',
         outline:
           'border border-gray-300 bg-white text-gray-700 ' +
-          'hover:bg-gray-100',
+          'enabled:hover:bg-gray-100 ' +
+          'disabled:opacity-50',
         destructive:
           'border border-transparent bg-error text-static-white ' +
           'hover:bg-error-hover',
@@ -32,6 +34,7 @@ const buttonVariants = cva(
         lg: 'h-12 px-5',
         md: 'h-[46px] px-4',
         sm: 'h-[42px] px-3',
+        xs: 'h-8 rounded-sm px-3 text-[0.8125rem]',
         icon: 'h-11 w-11',
       },
     },
