@@ -1,49 +1,58 @@
 'use client';
 
-import { useCallback } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, usePathname } from 'next/navigation';
 import type { FitLevel } from '@/shared/types/job';
 import { parseFitLevel } from '../utils/parseFitLevel';
 
 export function useJobFilter() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const sigungu = searchParams.get('sigungu') || null;
-  const fitLevel = parseFitLevel(searchParams.get('fitLevel'));
+  const [sigungu, setSigungu] = useState<string | null>(
+    searchParams.get('sigungu') || null,
+  );
+  const [fitLevel, setFitLevel] = useState<FitLevel | null>(
+    parseFitLevel(searchParams.get('fitLevel')),
+  );
 
-  const updateParams = useCallback(
-    (updates: { sigungu?: string | null; fitLevel?: FitLevel | null }) => {
-      const params = new URLSearchParams(searchParams.toString());
+  // 뒤로가기/앞으로가기 시 URL과 동기화
+  useEffect(() => {
+    setSigungu(searchParams.get('sigungu') || null);
+    setFitLevel(parseFitLevel(searchParams.get('fitLevel')));
+  }, [searchParams]);
 
-      if ('sigungu' in updates) {
-        if (updates.sigungu) params.set('sigungu', updates.sigungu);
-        else params.delete('sigungu');
-      }
-      if ('fitLevel' in updates) {
-        if (updates.fitLevel) params.set('fitLevel', updates.fitLevel);
-        else params.delete('fitLevel');
-      }
-
+  const updateUrl = useCallback(
+    (newSigungu: string | null, newFitLevel: FitLevel | null) => {
+      const params = new URLSearchParams();
+      if (newSigungu) params.set('sigungu', newSigungu);
+      if (newFitLevel) params.set('fitLevel', newFitLevel);
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      window.history.replaceState(
+        null,
+        '',
+        qs ? `${pathname}?${qs}` : pathname,
+      );
     },
-    [router, pathname, searchParams],
+    [pathname],
   );
 
   const handleSelectSigungu = useCallback(
     (value: string | null) => {
-      updateParams({ sigungu: sigungu === value ? null : value });
+      const newValue = sigungu === value ? null : value;
+      setSigungu(newValue);
+      updateUrl(newValue, fitLevel);
     },
-    [sigungu, updateParams],
+    [sigungu, fitLevel, updateUrl],
   );
 
   const handleSelectFitLevel = useCallback(
     (value: FitLevel | null) => {
-      updateParams({ fitLevel: fitLevel === value ? null : value });
+      const newValue = fitLevel === value ? null : value;
+      setFitLevel(newValue);
+      updateUrl(sigungu, newValue);
     },
-    [fitLevel, updateParams],
+    [fitLevel, sigungu, updateUrl],
   );
 
   return { sigungu, fitLevel, handleSelectSigungu, handleSelectFitLevel };
