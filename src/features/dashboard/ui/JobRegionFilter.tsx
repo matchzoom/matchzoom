@@ -1,19 +1,27 @@
+import { cva } from 'class-variance-authority';
 import { Info } from 'lucide-react';
 import type { FitLevel } from '@/shared/types/job';
 import { Button } from '@/shared/ui/Button/Button';
-import { cn } from '@/shared/utils/cn';
 
-const SIGUNGU_SELECTED_STYLE =
-  'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag';
+const filterChipVariants = cva('', {
+  variants: {
+    selected: {
+      sigungu:
+        'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag',
+      success:
+        'border-success bg-success-bg text-success enabled:hover:bg-success-bg',
+      warning:
+        'border-warning bg-warning-bg text-warning enabled:hover:bg-warning-bg',
+      error: 'border-error bg-error-bg text-error enabled:hover:bg-error-bg',
+    },
+  },
+});
 
-const fitLevelSelectedStyle: Record<FitLevel, string> = {
-  '잘 맞아요':
-    'border-success bg-success-bg text-success enabled:hover:bg-success-bg',
-  '도전해볼 수 있어요':
-    'border-warning bg-warning-bg text-warning enabled:hover:bg-warning-bg',
-  '힘들 수 있어요':
-    'border-error bg-error-bg text-error enabled:hover:bg-error-bg',
-};
+const fitLevelVariant = {
+  '잘 맞아요': 'success',
+  '도전해볼 수 있어요': 'warning',
+  '힘들 수 있어요': 'error',
+} as const satisfies Record<FitLevel, 'success' | 'warning' | 'error'>;
 
 type JobRegionFilterProps = {
   sigunguList: string[];
@@ -60,7 +68,9 @@ export function JobRegionFilter({
             aria-pressed={selectedSigungu === null}
             onClick={() => onSelectSigungu(null)}
             disabled={disabled}
-            className={cn(selectedSigungu === null && SIGUNGU_SELECTED_STYLE)}
+            className={filterChipVariants({
+              selected: selectedSigungu === null ? 'sigungu' : undefined,
+            })}
           >
             전체
           </Button>
@@ -75,9 +85,9 @@ export function JobRegionFilter({
               aria-pressed={selectedSigungu === sigungu}
               onClick={() => onSelectSigungu(sigungu)}
               disabled={disabled}
-              className={cn(
-                selectedSigungu === sigungu && SIGUNGU_SELECTED_STYLE,
-              )}
+              className={filterChipVariants({
+                selected: selectedSigungu === sigungu ? 'sigungu' : undefined,
+              })}
             >
               {sigungu}
             </Button>
@@ -99,10 +109,12 @@ export function JobRegionFilter({
               aria-pressed={selectedFitLevel === fitLevel}
               onClick={() => onSelectFitLevel(fitLevel)}
               disabled={disabled}
-              className={cn(
-                selectedFitLevel === fitLevel &&
-                  fitLevelSelectedStyle[fitLevel],
-              )}
+              className={filterChipVariants({
+                selected:
+                  selectedFitLevel === fitLevel
+                    ? fitLevelVariant[fitLevel]
+                    : undefined,
+              })}
             >
               {fitLevel}
             </Button>
