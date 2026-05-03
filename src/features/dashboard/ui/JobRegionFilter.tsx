@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { Info } from 'lucide-react';
 import type { FitLevel } from '@/shared/types/job';
-import { Button } from '@/shared/ui/Button/Button';
+import { Button } from '@/shared/ui/Button';
 
 const filterChipVariants = cva('', {
   variants: {
