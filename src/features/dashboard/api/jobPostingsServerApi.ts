@@ -65,26 +65,34 @@ const getCachedRawItems = unstable_cache(
   { revalidate: 300 },
 );
 
+const getCachedRankedPostings = unstable_cache(
+  async (userId: string): Promise<JobPosting[]> => {
+    const isTest = userId === TEST_USER_ID;
+
+    const [items, profileRows, bookmarkRows] = await Promise.all([
+      getCachedRawItems(),
+      isTest
+        ? Promise.resolve<ProfileRow[]>([TEST_PROFILE as unknown as ProfileRow])
+        : supabaseFetch<ProfileRow[]>(
+            `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
+          ),
+      isTest
+        ? Promise.resolve<{ posting_url: string }[]>([])
+        : supabaseFetch<{ posting_url: string }[]>(
+            `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
+          ),
+    ]);
+
+    const profile = profileRows[0];
+    const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
+    return rankPostings(items, profile, bookmarkedUrls);
+  },
+  ['ranked-postings'],
+  { revalidate: 300 },
+);
+
 export async function getRankedPostings(userId: string): Promise<JobPosting[]> {
-  const isTest = userId === TEST_USER_ID;
-
-  const [items, profileRows, bookmarkRows] = await Promise.all([
-    getCachedRawItems(),
-    isTest
-      ? Promise.resolve<ProfileRow[]>([TEST_PROFILE as unknown as ProfileRow])
-      : supabaseFetch<ProfileRow[]>(
-          `/rest/v1/profiles?user_id=eq.${userId}&select=mobility,hand_usage,stamina,communication,region_primary`,
-        ),
-    isTest
-      ? Promise.resolve<{ posting_url: string }[]>([])
-      : supabaseFetch<{ posting_url: string }[]>(
-          `/rest/v1/bookmarks?user_id=eq.${userId}&select=posting_url`,
-        ),
-  ]);
-
-  const profile = profileRows[0];
-  const bookmarkedUrls = new Set(bookmarkRows.map((r) => r.posting_url));
-  return rankPostings(items, profile, bookmarkedUrls);
+  return getCachedRankedPostings(userId);
 }
 
 export async function getJobPostingsPage(
