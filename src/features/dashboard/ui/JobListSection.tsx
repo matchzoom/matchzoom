@@ -83,6 +83,7 @@ export function JobListSection({
           fitLevelList={fitLevelList}
           selectedFitLevel={selectedFitLevel}
           onSelectFitLevel={onSelectFitLevel}
+          disabled={isFiltering}
         />
       ) : null}
 
