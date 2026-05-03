@@ -104,15 +104,6 @@ export function JobListSection({
             </li>
           ))}
         </ul>
-      ) : showEmpty ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 py-16 text-center">
-          <p className="text-[0.9375rem] font-semibold text-gray-700">
-            희망 지역의 채용공고가 없어요
-          </p>
-          <p className="text-[0.875rem] text-gray-400">
-            프로필에서 희망 지역을 변경하거나 나중에 다시 확인해보세요
-          </p>
-        </div>
       ) : (
         <div
           className={
@@ -122,13 +113,24 @@ export function JobListSection({
           }
           aria-busy={isFiltering}
         >
-          <VirtualJobList
-            items={postings}
-            onBookmarkToggle={onBookmarkToggle}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={onLoadMore}
-          />
+          {showEmpty ? (
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 py-16 text-center">
+              <p className="text-[0.9375rem] font-semibold text-gray-700">
+                희망 지역의 채용공고가 없어요
+              </p>
+              <p className="text-[0.875rem] text-gray-400">
+                프로필에서 희망 지역을 변경하거나 나중에 다시 확인해보세요
+              </p>
+            </div>
+          ) : (
+            <VirtualJobList
+              items={postings}
+              onBookmarkToggle={onBookmarkToggle}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={onLoadMore}
+            />
+          )}
         </div>
       )}
     </section>
