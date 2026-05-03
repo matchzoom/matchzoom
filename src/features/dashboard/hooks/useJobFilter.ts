@@ -1,41 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import type { FitLevel } from '@/shared/types/job';
 import { parseFitLevel } from '../utils/parseFitLevel';
 
-function readFiltersFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    sigungu: params.get('sigungu') || null,
-    fitLevel: parseFitLevel(params.get('fitLevel')),
-  };
-}
-
 export function useJobFilter() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [sigungu, setSigungu] = useState<string | null>(null);
-  const [fitLevel, setFitLevel] = useState<FitLevel | null>(null);
-
-  // 마운트 시 URL에서 초기값 읽기
-  useEffect(() => {
-    const { sigungu: s, fitLevel: f } = readFiltersFromUrl();
-    setSigungu(s);
-    setFitLevel(f);
-  }, []);
+  const [sigungu, setSigungu] = useState<string | null>(
+    searchParams.get('sigungu') || null,
+  );
+  const [fitLevel, setFitLevel] = useState<FitLevel | null>(
+    parseFitLevel(searchParams.get('fitLevel')),
+  );
 
   // 뒤로가기/앞으로가기 시 URL과 동기화
   useEffect(() => {
-    const handlePopState = () => {
-      const { sigungu: s, fitLevel: f } = readFiltersFromUrl();
-      setSigungu(s);
-      setFitLevel(f);
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    setSigungu(searchParams.get('sigungu') || null);
+    setFitLevel(parseFitLevel(searchParams.get('fitLevel')));
+  }, [searchParams]);
 
   const updateUrl = useCallback(
     (newSigungu: string | null, newFitLevel: FitLevel | null) => {
