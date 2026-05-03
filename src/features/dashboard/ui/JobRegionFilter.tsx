@@ -1,12 +1,27 @@
+import { cva } from 'class-variance-authority';
 import { Info } from 'lucide-react';
 import type { FitLevel } from '@/shared/types/job';
-import { cn } from '@/shared/utils/cn';
+import { Button } from '@/shared/ui/Button/Button';
 
-const fitLevelSelectedStyle: Record<FitLevel, string> = {
-  '잘 맞아요': 'border-success bg-success-bg text-success',
-  '도전해볼 수 있어요': 'border-warning bg-warning-bg text-warning',
-  '힘들 수 있어요': 'border-error bg-error-bg text-error',
-};
+const filterChipVariants = cva('', {
+  variants: {
+    selected: {
+      sigungu:
+        'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag',
+      success:
+        'border-success bg-success-bg text-success enabled:hover:bg-success-bg',
+      warning:
+        'border-warning bg-warning-bg text-warning enabled:hover:bg-warning-bg',
+      error: 'border-error bg-error-bg text-error enabled:hover:bg-error-bg',
+    },
+  },
+});
+
+const fitLevelVariant = {
+  '잘 맞아요': 'success',
+  '도전해볼 수 있어요': 'warning',
+  '힘들 수 있어요': 'error',
+} as const satisfies Record<FitLevel, 'success' | 'warning' | 'error'>;
 
 type JobRegionFilterProps = {
   sigunguList: string[];
@@ -47,47 +62,35 @@ export function JobRegionFilter({
           aria-label="시/군/구 필터"
           className="mb-2 flex flex-wrap gap-2"
         >
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="xs"
             aria-pressed={selectedSigungu === null}
             onClick={() => onSelectSigungu(null)}
             disabled={disabled}
-            className={cn(
-              'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
-              disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-              selectedSigungu === null
-                ? 'border-primary bg-primary-tag text-primary'
-                : cn(
-                    'border-gray-200 bg-white text-gray-700',
-                    !disabled && 'hover:border-gray-300 hover:bg-gray-50',
-                  ),
-            )}
+            className={filterChipVariants({
+              selected: selectedSigungu === null ? 'sigungu' : undefined,
+            })}
           >
             전체
-          </button>
+          </Button>
 
           <div aria-hidden="true" className="w-px self-stretch bg-gray-300" />
 
           {sigunguList.map((sigungu) => (
-            <button
+            <Button
               key={sigungu}
-              type="button"
+              variant="outline"
+              size="xs"
               aria-pressed={selectedSigungu === sigungu}
               onClick={() => onSelectSigungu(sigungu)}
               disabled={disabled}
-              className={cn(
-                'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
-                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-                selectedSigungu === sigungu
-                  ? 'border-primary bg-primary-tag text-primary'
-                  : cn(
-                      'border-gray-200 bg-white text-gray-700',
-                      !disabled && 'hover:border-gray-300 hover:bg-gray-50',
-                    ),
-              )}
+              className={filterChipVariants({
+                selected: selectedSigungu === sigungu ? 'sigungu' : undefined,
+              })}
             >
               {sigungu}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -99,25 +102,22 @@ export function JobRegionFilter({
           className="mb-8 flex flex-wrap gap-2"
         >
           {fitLevelList.map((fitLevel) => (
-            <button
+            <Button
               key={fitLevel}
-              type="button"
+              variant="outline"
+              size="xs"
               aria-pressed={selectedFitLevel === fitLevel}
               onClick={() => onSelectFitLevel(fitLevel)}
               disabled={disabled}
-              className={cn(
-                'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
-                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-                selectedFitLevel === fitLevel
-                  ? fitLevelSelectedStyle[fitLevel]
-                  : cn(
-                      'border-gray-200 bg-white text-gray-700',
-                      !disabled && 'hover:border-gray-300 hover:bg-gray-50',
-                    ),
-              )}
+              className={filterChipVariants({
+                selected:
+                  selectedFitLevel === fitLevel
+                    ? fitLevelVariant[fitLevel]
+                    : undefined,
+              })}
             >
               {fitLevel}
-            </button>
+            </Button>
           ))}
         </div>
       )}
