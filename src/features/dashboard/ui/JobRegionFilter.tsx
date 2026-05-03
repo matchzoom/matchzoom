@@ -15,6 +15,7 @@ type JobRegionFilterProps = {
   fitLevelList: FitLevel[];
   selectedFitLevel: FitLevel | null;
   onSelectFitLevel: (fitLevel: FitLevel | null) => void;
+  disabled?: boolean;
 };
 
 export function JobRegionFilter({
@@ -24,6 +25,7 @@ export function JobRegionFilter({
   fitLevelList,
   selectedFitLevel,
   onSelectFitLevel,
+  disabled = false,
 }: JobRegionFilterProps) {
   if (sigunguList.length === 0 && fitLevelList.length < 2) return null;
 
@@ -49,8 +51,10 @@ export function JobRegionFilter({
             type="button"
             aria-pressed={selectedSigungu === null}
             onClick={() => onSelectSigungu(null)}
+            disabled={disabled}
             className={cn(
-              'h-8 cursor-pointer rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+              'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+              disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
               selectedSigungu === null
                 ? 'border-primary bg-primary-tag text-primary'
                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
@@ -67,8 +71,10 @@ export function JobRegionFilter({
               type="button"
               aria-pressed={selectedSigungu === sigungu}
               onClick={() => onSelectSigungu(sigungu)}
+              disabled={disabled}
               className={cn(
-                'h-8 cursor-pointer rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+                'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 selectedSigungu === sigungu
                   ? 'border-primary bg-primary-tag text-primary'
                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
@@ -92,8 +98,10 @@ export function JobRegionFilter({
               type="button"
               aria-pressed={selectedFitLevel === fitLevel}
               onClick={() => onSelectFitLevel(fitLevel)}
+              disabled={disabled}
               className={cn(
-                'h-8 cursor-pointer rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+                'h-8 rounded-sm border px-3 text-[0.8125rem] font-semibold transition-colors',
+                disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 selectedFitLevel === fitLevel
                   ? fitLevelSelectedStyle[fitLevel]
                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
