@@ -1,12 +1,11 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import type { FitLevel } from '@/shared/types/job';
 import { parseFitLevel } from '../utils/parseFitLevel';
 
 export function useJobFilter() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -27,9 +26,13 @@ export function useJobFilter() {
       }
 
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      window.history.replaceState(
+        null,
+        '',
+        qs ? `${pathname}?${qs}` : pathname,
+      );
     },
-    [router, pathname, searchParams],
+    [pathname, searchParams],
   );
 
   const handleSelectSigungu = useCallback(
