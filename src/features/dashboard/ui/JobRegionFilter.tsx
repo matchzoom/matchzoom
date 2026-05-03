@@ -57,7 +57,10 @@ export function JobRegionFilter({
               disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
               selectedSigungu === null
                 ? 'border-primary bg-primary-tag text-primary'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
+                : cn(
+                    'border-gray-200 bg-white text-gray-700',
+                    !disabled && 'hover:border-gray-300 hover:bg-gray-50',
+                  ),
             )}
           >
             전체
@@ -77,7 +80,10 @@ export function JobRegionFilter({
                 disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 selectedSigungu === sigungu
                   ? 'border-primary bg-primary-tag text-primary'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
+                  : cn(
+                      'border-gray-200 bg-white text-gray-700',
+                      !disabled && 'hover:border-gray-300 hover:bg-gray-50',
+                    ),
               )}
             >
               {sigungu}
@@ -104,7 +110,10 @@ export function JobRegionFilter({
                 disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 selectedFitLevel === fitLevel
                   ? fitLevelSelectedStyle[fitLevel]
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50',
+                  : cn(
+                      'border-gray-200 bg-white text-gray-700',
+                      !disabled && 'hover:border-gray-300 hover:bg-gray-50',
+                    ),
               )}
             >
               {fitLevel}
