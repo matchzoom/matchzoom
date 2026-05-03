@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, Ref } from 'react';
 import { cn } from '@/shared/utils/cn';
 
 const buttonVariants = cva(
-  'transition-ui inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-[0.9375rem] font-semibold leading-none disabled:cursor-not-allowed',
+  'transition-ui inline-flex items-center justify-center gap-2 rounded-md text-[0.9375rem] font-semibold leading-none enabled:cursor-pointer disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
