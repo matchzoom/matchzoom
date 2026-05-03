@@ -25,10 +25,12 @@ const buttonVariants = cva(
           'disabled:opacity-50',
         destructive:
           'border border-transparent bg-error text-static-white ' +
-          'hover:bg-error-hover',
+          'enabled:hover:bg-error-hover ' +
+          'disabled:opacity-50',
         kakao:
           'border border-transparent bg-[var(--kakao)] text-[var(--kakao-text)] ' +
-          'hover:bg-[var(--kakao-hover)]',
+          'enabled:hover:bg-[var(--kakao-hover)] ' +
+          'disabled:opacity-50',
       },
       size: {
         lg: 'h-12 px-5',

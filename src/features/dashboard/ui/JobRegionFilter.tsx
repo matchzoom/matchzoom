@@ -3,6 +3,9 @@ import type { FitLevel } from '@/shared/types/job';
 import { Button } from '@/shared/ui/Button/Button';
 import { cn } from '@/shared/utils/cn';
 
+const SIGUNGU_SELECTED_STYLE =
+  'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag';
+
 const fitLevelSelectedStyle: Record<FitLevel, string> = {
   '잘 맞아요':
     'border-success bg-success-bg text-success enabled:hover:bg-success-bg',
@@ -57,10 +60,7 @@ export function JobRegionFilter({
             aria-pressed={selectedSigungu === null}
             onClick={() => onSelectSigungu(null)}
             disabled={disabled}
-            className={cn(
-              selectedSigungu === null &&
-                'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag',
-            )}
+            className={cn(selectedSigungu === null && SIGUNGU_SELECTED_STYLE)}
           >
             전체
           </Button>
@@ -76,8 +76,7 @@ export function JobRegionFilter({
               onClick={() => onSelectSigungu(sigungu)}
               disabled={disabled}
               className={cn(
-                selectedSigungu === sigungu &&
-                  'border-primary bg-primary-tag text-primary enabled:hover:bg-primary-tag',
+                selectedSigungu === sigungu && SIGUNGU_SELECTED_STYLE,
               )}
             >
               {sigungu}
