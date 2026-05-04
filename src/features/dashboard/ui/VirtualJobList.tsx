@@ -26,7 +26,6 @@ export function VirtualJobList({
 }: Props) {
   const columns = useBreakpointLimit();
   const listRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
 
   useLayoutEffect(() => {
@@ -43,22 +42,20 @@ export function VirtualJobList({
     overscan: 2,
   });
 
-  // isFetchingNextPage 변화에도 observer를 재생성해 fetch 완료 후 sentinel이
-  // 여전히 뷰포트에 있으면 자동 재발화시킨다
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel || !fetchNextPage) return;
-    if (!hasNextPage || isFetchingNextPage) return;
+  const virtualItems = virtualizer.getVirtualItems();
+  const lastItem = virtualItems[virtualItems.length - 1];
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) fetchNextPage();
-      },
-      { threshold: 0 },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  useEffect(() => {
+    if (!lastItem || !fetchNextPage) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    if (lastItem.index >= rowCount - 1) fetchNextPage();
+  }, [
+    lastItem?.index,
+    rowCount,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  ]);
 
   const ariaSetSize = hasNextPage ? -1 : items.length;
 
@@ -109,17 +106,6 @@ export function VirtualJobList({
             </div>
           );
         })}
-
-        <div
-          ref={sentinelRef}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            bottom: 200,
-            height: 1,
-            width: '100%',
-          }}
-        />
       </div>
 
       {isFetchingNextPage && (
