@@ -14,7 +14,16 @@ const ReactQueryDevtools =
     : () => null;
 
 export const QueryProvider = ({ children }: { children: ReactNode }) => {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            throwOnError: true,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
