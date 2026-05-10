@@ -11,17 +11,29 @@ export async function buildSummaryText(
   worknetData: JobNcsData[],
   radarChart: RadarChart,
 ): Promise<string> {
-  // top3 직종에 해당하는 NCS 데이터 필터링
-  const top3Names = top3Jobs.map((j) => j.job_name);
-  const relevantNcs = worknetData.filter((d) => top3Names.includes(d.jobName));
+  // top3 직종에 해당하는 NCS 데이터 필터링 (공백·특수문자 무시 매칭)
+  const normalize = (s: string) => s.replace(/[\s·-]/g, '');
+  const top3Normalized = top3Jobs.map((j) => normalize(j.job_name));
+  const relevantNcs = worknetData.filter((d) =>
+    top3Normalized.some(
+      (name) =>
+        name === normalize(d.jobName) ||
+        name.includes(normalize(d.jobName)) ||
+        normalize(d.jobName).includes(name),
+    ),
+  );
 
-  // NCS 데이터가 없으면 radar 기반 폴백
-  if (relevantNcs.length === 0) {
+  // 매칭된 NCS가 없으면 전체 데이터에서 상위 3개라도 활용
+  const ncsToUse =
+    relevantNcs.length > 0 ? relevantNcs : worknetData.slice(0, 3);
+
+  // NCS 데이터 자체가 없으면 radar 기반 폴백
+  if (ncsToUse.length === 0) {
     return buildRadarFallbackSummary(radarChart);
   }
 
   // NCS 키워드 추출
-  const ncsContext = relevantNcs
+  const ncsContext = ncsToUse
     .map((job) => {
       const unitNames = job.units.map((u) => u.job_sdvn).join(', ');
       const ktaLabels = [
@@ -59,7 +71,7 @@ export async function buildSummaryText(
 아래 NCS 직무 데이터의 **지식기술태도 키워드** 또는 **능력단위명**을 자연어로 변환하여 한 문장을 만드세요.
 
 ## 규칙
-- 존댓말, 한 문장, 60자 이내
+- 존댓���, 반드시 한 문장(쉼표로 두 절 나열 금지), 40자 이내
 - 주어 없이 서술 ("저는", "~님은" 금지)
 - NCS 키워드를 반드시 1개 이상 자연어로 녹일 것 (그대로 복사 금지)
 - "추천드립니다", "매칭되었습니다", "분석했습니다" 금지
