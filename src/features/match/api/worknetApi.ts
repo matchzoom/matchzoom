@@ -78,23 +78,29 @@ async function fetchJobNcs(
 }
 
 /**
- * 45개 직종 전체의 NCS 데이터를 일괄 조회.
+ * 화이트리스트 직종 전체의 NCS 데이터를 일괄 조회.
+ * rate limit 방지를 위해 5개씩 배치 병렬 처리.
  */
 async function fetchAllJobNcsData(): Promise<JobNcsData[]> {
   const authKey = process.env.WORK24_API_KEY;
   if (!authKey) return [];
 
+  const BATCH_SIZE = 5;
   const results: JobNcsData[] = [];
 
-  for (const jobName of JOB_NAMES) {
-    try {
-      const units = await fetchJobNcs(authKey, jobName);
-      if (units.length > 0) {
-        results.push({ jobName, units });
-      }
-    } catch {
-      continue;
-    }
+  for (let i = 0; i < JOB_NAMES.length; i += BATCH_SIZE) {
+    const batch = JOB_NAMES.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.all(
+      batch.map(async (jobName) => {
+        try {
+          const units = await fetchJobNcs(authKey, jobName);
+          return units.length > 0 ? { jobName, units } : null;
+        } catch {
+          return null;
+        }
+      }),
+    );
+    results.push(...batchResults.filter((r): r is JobNcsData => r !== null));
   }
 
   return results;

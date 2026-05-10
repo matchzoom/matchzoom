@@ -98,7 +98,13 @@ describe('buildSummaryText', () => {
     expect(mockOpenAiFetch).not.toHaveBeenCalled();
   });
 
-  it('top3 직종에 매칭되는 NCS가 없으면 폴백한다', async () => {
+  it('top3 직종에 매칭되는 NCS가 없으면 전체 NCS 상위 3개로 OpenAI를 호출한다', async () => {
+    mockOpenAiFetch.mockResolvedValue(
+      JSON.stringify({
+        summary_text: '정돈된 환경에서 차분히 일할 때 편안해요',
+      }),
+    );
+
     const unmatchedJobs: Top3Job[] = [
       {
         rank: 1,
@@ -126,9 +132,8 @@ describe('buildSummaryText', () => {
       radarChart,
     );
 
-    expect(mockOpenAiFetch).not.toHaveBeenCalled();
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThan(0);
+    expect(mockOpenAiFetch).toHaveBeenCalledTimes(1);
+    expect(result).toBe('정돈된 환경에서 차분히 일할 때 편안해요');
   });
 
   it('OpenAI 응답 파싱 실패 시 폴백한다', async () => {
