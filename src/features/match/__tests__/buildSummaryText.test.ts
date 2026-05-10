@@ -130,6 +130,35 @@ describe('buildSummaryText', () => {
     expect(result).toBe('사람의 몸을 부드럽게 풀어주는 손길에 강점이 있어요');
   });
 
+  it('직종 폴백 매칭은 공백·가운뎃점 차이를 무시한다', async () => {
+    // '점역·교정사'(가운뎃점 포함)이 폴백 키인데, 입력은 가운뎃점 없는 형태
+    const variantNameJobs: Top3Job[] = [
+      {
+        rank: 1,
+        job_name: '점역교정사',
+        match_pct: 80,
+        fit_level: '잘 맞아요',
+      },
+      {
+        rank: 2,
+        job_name: '환경정리',
+        match_pct: 70,
+        fit_level: '도전해볼 수 있어요',
+      },
+      {
+        rank: 3,
+        job_name: '사무 보조',
+        match_pct: 60,
+        fit_level: '도전해볼 수 있어요',
+      },
+    ];
+
+    const result = await buildSummaryText(variantNameJobs, [], radarChart);
+
+    expect(result).toBe('글자를 꼼꼼히 살피고 정확하게 다루는 집중력이 있어요');
+    expect(mockOpenAiFetch).not.toHaveBeenCalled();
+  });
+
   it('직종 폴백은 top3 rank 1부터 순서대로 시도한다', async () => {
     const jobsWithRank1Unmapped: Top3Job[] = [
       {

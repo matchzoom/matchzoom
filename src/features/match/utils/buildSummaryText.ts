@@ -2,6 +2,9 @@ import type { JobNcsData } from '@/shared/types/worknet';
 import type { RadarChart, Top3Job } from '@/shared/types/match';
 import { openAiFetch } from '@/shared/api/openAiFetch';
 
+/** 직종명을 공백·가운뎃점·하이픈을 제거한 형태로 정규화 (매칭용) */
+const normalize = (s: string) => s.replace(/[\s·-]/g, '');
+
 /**
  * top3 직종의 NCS 데이터를 기반으로 summary_text를 생성한다.
  * 메인 매칭 프롬프트와 분리하여, NCS 키워드가 100% 반영되도록 한다.
@@ -12,7 +15,6 @@ export async function buildSummaryText(
   radarChart: RadarChart,
 ): Promise<string> {
   // top3 직종에 해당하는 NCS 데이터 필터링 (공백·특수문자 무시 매칭)
-  const normalize = (s: string) => s.replace(/[\s·-]/g, '');
   const top3Normalized = top3Jobs.map((j) => normalize(j.job_name));
   const relevantNcs = worknetData.filter((d) =>
     top3Normalized.some(
@@ -162,9 +164,21 @@ const JOB_FALLBACK_SUMMARY: Record<string, string> = {
     '물건을 가지런히 진열하고 정돈하는 일에 강점이 있어요',
 };
 
+/**
+ * `JOB_FALLBACK_SUMMARY`를 정규화된 키로 미리 인덱싱한다.
+ * 화이트리스트의 직종명에 공백·가운뎃점이 미세하게 달라져도 폴백이 매칭되도록 한다.
+ */
+const JOB_FALLBACK_BY_NORMALIZED_NAME: Record<string, string> =
+  Object.fromEntries(
+    Object.entries(JOB_FALLBACK_SUMMARY).map(([name, summary]) => [
+      normalize(name),
+      summary,
+    ]),
+  );
+
 function findJobFallbackSummary(top3Jobs: Top3Job[]): string | null {
   for (const job of top3Jobs) {
-    const fallback = JOB_FALLBACK_SUMMARY[job.job_name];
+    const fallback = JOB_FALLBACK_BY_NORMALIZED_NAME[normalize(job.job_name)];
     if (fallback) return fallback;
   }
   return null;
