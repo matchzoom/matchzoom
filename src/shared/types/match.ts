@@ -21,7 +21,15 @@ export const Top3JobSchema = z.object({
 
 export type Top3Job = z.infer<typeof Top3JobSchema>;
 
-// --- AI 응답 전체 ---
+// --- AI 1차 응답 (radar + top3만, summary 제외) ---
+export const AiMatchCoreSchema = z.object({
+  radar_chart: RadarChartSchema,
+  top3_jobs: z.array(Top3JobSchema).length(3),
+});
+
+export type AiMatchCore = z.infer<typeof AiMatchCoreSchema>;
+
+// --- AI 응답 전체 (하위 호환) ---
 export const AiMatchResponseSchema = z.object({
   radar_chart: RadarChartSchema,
   summary_text: z.string().min(1),

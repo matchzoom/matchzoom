@@ -54,6 +54,5 @@ export const mockProfile = {
 
 export const validAiResponse = JSON.stringify({
   radar_chart: mockMatchResult.radar_chart,
-  summary_text: mockMatchResult.summary_text,
   top3_jobs: mockMatchResult.top3_jobs,
 });
