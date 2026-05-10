@@ -2,6 +2,9 @@ import type { JobNcsData } from '@/shared/types/worknet';
 import type { RadarChart, Top3Job } from '@/shared/types/match';
 import { openAiFetch } from '@/shared/api/openAiFetch';
 
+/** 직종명을 공백·가운뎃점·하이픈을 제거한 형태로 정규화 (매칭용) */
+const normalize = (s: string) => s.replace(/[\s·-]/g, '');
+
 /**
  * top3 직종의 NCS 데이터를 기반으로 summary_text를 생성한다.
  * 메인 매칭 프롬프트와 분리하여, NCS 키워드가 100% 반영되도록 한다.
@@ -12,7 +15,6 @@ export async function buildSummaryText(
   radarChart: RadarChart,
 ): Promise<string> {
   // top3 직종에 해당하는 NCS 데이터 필터링 (공백·특수문자 무시 매칭)
-  const normalize = (s: string) => s.replace(/[\s·-]/g, '');
   const top3Normalized = top3Jobs.map((j) => normalize(j.job_name));
   const relevantNcs = worknetData.filter((d) =>
     top3Normalized.some(
@@ -23,14 +25,14 @@ export async function buildSummaryText(
     ),
   );
 
-  // 매칭된 NCS가 없으면 전체 데이터에서 상위 3개라도 활용
-  const ncsToUse =
-    relevantNcs.length > 0 ? relevantNcs : worknetData.slice(0, 3);
-
-  // NCS 데이터 자체가 없으면 radar 기반 폴백
-  if (ncsToUse.length === 0) {
-    return buildRadarFallbackSummary(radarChart);
+  // top3 직종에 매칭되는 NCS가 없으면 직종 폴백 → radar 폴백 순으로 시도.
+  // 무관한 NCS를 OpenAI에 넘기면 엉뚱한 키워드가 summary에 섞이므로 호출하지 않는다.
+  if (relevantNcs.length === 0) {
+    const jobFallback = findJobFallbackSummary(top3Jobs);
+    return jobFallback ?? buildRadarFallbackSummary(radarChart);
   }
+
+  const ncsToUse = relevantNcs;
 
   // NCS 키워드 추출
   const ncsContext = ncsToUse
@@ -124,7 +126,65 @@ const AXIS_LABELS: Record<string, string> = {
   env_sensitivity: '조용한 환경 선호도',
 };
 
-/** NCS 데이터가 없을 때 radar 기반 폴백 summary */
+/**
+ * NCS API에서 의미 있는 매칭이 안 되는 화이트리스트 직종에 대한 사전 정의 한 문장.
+ * NCS 검색 노이즈로 잘못된 키워드가 summary에 섞이는 것을 방지한다.
+ * top3 rank 1부터 순서대로 폴백을 시도한다.
+ */
+const JOB_FALLBACK_SUMMARY: Record<string, string> = {
+  안마사: '사람의 몸을 부드럽게 풀어주는 손길에 강점이 있어요',
+  헬스키퍼: '정해진 마사지 절차를 차분히 수행할 때 안정적이에요',
+  '점역·교정사': '글자를 꼼꼼히 살피고 정확하게 다루는 집중력이 있어요',
+  '온라인 콘텐츠 모니터링':
+    '화면을 차분히 살피며 패턴을 찾아내는 데 강점이 있어요',
+  호텔객실관리: '공간을 가지런히 정돈하는 작업에서 안정적이에요',
+  '방역·소독활동': '정해진 절차에 따라 깨끗하게 관리하는 일에 강점이 있어요',
+  '업사이클링·리사이클링':
+    '재료를 가려내고 새로운 형태로 다듬는 일에 강점이 있어요',
+  은행서비스안내: '정해진 안내 흐름을 차분하게 전달하는 데 강점이 있어요',
+  건강검진센터지원: '검진 절차를 침착하게 안내하는 일에서 안정적이에요',
+  스포츠이용시설안내: '시설 이용 흐름을 친절하게 안내하는 데 강점이 있어요',
+  재래시장관리: '시장 환경을 가지런히 정돈하는 일에서 안정적이에요',
+  '장애인전문주차 구역계도 및 홍보':
+    '정해진 안내를 꾸준히 전달하는 데 강점이 있어요',
+  '무인정보단말기(키오스크)안내':
+    '정해진 화면 흐름을 침착하게 안내하는 일이 잘 맞아요',
+  '간식 포장 및 점검': '재료를 차곡차곡 담아 마무리하는 일에 강점이 있어요',
+  교통약자승하차지원:
+    '정해진 도움 절차를 침착하게 수행하는 일에서 안정적이에요',
+  '장난감 세척': '물건을 깨끗하게 닦아내는 일에 차분한 집중력이 있어요',
+  '다회용품 세척 및 관리': '깨끗하게 관리하는 일에서 안정적이에요',
+  '이동보조기기 분해 세척 및 소독':
+    '기구를 꼼꼼히 살피고 깨끗하게 관리하는 데 강점이 있어요',
+  버스청결관리: '공간을 가지런히 정돈하는 일에서 안정적이에요',
+  '우편물 분류': '물건을 종류별로 가려내는 꼼꼼함이 강점이에요',
+  문서파기: '서류를 차분히 정리하고 마무리하는 일에 안정적이에요',
+  기부물품관리: '물건을 종류별로 가려내고 정리하는 데 강점이 있어요',
+  '대형마트 매장정리 및 상품관리':
+    '물건을 가지런히 진열하고 정돈하는 일에 강점이 있어요',
+};
+
+/**
+ * `JOB_FALLBACK_SUMMARY`를 정규화된 키로 미리 인덱싱한다.
+ * 화이트리스트의 직종명에 공백·가운뎃점이 미세하게 달라져도 폴백이 매칭되도록 한다.
+ */
+const JOB_FALLBACK_BY_NORMALIZED_NAME: Record<string, string> =
+  Object.fromEntries(
+    Object.entries(JOB_FALLBACK_SUMMARY).map(([name, summary]) => [
+      normalize(name),
+      summary,
+    ]),
+  );
+
+function findJobFallbackSummary(top3Jobs: Top3Job[]): string | null {
+  for (const job of top3Jobs) {
+    const fallback = JOB_FALLBACK_BY_NORMALIZED_NAME[normalize(job.job_name)];
+    if (fallback) return fallback;
+  }
+  return null;
+}
+
+/** 직종 폴백도 없을 때의 최종 radar 기반 폴백 summary */
 function buildRadarFallbackSummary(radarChart: RadarChart): string {
   const entries = Object.entries(radarChart) as [string, number][];
   const [top] = entries.sort((a, b) => b[1] - a[1]);

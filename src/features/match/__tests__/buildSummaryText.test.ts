@@ -98,29 +98,23 @@ describe('buildSummaryText', () => {
     expect(mockOpenAiFetch).not.toHaveBeenCalled();
   });
 
-  it('top3 직종에 매칭되는 NCS가 없으면 전체 NCS 상위 3개로 OpenAI를 호출한다', async () => {
-    mockOpenAiFetch.mockResolvedValue(
-      JSON.stringify({
-        summary_text: '정돈된 환경에서 차분히 일할 때 편안해요',
-      }),
-    );
-
+  it('top3 직종에 매칭되는 NCS가 없으면 직종 폴백을 사용하고 OpenAI를 호출하지 않는다', async () => {
     const unmatchedJobs: Top3Job[] = [
       {
         rank: 1,
-        job_name: '반려동물돌봄',
+        job_name: '안마사',
         match_pct: 80,
         fit_level: '잘 맞아요',
       },
       {
         rank: 2,
-        job_name: '실버케어',
+        job_name: '헬스키퍼',
         match_pct: 70,
         fit_level: '도전해볼 수 있어요',
       },
       {
         rank: 3,
-        job_name: '급식지원',
+        job_name: '점역·교정사',
         match_pct: 60,
         fit_level: '도전해볼 수 있어요',
       },
@@ -132,8 +126,94 @@ describe('buildSummaryText', () => {
       radarChart,
     );
 
-    expect(mockOpenAiFetch).toHaveBeenCalledTimes(1);
-    expect(result).toBe('정돈된 환경에서 차분히 일할 때 편안해요');
+    expect(mockOpenAiFetch).not.toHaveBeenCalled();
+    expect(result).toBe('사람의 몸을 부드럽게 풀어주는 손길에 강점이 있어요');
+  });
+
+  it('직종 폴백 매칭은 공백·가운뎃점 차이를 무시한다', async () => {
+    // '점역·교정사'(가운뎃점 포함)이 폴백 키인데, 입력은 가운뎃점 없는 형태
+    const variantNameJobs: Top3Job[] = [
+      {
+        rank: 1,
+        job_name: '점역교정사',
+        match_pct: 80,
+        fit_level: '잘 맞아요',
+      },
+      {
+        rank: 2,
+        job_name: '환경정리',
+        match_pct: 70,
+        fit_level: '도전해볼 수 있어요',
+      },
+      {
+        rank: 3,
+        job_name: '사무 보조',
+        match_pct: 60,
+        fit_level: '도전해볼 수 있어요',
+      },
+    ];
+
+    const result = await buildSummaryText(variantNameJobs, [], radarChart);
+
+    expect(result).toBe('글자를 꼼꼼히 살피고 정확하게 다루는 집중력이 있어요');
+    expect(mockOpenAiFetch).not.toHaveBeenCalled();
+  });
+
+  it('직종 폴백은 top3 rank 1부터 순서대로 시도한다', async () => {
+    const jobsWithRank1Unmapped: Top3Job[] = [
+      {
+        rank: 1,
+        job_name: '대형마트 매장정리 및 상품관리',
+        match_pct: 80,
+        fit_level: '잘 맞아요',
+      },
+      {
+        rank: 2,
+        job_name: '안마사',
+        match_pct: 70,
+        fit_level: '도전해볼 수 있어요',
+      },
+      {
+        rank: 3,
+        job_name: '환경정리',
+        match_pct: 60,
+        fit_level: '도전해볼 수 있어요',
+      },
+    ];
+
+    const result = await buildSummaryText(
+      jobsWithRank1Unmapped,
+      [],
+      radarChart,
+    );
+
+    // rank 1의 폴백이 우선
+    expect(result).toBe('물건을 가지런히 진열하고 정돈하는 일에 강점이 있어요');
+    expect(mockOpenAiFetch).not.toHaveBeenCalled();
+  });
+
+  it('top3 모두 직종 폴백에 없고 NCS도 없으면 radar 폴백으로 떨어진다', async () => {
+    const noFallbackJobs: Top3Job[] = [
+      { rank: 1, job_name: '사무 보조', match_pct: 80, fit_level: '잘 맞아요' },
+      {
+        rank: 2,
+        job_name: '도서관 사서보조',
+        match_pct: 70,
+        fit_level: '도전해볼 수 있어요',
+      },
+      {
+        rank: 3,
+        job_name: '실버케어',
+        match_pct: 60,
+        fit_level: '도전해볼 수 있어요',
+      },
+    ];
+
+    const result = await buildSummaryText(noFallbackJobs, [], radarChart);
+
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(10);
+    expect(mockOpenAiFetch).not.toHaveBeenCalled();
   });
 
   it('OpenAI 응답 파싱 실패 시 폴백한다', async () => {
