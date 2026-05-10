@@ -11,6 +11,15 @@ vi.mock('@/shared/api/supabaseFetch', () => ({ supabaseFetch: vi.fn() }));
 vi.mock('@/shared/api/openAiFetch', () => ({ openAiFetch: vi.fn() }));
 vi.mock('@/shared/utils/authCookies', () => ({ getAuthCookie: vi.fn() }));
 vi.mock('@/shared/utils/session', () => ({ verifySession: vi.fn() }));
+vi.mock('@/features/match/api/worknetApi', () => ({
+  getCachedWorknetData: vi.fn().mockResolvedValue([]),
+}));
+vi.mock('@/features/match/utils/buildSummaryText', () => ({
+  buildSummaryText: vi.fn().mockResolvedValue('사무직에 적합합니다.'),
+}));
+vi.mock('next/cache', () => ({
+  unstable_cache: (fn: Function) => fn,
+}));
 
 import { supabaseFetch } from '@/shared/api/supabaseFetch';
 import { openAiFetch } from '@/shared/api/openAiFetch';
