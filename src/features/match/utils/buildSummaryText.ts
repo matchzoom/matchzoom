@@ -92,7 +92,8 @@ JSON만 출력:`,
   ]);
 
   try {
-    const parsed = JSON.parse(raw);
+    const cleaned = raw.replace(/^```json\s*|\s*```$/g, '').trim();
+    const parsed = JSON.parse(cleaned);
     if (parsed.summary_text && typeof parsed.summary_text === 'string') {
       return parsed.summary_text;
     }
