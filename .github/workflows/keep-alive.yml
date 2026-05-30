@@ -11,8 +11,10 @@ jobs:
     steps:
       - name: Check Supabase health
         run: |
-          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/health")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SECRET_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/")
           echo "HTTP status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "Supabase health check FAILED (status: $STATUS)"
