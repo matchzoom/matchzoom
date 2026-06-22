@@ -11,10 +11,13 @@ jobs:
     steps:
       - name: Check Supabase health
         run: |
+          URL=$(echo -n "${{ secrets.SUPABASE_URL }}" | tr -d '[:space:]')
+          URL=${URL%/}
+          echo "Target host: $(echo "$URL" | sed -E 's#https?://([^/]+).*#\1#')"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_SECRET_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/")
+            "${URL}/rest/v1/")
           echo "HTTP status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "Supabase health check FAILED (status: $STATUS)"
@@ -24,7 +27,9 @@ jobs:
 
       - name: Ping via app
         run: |
+          SITE_URL=$(echo -n "${{ secrets.NEXT_PUBLIC_SITE_URL }}" | tr -d '[:space:]')
+          SITE_URL=${SITE_URL%/}
           curl -fsS \
             -H "x-ping-secret: ${{ secrets.PING_SECRET }}" \
-            "${{ secrets.NEXT_PUBLIC_SITE_URL }}/api/ping" \
+            "${SITE_URL}/api/ping" \
             && echo "Supabase ping OK"
